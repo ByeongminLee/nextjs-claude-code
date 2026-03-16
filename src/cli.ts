@@ -3,6 +3,7 @@ import prompts from 'prompts';
 import pc from 'picocolors';
 import { log, banner } from './logger';
 import { install } from './installer';
+import { updateSkills } from './skills-installer';
 import { UserAnswers } from './types';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -10,6 +11,19 @@ const pkg = require('../package.json') as { version: string };
 
 export async function run(): Promise<void> {
   const args = process.argv.slice(2);
+  const command = args[0];
+
+  // ── skill-update 명령어 ────────────────────────────────────────────────
+  if (command === 'skill-update') {
+    banner(pkg.version);
+    log.info('Updating skills to latest versions...');
+    log.blank();
+    await updateSkills(process.cwd());
+    log.blank();
+    return;
+  }
+
+  // ── 기본 설치 ─────────────────────────────────────────────────────────
   const force = args.includes('--force');
   const dryRun = args.includes('--dry-run');
 
@@ -57,6 +71,7 @@ export async function run(): Promise<void> {
   console.log(`  3. Run ${pc.cyan('/spec [feature-name] "description"')} to define features`);
   console.log(`  4. Run ${pc.cyan('/dev [feature-name]')} to implement`);
   console.log();
+  console.log(pc.dim(`  Update skills anytime: ${pc.cyan('npx nextjs-claude-code skill-update')}`));
   console.log(pc.dim('  Docs: https://github.com/ByeongminLee/nextjs-claude-code'));
   console.log();
 }

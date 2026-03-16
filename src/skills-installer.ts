@@ -1,9 +1,8 @@
 import fs from 'fs';
 import path from 'path';
 import { execSync } from 'child_process';
-import pc from 'picocolors';
 import { SkillDef, SkillManifestEntry, FrameworkType } from './types';
-import { log } from './logger';
+import { progress } from './logger';
 
 const TEMPLATE_DIR = path.resolve(__dirname, '../template');
 
@@ -227,31 +226,6 @@ export function shouldInstall(skill: SkillDef, framework: FrameworkType, librari
   return true;
 }
 
-/**
- * npx skills add ... 로 스킬 설치 시도
- * 성공하면 설치된 SKILL.md 경로를 반환, 실패하면 null
- */
-export function installSkillViaCli(
-  cli: string,
-  targetDir: string,
-  timeout = 30000,
-): boolean {
-  try {
-    execSync(cli, {
-      cwd: targetDir,
-      timeout,
-      stdio: 'pipe',
-    });
-    return true;
-  } catch {
-    return false;
-  }
-}
-
-export function getBundledSkillDir(skillName: string): string {
-  return path.join(TEMPLATE_DIR, '.claude', 'skills', skillName);
-}
-
 function copyDirRecursive(src: string, dest: string): void {
   fs.mkdirSync(dest, { recursive: true });
   for (const entry of fs.readdirSync(src, { withFileTypes: true })) {
@@ -265,6 +239,13 @@ function copyDirRecursive(src: string, dest: string): void {
   }
 }
 
+export function getBundledSkillDir(skillName: string): string {
+  return path.join(TEMPLATE_DIR, '.claude', 'skills', skillName);
+}
+
+/**
+ * 설치: 번들된 스킬을 바로 복사 (빠름)
+ */
 export async function installSkills(
   targetDir: string,
   framework: FrameworkType,
@@ -272,34 +253,24 @@ export async function installSkills(
   dryRun: boolean,
 ): Promise<void> {
   const skillsDir = path.join(targetDir, '.claude', 'skills');
-  const manifest: SkillManifestEntry[] = [];
-
   const toInstall = SKILLS.filter((s) => shouldInstall(s, framework, libraries));
 
-  log.info(`Installing ${toInstall.length} skills...`);
+  const manifest: SkillManifestEntry[] = [];
+  let installed = 0;
 
   for (const skill of toInstall) {
-    const destDir = path.join(skillsDir, skill.name);
-    const destPath = path.join(destDir, 'SKILL.md');
-    const relDest = path.relative(process.cwd(), destPath);
+    progress.update(`Installing skills... (${installed}/${toInstall.length}) ${skill.name}`);
 
-    let source: 'cli' | 'bundled' = 'bundled';
+    const destDir = path.join(skillsDir, skill.name);
+    const bundledDir = getBundledSkillDir(skill.name);
 
     if (!dryRun) {
-      // 1. Try npx skills add (latest version from skills.sh)
-      const cliSuccess = installSkillViaCli(skill.cli, targetDir);
-
-      if (cliSuccess && fs.existsSync(destPath)) {
-        source = 'cli';
+      if (fs.existsSync(path.join(bundledDir, 'SKILL.md'))) {
+        copyDirRecursive(bundledDir, destDir);
       } else {
-        // 2. Fallback to bundled version (copy entire skill directory)
-        const bundledDir = getBundledSkillDir(skill.name);
-        if (fs.existsSync(path.join(bundledDir, 'SKILL.md'))) {
-          copyDirRecursive(bundledDir, destDir);
-        } else {
-          log.warn(`  skipped  ${skill.name} (npx failed & no bundled version available)`);
-          continue;
-        }
+        // 번들 없으면 skip
+        installed++;
+        continue;
       }
     }
 
@@ -308,17 +279,65 @@ export async function installSkills(
       url: skill.url,
       cli: skill.cli,
       installedAt: new Date().toISOString(),
-      source,
+      source: 'bundled',
     });
-
-    const sourceTag = source === 'cli' ? pc.dim('(latest)') : pc.dim('(bundled)');
-    log.success(`${relDest} ${sourceTag}`);
+    installed++;
   }
 
-  // Write manifest for future update tracking
   if (!dryRun && manifest.length > 0) {
-    const manifestPath = path.join(skillsDir, 'skills-manifest.json');
+    fs.writeFileSync(
+      path.join(skillsDir, 'skills-manifest.json'),
+      JSON.stringify(manifest, null, 2) + '\n',
+      'utf-8',
+    );
+  }
+
+  progress.succeed(`Skills installed (${installed}/${toInstall.length})`);
+}
+
+/**
+ * skill-update: 모든 스킬을 npx skills add 로 최신화
+ */
+export async function updateSkills(targetDir: string): Promise<void> {
+  const manifestPath = path.join(targetDir, '.claude', 'skills', 'skills-manifest.json');
+
+  // manifest가 있으면 설치된 스킬만, 없으면 전체
+  let toUpdate: SkillDef[];
+  if (fs.existsSync(manifestPath)) {
+    const manifest: SkillManifestEntry[] = JSON.parse(fs.readFileSync(manifestPath, 'utf-8'));
+    const installedNames = new Set(manifest.map((m) => m.name));
+    toUpdate = SKILLS.filter((s) => installedNames.has(s.name));
+  } else {
+    toUpdate = SKILLS;
+  }
+
+  let updated = 0;
+  let failed = 0;
+
+  for (const skill of toUpdate) {
+    progress.update(`Updating skills... (${updated + failed}/${toUpdate.length}) ${skill.name}`);
+    try {
+      execSync(skill.cli, { cwd: targetDir, timeout: 30000, stdio: 'pipe' });
+      updated++;
+    } catch {
+      failed++;
+    }
+  }
+
+  // manifest 갱신
+  if (fs.existsSync(manifestPath)) {
+    const manifest: SkillManifestEntry[] = JSON.parse(fs.readFileSync(manifestPath, 'utf-8'));
+    const now = new Date().toISOString();
+    for (const entry of manifest) {
+      entry.installedAt = now;
+      entry.source = 'cli';
+    }
     fs.writeFileSync(manifestPath, JSON.stringify(manifest, null, 2) + '\n', 'utf-8');
-    log.info(`Skills manifest written to .claude/skills/skills-manifest.json`);
+  }
+
+  if (failed > 0) {
+    progress.succeed(`Skills updated (${updated} ok, ${failed} failed)`);
+  } else {
+    progress.succeed(`Skills updated (${updated}/${toUpdate.length})`);
   }
 }
