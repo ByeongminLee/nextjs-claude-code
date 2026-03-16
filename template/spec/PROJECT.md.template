@@ -1,0 +1,38 @@
+# {{PROJECT_NAME}}
+
+## Purpose
+<!-- /init will analyze the codebase and fill this in -->
+
+## Core Value
+<!-- The ONE thing this product delivers -->
+
+## Framework
+{{FRAMEWORK}}
+
+## Architecture
+{{ARCH_PATTERN_LABEL}}
+
+## Router Type
+{{ROUTER_TYPE}}
+
+## Libraries
+{{LIBRARIES_LIST}}
+
+## Tech Stack
+{{TECH_STACK}}
+
+## Key Decisions
+| Decision | Reason | Date |
+|---|---|---|
+
+## Testing
+- Framework: not configured
+- E2E: not configured
+- Test command: not configured
+- Strategy: not configured
+
+> Set `testing: required` in spec.md frontmatter when ready to add tests for a feature.
+> Run `/init` to auto-detect testing setup from package.json, or update this section manually.
+
+## Out of Scope
+<!-- Features explicitly NOT being built -->

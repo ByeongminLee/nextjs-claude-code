@@ -1,0 +1,41 @@
+{
+  "name": "nextjs-claude-code",
+  "version": "0.1.0",
+  "description": "NCC — Spec-Driven AI workflow for Next.js & React. Define features with /spec, implement with /dev, force-complete with /loop.",
+  "author": {
+    "name": "ByeongminLee"
+  },
+  "homepage": "https://github.com/ByeongminLee/nextjs-claude-code",
+  "repository": "https://github.com/ByeongminLee/nextjs-claude-code",
+  "license": "MIT",
+  "keywords": [
+    "claude-code",
+    "nextjs",
+    "react",
+    "spec-driven",
+    "agents",
+    "skills",
+    "workflow"
+  ],
+  "agents": "../template/.claude/agents",
+  "skills": "../template/.claude/skills",
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/template/.claude/scripts/validate-spec.sh\"",
+            "statusMessage": "Validating spec format..."
+          },
+          {
+            "type": "command",
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/template/.claude/scripts/reflect-spec.sh\"",
+            "statusMessage": "Checking spec reflection..."
+          }
+        ]
+      }
+    ]
+  }
+}

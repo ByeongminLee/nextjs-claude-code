@@ -1,0 +1,17 @@
+---
+feature: {{FEATURE_NAME}}
+deps: []
+testing: none          # none | optional | required
+---
+
+## Purpose
+[One sentence describing the user problem this feature solves and for whom]
+
+## Requirements
+REQ-001:
+
+## Behaviors
+- When [trigger], [result]
+
+## Out of Scope
+-

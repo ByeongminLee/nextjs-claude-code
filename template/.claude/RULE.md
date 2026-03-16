@@ -1,0 +1,310 @@
+# FeatureSpec Workflow Rules
+
+> **This file is immutable.** Do not modify after `/init`. These are FeatureSpec workflow rules, not project coding rules.
+> Project-specific coding rules belong in `spec/rules/`.
+
+## Folder Structure
+
+```
+spec/
+  PROJECT.md             ← project purpose, tech stack, testing setup
+  ARCHITECTURE.md        ← feature map, cross-feature dependencies
+  RULE.md                ← THIS FILE (FeatureSpec workflow rules, immutable)
+  STATE.md               ← all features and their current phases (multi-feature)
+  DEBUG.md               ← debug log (created by /debug)
+  rules/                 ← project coding rules (managed by /rule)
+  feature/
+    [name]/
+      spec.md            ← what to build
+      design.md          ← how to build it
+      PLAN.md            ← WHAT to do — task list, checkpoints, auto-fix budget (planner writes, executor executes)
+      CONTEXT.md         ← WHY — locked decisions, constraints, non-negotiables (planner writes, executor references)
+      LOOP_NOTES.md      ← cross-iteration context for /loop (created/deleted by loop agent)
+      history/           ← change history archive
+```
+
+## STATE.md Format
+
+STATE.md tracks multiple features independently. Each feature has its own phase.
+
+```markdown
+# State
+Updated: YYYY-MM-DD
+
+## Features
+
+### [feature-name] [phase]
+Started: YYYY-MM-DD
+
+### [feature-name] [phase]
+Started: YYYY-MM-DD
+Loop: 2/5 — 3/5 REQs passing
+
+## Completed
+- [feature-name] (YYYY-MM-DD)
+
+## Blockers
+- [feature-name]: [blocker description]
+```
+
+Valid phases: `idle`, `planning`, `executing`, `verifying`, `looping`
+
+**Rules:**
+- Each feature's phase is independent — one feature can be `executing` while another is `idle`
+- When a feature completes, move it from `## Features` to `## Completed` with date
+- Keep `## Features` section clean — remove completed features from it
+- Keep STATE.md under 100 lines — archive old completed entries
+
+## Available Skills
+
+| Skill | Purpose |
+|---|---|
+| `/init` | First-time setup: analyze codebase, populate spec docs |
+| `/spec` | Define or update a feature spec (usage: `/spec [feature-name] [description]`) |
+| `/dev` | Plan → implement → verify a feature |
+| `/review` | Check spec compliance |
+| `/status` | Show project status |
+| `/debug` | Systematic bug fixing |
+| `/rule` | Add or update a project coding rule |
+| `/loop` | Force-complete: loop until all REQs in spec.md are satisfied |
+
+## Loop Protocol
+
+`/loop` enforces REQ-level compliance through iterative review → fix → cleanup cycles:
+
+```
+/loop "feature name"
+  → reviewer checks each REQ (PASS/FAIL)
+  → executor fixes only failing REQs (with context from previous attempts)
+  → de-sloppify: cleanup pass removes unnecessary code/tests
+  → update LOOP_NOTES.md with results and next strategy
+  → re-review
+  → repeat until 100% or max iterations
+```
+
+- Default max iterations: **5** (configurable via `max-iterations` in spec.md frontmatter)
+- Each iteration has its own auto-fix budget of 3 (resets per iteration)
+- Only failing REQs are targeted — passing code is never modified
+- If max iterations reached with failing REQs: stop and report to user
+- Use `/loop` after `/dev` when you want guaranteed spec compliance
+- Resumable: if `/loop` is interrupted, re-running reads LOOP_NOTES.md to continue
+
+**Cross-iteration context**: `spec/feature/[name]/LOOP_NOTES.md`
+- Updated after each iteration with REQ status, failure analysis, and next strategy
+- Prevents repeating the same failed approach across iterations
+- Deleted on loop completion; kept on exhaustion (useful for manual debugging)
+
+**De-Sloppify pass**: after each fix, a separate cleanup step removes:
+- Tests that verify language/framework behavior (not business logic)
+- Over-defensive error handling, console.log, commented-out code
+- Does NOT count toward auto-fix budget
+
+| Phase in STATE.md | Meaning |
+|---|---|
+| `looping` | Loop agent is running review → fix → cleanup cycles |
+
+## Checkpoint Conditions
+
+| Type | Condition | Action |
+|---|---|---|
+| `checkpoint:decision` | Implementation direction unclear, existing type structure change required | Present options, wait for user |
+| `checkpoint:human-verify` | UI implementation complete | Request browser verification, wait |
+| `checkpoint:auth-gate` | Payment or auth manual steps required | Always stop, never simulate |
+
+## Auto-fix Budget
+Maximum retries: **3**
+
+- **`/dev` mode**: single shared counter across the entire session. Persists across agent boundaries via feature's PLAN.md `Used: N`.
+- **`/loop` mode**: resets to 0 at the start of each iteration. Each iteration gets its own budget of 3.
+- **`/debug` mode**: 3 attempts per bug. Tracked in DEBUG.md.
+
+All retries — whether from build errors, type errors, or verifier failures — share the budget within their mode.
+After 3 failed attempts: stop and escalate to user.
+
+## Model Routing
+
+Default model for all agents is **sonnet**. Opus is never used.
+
+### Who decides the model
+
+| Flow | Who decides | How |
+|------|------------|-----|
+| `/dev` | **planner** | Analyzes task size → writes `## Model Assignment` in feature's PLAN.md → dev skill and executor read it |
+| `/loop` | **loop agent** | Assesses failing REQ count per iteration → chooses model for executor/reviewer spawns |
+| `/review`, `/spec`, `/debug` | **skill** | Assesses task size before spawning agent |
+| `/status`, `/rule` | **fixed** | Always haiku (frontmatter) |
+| `/init` | **fixed** | Always sonnet (frontmatter) |
+
+### Size criteria
+
+| Size | Criteria | Model |
+|------|----------|-------|
+| **Small** | Single file change, ≤3 tasks, single REQ fix, read-only analysis of <5 files, no checkpoints | `haiku` |
+| **Medium/Large** | Multi-file change, new feature, complex logic, cross-feature impact, >3 tasks, checkpoints present | `sonnet` |
+
+### Agent-specific guidance
+
+| Agent | When to use haiku |
+|-------|-------------------|
+| `planner` | Never — always sonnet (architectural decisions need deeper reasoning) |
+| `executor` | Planner assigns in PLAN.md: ≤3 simple tasks AND no checkpoint conditions |
+| `verifier` | Always haiku — pattern matching, grep, file existence checks |
+| `code-quality-reviewer` | Always haiku — static analysis, pattern detection |
+| `reviewer` | Feature has ≤5 REQs AND implementation is <5 files |
+| `spec-writer` | Updating existing spec with minor changes (not new feature) |
+| `debugger` | Single-file bug with clear reproduction steps |
+| `rule-writer` | Always haiku (frontmatter) |
+| `loop` | Never — orchestrates multiple agents, needs sonnet for strategy |
+| `init` | Never — full codebase analysis needs sonnet |
+
+If unsure, default to sonnet — correctness over cost savings.
+
+## Language
+- Default language for all spec documents (spec.md, design.md) is **English**
+- If the user writes instructions in another language, match that language for the generated content
+- Section headers must use one of the accepted formats recognized by `validate-spec.sh`: **English or Korean**
+- Document body text may be written in any language the user prefers
+
+## Resume Protocol
+If `/dev` is interrupted (session crash, timeout, context limit), running `/dev` again will resume from where it left off:
+
+- `spec/STATE.md` tracks each feature's phase independently: `idle` → `planning` → `executing` → `verifying` → `idle` (or `looping` when `/loop` is active)
+- `/dev` reads the target feature's phase from STATE.md and routes to the appropriate agent instead of restarting from scratch
+- Completed tasks (`- [x]`) in the feature's PLAN.md are skipped on resume
+- Auto-fix budget (`Used: N`) in PLAN.md persists across sessions
+
+| Phase | On `/dev` resume |
+|---|---|
+| `idle` | Fresh start → planner |
+| `planning` | Check feature's PLAN.md status → resume planning or skip to executor |
+| `executing` | Skip completed tasks → continue from first `- [ ]` |
+| `verifying` | Re-run verifier |
+
+## Context Management
+- Executor marks each task `[x]` in `spec/feature/[name]/PLAN.md` immediately upon completion — this enables resume after interruption
+- Before long operations, save current state so work is recoverable after context compaction
+- Keep `spec/STATE.md` under 100 lines — archive old entries to feature history
+
+## Excluded Paths
+Do not read or analyze these directories:
+- `node_modules/`, `.next/`, `dist/`, `.turbo/`, `.cache/`
+- Binary files, lock files (`package-lock.json`, `pnpm-lock.yaml`)
+
+## Verification Protocol
+After every `/dev` completion, the verifier runs automatically with 4 levels:
+
+| Level | Check | Pass Criteria |
+|---|---|---|
+| 1 — Existence | All planned files exist | Every file in PLAN.md is present |
+| 2 — Substantive | No stubs or placeholders | No TODO, empty bodies, dummy values, `not implemented` patterns |
+| 2b — Tests | Test files exist (if `testing: required`) | Blocking when required; advisory otherwise |
+| 3 — Wired | Components/hooks/APIs connected | Imports exist, endpoints called, state propagates to UI |
+| 4 — Human | Feature actually works | User confirms in browser |
+
+- Levels 1-3 run automatically; Level 4 triggers `checkpoint:human-verify`
+- Level 2b behavior depends on `spec.md` `testing` frontmatter: `required` = blocking, `optional`/`none` = advisory
+- When `testing: required`, executor writes tests after implementation and before spawning verifier
+- Verifier failures count toward the shared auto-fix budget (3 retries total)
+- Verifier never modifies code — it only reports
+
+## Agent Role Boundaries
+
+| Agent | Can modify source code | Can modify spec/ docs | Read-only |
+|---|---|---|---|
+| `init` | No | Yes | — |
+| `spec-writer` | No | Yes (spec.md, design.md) | — |
+| `planner` | No | Yes (CONTEXT.md, PLAN.md in feature dir) | — |
+| `executor` | **Yes** | Partial (STATE.md, feature PLAN.md, history) | — |
+| `verifier` | No | No | **Yes** |
+| `reviewer` | No | No | **Yes** |
+| `code-quality-reviewer` | No | No | **Yes** |
+| `status` | No | No | **Yes** |
+| `debugger` | **Yes** | Yes (DEBUG.md, STATE.md) | — |
+| `rule-writer` | No | Yes (spec/rules/) | — |
+| `loop` | **Yes** (via executor) | Partial (STATE.md, feature PLAN.md, LOOP_NOTES.md, history) | — |
+
+- Only `executor`, `debugger`, and `loop` (which spawns executor) may modify source code
+- `verifier`, `reviewer`, `code-quality-reviewer`, `status` are strictly read-only — they never modify any file
+- `/review` runs `reviewer` (spec compliance) then `code-quality-reviewer` (code quality) sequentially
+- `debugger` shares the same auto-fix budget concept: after 3 failed fix attempts, stop and escalate to user
+
+## Required Document Format
+
+### Writing Rules
+Both `spec.md` and `design.md` must follow these rules:
+- Both files must begin with YAML frontmatter (`---`)
+- No inline formatting in document body: `**bold**`, `_italic_`, `` `code` ``, `~~strikethrough~~` are prohibited
+- Requirements use `REQ-NNN: statement` format — no bullet prefix, one declarative statement per line
+- All content must be declarative — no prose, no explanatory sentences
+- Prose is only allowed in `## Purpose`, limited to 1–3 sentences
+
+### spec.md
+
+Frontmatter (required):
+```yaml
+---
+feature: [name]
+deps: [feature-name, ...]   # features this spec depends on; [] if none
+api: [METHOD /path, ...]    # API endpoints this feature depends on or relates to; omit if none
+testing: none                # none | optional | required
+---
+```
+
+`testing` field values:
+- `required`: executor writes tests after implementation; verifier Level 2b blocks if tests missing
+- `optional`: executor skips test phase; verifier Level 2b warns but does not block
+- `none`: no test expectations for this feature
+
+`max-iterations` field (optional):
+- Controls `/loop` max iteration count. Default: 5 if omitted.
+
+Sections (required):
+```
+## Purpose
+## Requirements
+## Behaviors
+## Out of Scope
+```
+
+### design.md
+
+Frontmatter (required):
+```yaml
+---
+feature: [name]
+figma: "url or empty string"   # "" if UI feature but no Figma link; "N/A" if purely backend
+---
+```
+
+Sections (required):
+```
+## Components
+## State
+## Data Flow
+## Technical Decisions
+```
+
+- All sections are required; write `N/A` if not applicable
+- Section headers must match exactly (English) or use accepted localized equivalents recognized by `validate-spec.sh`
+
+## Plan Approval Protocol
+- PLAN.md (inside the feature directory) must include an `## Approval` section with `Status:` and `Approved-at:` fields
+- Planner must set `Status: pending` on creation and update to `Status: approved` with timestamp only after explicit user confirmation
+- Executor must verify `Status: approved` before starting any work — if pending or missing, executor must stop immediately
+
+## History Entry Format
+History entries in `spec/feature/[name]/history/` are validated by PostToolUse hook.
+History entries are written **only after verification passes** (all 4 levels). Partial implementations or interrupted sessions do not generate history entries.
+
+Required:
+- **Filename**: `YYYY-MM-DD-[description].md`
+- **Top-level heading**: `# [Change description]`
+- **Date field**: `Date: YYYY-MM-DD`
+- **Required sections**: `## Reason`, `## Changes`, `## Files Modified`
+- **Optional section**: `## Figma`
+
+## Prohibited Actions
+- Do not modify `spec/RULE.md` — this file is immutable after setup
+- Do not modify `spec/feature/[name]/spec.md` or `design.md` during `/dev` without user approval
+- Do not skip `checkpoint:auth-gate` under any circumstances
+- Do not commit directly to main/master

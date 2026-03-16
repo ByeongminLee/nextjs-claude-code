@@ -1,0 +1,24 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "nextjs-claude-code",
+  "description": "Spec-Driven AI Development workflow for Next.js & React — define features with /spec, implement with /dev, force-complete with /loop",
+  "owner": {
+    "name": "ByeongminLee"
+  },
+  "plugins": [
+    {
+      "name": "nextjs-claude-code",
+      "source": "./",
+      "description": "NCC — 10 agents, 16 reference skills, 8 slash commands for spec-driven Next.js & React development",
+      "version": "0.1.0",
+      "author": {
+        "name": "ByeongminLee"
+      },
+      "homepage": "https://github.com/ByeongminLee/nextjs-claude-code",
+      "repository": "https://github.com/ByeongminLee/nextjs-claude-code",
+      "license": "MIT",
+      "keywords": ["nextjs", "react", "spec-driven", "agents", "skills"],
+      "category": "workflow"
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/scripts/validate-spec.sh",
+            "statusMessage": "Validating spec format..."
+          },
+          {
+            "type": "command",
+            "command": "bash .claude/scripts/reflect-spec.sh",
+            "statusMessage": "Checking spec reflection..."
+          }
+        ]
+      }
+    ]
+  }
+}

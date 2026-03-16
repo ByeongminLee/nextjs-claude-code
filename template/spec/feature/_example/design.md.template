@@ -1,0 +1,17 @@
+---
+feature: {{FEATURE_NAME}}
+figma: ""                  # optional — Figma URL for design reference; "N/A" if backend only
+---
+
+## Components
+- ComponentName: role
+
+## State
+- stateName: type — purpose
+
+## Data Flow
+- trigger → state change → UI effect
+
+## Technical Decisions
+| Decision | Reason |
+|---|---|

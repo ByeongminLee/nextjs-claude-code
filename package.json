@@ -1,0 +1,55 @@
+{
+  "name": "nextjs-claude-code",
+  "version": "0.1.0",
+  "description": "Spec-Driven AI Development workflow for Next.js & React with Claude Code",
+  "author": "ByeongminLee",
+  "keywords": [
+    "claude-code",
+    "nextjs",
+    "react",
+    "ai",
+    "spec-driven",
+    "workflow",
+    "agents",
+    "scaffolding",
+    "feature-based"
+  ],
+  "homepage": "https://github.com/ByeongminLee/nextjs-claude-code#readme",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ByeongminLee/nextjs-claude-code.git"
+  },
+  "bugs": {
+    "url": "https://github.com/ByeongminLee/nextjs-claude-code/issues"
+  },
+  "license": "MIT",
+  "main": "dist/index.js",
+  "bin": {
+    "nextjs-claude-code": "dist/index.js"
+  },
+  "files": [
+    "dist",
+    "template",
+    "scripts",
+    ".claude-plugin"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "fetch-skills": "npx ts-node scripts/fetch-skills.ts",
+    "prepublishOnly": "npm run fetch-skills && npm run build"
+  },
+  "dependencies": {
+    "picocolors": "^1.1.1",
+    "prompts": "^2.4.2"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/prompts": "^2.4.9",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.0.0"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

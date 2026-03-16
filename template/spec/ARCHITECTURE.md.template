@@ -1,0 +1,38 @@
+# Architecture Guide
+Project: {{PROJECT_NAME}} | Pattern: {{ARCH_PATTERN_LABEL}} | Framework: {{FRAMEWORK}}
+
+## Core Principles
+
+<!-- /init will populate this based on your selected architecture pattern and actual codebase -->
+<!-- Run /init to analyze your project and fill in the principles that apply -->
+
+## File Placement Guide
+
+<!-- /init will detect your conventions and document them here -->
+
+## Import Boundaries
+
+<!-- /init will analyze your imports and document the rules in use -->
+
+## Your Project Structure
+
+<!-- /init will scan and fill this in with your actual folder structure -->
+
+## Feature Map
+
+| Feature | Location | Status | Dependencies |
+|---------|----------|--------|--------------|
+{{FEATURES_LIST}}
+
+## Global Patterns
+- Framework: {{FRAMEWORK}}
+- Libraries: {{LIBRARIES_LIST}}
+
+## Agent Navigation
+- New feature → spec/feature/[name]/spec.md
+- Feature plan → spec/feature/[name]/PLAN.md
+- Feature context → spec/feature/[name]/CONTEXT.md
+- Architecture → spec/ARCHITECTURE.md (this file)
+- Coding rules → spec/rules/
+- Current progress → spec/STATE.md
+- Project context → spec/PROJECT.md
