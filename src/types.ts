@@ -1,15 +1,8 @@
 export type ToolTarget = 'claude';
 export type FrameworkType = 'nextjs-app' | 'nextjs-pages' | 'react';
-export type TeamSize = 'solo' | 'small' | 'medium' | 'large';
-export type ArchPattern = 'flat' | 'feature-based' | 'fsd' | 'monorepo';
 
 export interface UserAnswers {
   projectName: string;
-  framework: FrameworkType;
-  teamSize: TeamSize;
-  archPattern: ArchPattern;
-  libraries: string[];
-  features: string[];
   tool: ToolTarget;
   workspacePath?: string; // monorepo 시 앱 경로 (e.g. 'apps/web')
 }
@@ -23,13 +16,6 @@ export interface InstallOptions {
 
 export interface TemplateVars {
   PROJECT_NAME: string;
-  FRAMEWORK: string;
-  TECH_STACK: string;         // 조합된 스택 문자열 (agent 참조용)
-  ARCH_PATTERN: string;
-  ARCH_PATTERN_LABEL: string;
-  ROUTER_TYPE: string;
-  LIBRARIES_LIST: string;
-  FEATURES_LIST: string;
   CURRENT_DATE: string;
   [key: string]: string;
 }

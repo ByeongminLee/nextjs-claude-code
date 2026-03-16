@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
-import { InstallOptions, TemplateVars } from './types';
-import { render, buildTemplateVars, sanitizeFeatureName } from './renderer';
+import { InstallOptions, TemplateVars, FrameworkType } from './types';
+import { render, buildTemplateVars } from './renderer';
 import { installSkills, SKILLS } from './skills-installer';
 import { log } from './logger';
 
@@ -37,15 +37,68 @@ Use the available skills:
 ${FS_MARKER_END}
 `;
 
+// ─── package.json 자동 감지 ──────────────────────────────────────────────────
+
+function detectFromPackageJson(targetDir: string): { framework: FrameworkType; libraries: string[] } {
+  const pkgPath = path.join(targetDir, 'package.json');
+  if (!fs.existsSync(pkgPath)) {
+    return { framework: 'nextjs-app', libraries: [] };
+  }
+
+  const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf-8')) as {
+    dependencies?: Record<string, string>;
+    devDependencies?: Record<string, string>;
+  };
+  const deps = { ...pkg.dependencies, ...pkg.devDependencies };
+
+  // Framework 감지
+  let framework: FrameworkType = 'react';
+  if ('next' in deps) {
+    // App Router vs Pages Router: app/ 디렉토리 존재 여부로 판단
+    const hasAppDir =
+      fs.existsSync(path.join(targetDir, 'app')) ||
+      fs.existsSync(path.join(targetDir, 'src', 'app'));
+    framework = hasAppDir ? 'nextjs-app' : 'nextjs-pages';
+  }
+
+  // Library 감지 (package name → skill slug)
+  const libraryMap: Record<string, string> = {
+    'react-hook-form':        'react-hook-form',
+    'zod':                    'zod',
+    'axios':                  'axios',
+    'zustand':                'zustand',
+    'jotai':                  'jotai',
+    '@tanstack/react-query':  'tanstack-query',
+    'swr':                    'swr',
+    'tailwindcss':            'tailwind',
+    'framer-motion':          'framer-motion',
+    'better-auth':            'better-auth',
+    'next-auth':              'next-auth',
+    'prisma':                 'prisma',
+    'drizzle-orm':            'drizzle',
+    'turbo':                  'monorepo',
+  };
+
+  // shadcn: components.json 존재 여부로 감지
+  const libraries: string[] = [];
+  if (fs.existsSync(path.join(targetDir, 'components.json'))) {
+    libraries.push('shadcn');
+  }
+
+  for (const [pkgName, slug] of Object.entries(libraryMap)) {
+    if (pkgName in deps) {
+      libraries.push(slug);
+    }
+  }
+
+  return { framework, libraries };
+}
+
 // ─── Main install ────────────────────────────────────────────────────────────
 
 export async function install(options: InstallOptions): Promise<void> {
   const { answers, force = false, dryRun = false } = options;
-  // Monorepo: spec and app files go into workspacePath; .claude stays at repo root
   const rootDir = options.targetDir;
-  const appDir = answers.archPattern === 'monorepo' && answers.workspacePath
-    ? path.join(rootDir, answers.workspacePath)
-    : rootDir;
 
   const vars = buildTemplateVars(answers);
 
@@ -53,28 +106,16 @@ export async function install(options: InstallOptions): Promise<void> {
   log.blank();
 
   // ── spec/ ────────────────────────────────────────────────────────────────
-  // Architecture-specific content is now in .claude/skills/architectures/ (reference only).
-  // /init agent reads the skill and generates spec/ARCHITECTURE.md based on actual project analysis.
   const specTemplateDir = path.join(TEMPLATE_DIR, 'spec');
-  await copyDir(specTemplateDir, path.join(appDir, 'spec'), vars, force, dryRun);
+  await copyDir(specTemplateDir, path.join(rootDir, 'spec'), vars, force, dryRun);
 
   // ── Claude Code agent files ─────────────────────────────────────────────
   await installClaude(rootDir, vars, force, dryRun);
 
-  // ── skills.sh skills ──────────────────────────────────────────────────────
+  // ── skills: package.json 자동 감지 후 설치 ──────────────────────────────
   log.blank();
-  await installSkills(rootDir, answers.framework, answers.libraries, dryRun);
-
-  // ── feature directories ──────────────────────────────────────────────────
-  log.blank();
-  for (const rawName of answers.features) {
-    const name = sanitizeFeatureName(rawName);
-    if (!name) {
-      log.warn(`Skipped feature "${rawName}" — name must contain English letters or numbers`);
-      continue;
-    }
-    await createFeatureDir(appDir, name, vars, force, dryRun);
-  }
+  const { framework, libraries } = detectFromPackageJson(rootDir);
+  await installSkills(rootDir, framework, libraries, dryRun);
 }
 
 // ─── Claude Code installer ───────────────────────────────────────────────────
@@ -155,49 +196,6 @@ async function copyDir(
     }
 
     log.success(relDest);
-  }
-}
-
-async function createFeatureDir(
-  targetDir: string,
-  featureName: string,
-  vars: TemplateVars,
-  force: boolean,
-  dryRun: boolean,
-): Promise<void> {
-  const featureTemplateDir = path.join(TEMPLATE_DIR, 'spec', 'feature', '_example');
-  const featureDestDir = path.join(targetDir, 'spec', 'feature', featureName);
-  const featureVars: TemplateVars = { ...vars, FEATURE_NAME: featureName };
-
-  for (const [src, dest] of [
-    ['spec.md.template', 'spec.md'],
-    ['design.md.template', 'design.md'],
-  ]) {
-    const srcPath = path.join(featureTemplateDir, src);
-    const destPath = path.join(featureDestDir, dest);
-    const relDest = path.relative(targetDir, destPath);
-
-    if (!force && fs.existsSync(destPath)) {
-      log.step(`skipped  ${relDest}`);
-      continue;
-    }
-
-    if (!dryRun) {
-      fs.mkdirSync(featureDestDir, { recursive: true });
-      const content = fs.readFileSync(srcPath, 'utf-8');
-      fs.writeFileSync(destPath, render(content, featureVars), 'utf-8');
-    }
-
-    log.success(relDest);
-  }
-
-  const gitkeepPath = path.join(featureDestDir, 'history', '.gitkeep');
-  if (!fs.existsSync(gitkeepPath)) {
-    if (!dryRun) {
-      fs.mkdirSync(path.dirname(gitkeepPath), { recursive: true });
-      fs.writeFileSync(gitkeepPath, '', 'utf-8');
-    }
-    log.success(path.relative(targetDir, gitkeepPath));
   }
 }
 

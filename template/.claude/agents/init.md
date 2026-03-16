@@ -45,18 +45,37 @@ Only when invoked via `/init`. Safe to re-run — existing spec files are preser
    If all files already exist, skip this step and log: "spec/ directory already initialized."
 
 1. **Detect framework and router type**
-   - Check for `app/` directory → Next.js App Router
-   - Check for `pages/` directory → Next.js Pages Router
-   - Check `package.json` `dependencies` for `next`, `react`, `vite`
-   - Read `next.config.*`, `vite.config.*` if present
 
-2. **Analyze package.json and config files**
+   Read `package.json` dependencies first:
+   - `next` present → Next.js project
+   - `next` absent → Ask the user: "Next.js was not detected in package.json. Is this a Next.js project? (yes = treat as Next.js App Router, no = treat as React)"
+     - If yes: treat as `nextjs-app`
+     - If no: treat as `react`
+
+   If Next.js is detected, determine router type:
+   - `app/` or `src/app/` directory exists → App Router
+   - `pages/` or `src/pages/` directory exists → Pages Router
+   - Both exist → App Router (primary)
+
+   Read `next.config.*`, `vite.config.*` if present for additional context.
+
+2. **Analyze package.json and config files — fully automatic, no questions**
    - Read `package.json`: dependencies, scripts, engines
    - Read `tsconfig.json`: paths, strict mode, baseUrl
    - Read `tailwind.config.*` if present
    - Read `components.json` if present (shadcn/ui config)
-   - Detect installed libraries: form, state, UI, auth, ORM
-   - **Detect testing setup**: check for vitest, jest, playwright, @testing-library in dependencies/devDependencies and scripts (test, test:e2e, etc.)
+   - **Auto-detect all installed libraries** from dependencies/devDependencies:
+     - Form: react-hook-form, formik
+     - Validation: zod, yup
+     - State: zustand, jotai, redux, recoil
+     - Server state: @tanstack/react-query, swr
+     - UI: shadcn/ui (components.json), @radix-ui/*, @mui/material, antd
+     - Styling: tailwindcss, styled-components, emotion
+     - Animation: framer-motion
+     - Auth: better-auth, next-auth, @auth/core
+     - ORM: prisma, drizzle-orm
+     - HTTP: axios
+   - **Detect testing setup**: check for vitest, jest, playwright, @testing-library in dependencies/devDependencies and scripts
 
 3. **Detect architecture pattern**
    - Presence of `features/` → feature-based
@@ -74,7 +93,7 @@ Only when invoked via `/init`. Safe to re-run — existing spec files are preser
    - Note cross-feature imports
 
 5. **Write `spec/PROJECT.md`**
-   - Fill in: project name, framework, router type, detected libraries, architecture pattern
+   - Fill in all detected values: project name (from package.json `name` or directory name), framework, router type, detected libraries, architecture pattern
    - Fill in `## Testing` section based on detection from step 2:
      - Framework: vitest / jest / none detected
      - E2E: playwright / cypress / none detected
@@ -148,6 +167,6 @@ Only when invoked via `/init`. Safe to re-run — existing spec files are preser
 ## Hard constraints
 - Never modify source code files (`.ts`, `.tsx`, `.js`, `.jsx`, `.css`, etc.)
 - Never delete existing spec files — only create or append
-- If `spec/PROJECT.md` already has real content, ask before overwriting
+- If `spec/PROJECT.md` already has real content (not placeholder comments), ask before overwriting
 - If `spec/ARCHITECTURE.md` already exists, read it first and append newly discovered features
 - Do not read: `node_modules/`, `.next/`, `dist/`, `.turbo/`, lock files

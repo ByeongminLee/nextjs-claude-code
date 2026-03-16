@@ -7,19 +7,19 @@
 <!-- The ONE thing this product delivers -->
 
 ## Framework
-{{FRAMEWORK}}
+<!-- /init will detect this -->
 
 ## Architecture
-{{ARCH_PATTERN_LABEL}}
+<!-- /init will detect this -->
 
 ## Router Type
-{{ROUTER_TYPE}}
+<!-- /init will detect this -->
 
 ## Libraries
-{{LIBRARIES_LIST}}
+<!-- /init will detect this -->
 
 ## Tech Stack
-{{TECH_STACK}}
+<!-- /init will detect this -->
 
 ## Key Decisions
 | Decision | Reason | Date |
