@@ -143,9 +143,53 @@ Only when invoked via `/init`. Safe to re-run — existing spec files are preser
    Started: —
    ```
 
-10. **Present summary to user**
+10. **Generate `AGENTS.md` navigation indices**
+    - Scan for source directories: `src/`, `app/`, `components/`, `lib/`, `hooks/`, `features/`, `pages/`, `utils/`, `services/`, `actions/`, `types/` and their subdirectories
+    - For each directory that exists AND has 3+ source files (`.ts`, `.tsx`, `.js`, `.jsx`):
+      - Read each file's first 20 lines (imports, exports, component name)
+      - Write `AGENTS.md` in that directory following the format in `spec/RULE.md` → `## AGENTS.md Navigation Index`
+      - `## Files` — 1-2 lines per file (name, purpose, key exports/props)
+      - `## Directories` — 1 line per subdirectory (name, purpose)
+    - Do NOT generate for: `node_modules/`, `.next/`, `dist/`, `.turbo/`, `spec/`, `.claude/`
+    - Do NOT generate for directories with fewer than 3 source files
+    - If a directory has 50+ files, group by pattern instead of listing each
+    - Log: "Generated AGENTS.md in N directories"
+
+11. **Detect git branch strategy (optional)**
+
+   Check if `spec/GIT_STRATEGY.md` exists. If it does NOT exist and git remote is configured:
+   - Run `git branch -r` to check for remote branches
+   - If remote branches exist, ask the user:
+     ```
+     Git remote detected. Would you like to set up your branch strategy now?
+     This enables /commit and /pr commands with auto-generated messages and PR bodies.
+     (yes / skip — you can always set it up later with /commit or /pr)
+     ```
+   - If yes: spawn `git-strategy-detector` agent (haiku) with: `Detect the git branch strategy for this project.`
+   - If skip or no remote: continue to next step
+
+12. **Suggest on-demand skills based on detected libraries**
+
+   After completing analysis, check if there are matching on-demand skills:
+   - Also check if `find-skills` is installed (it should be core). If not, note it for the user.
+   - Read `.claude/skills/skill-catalog.json` (list of available on-demand skills)
+   - Read `.claude/skills/skills-manifest.json` (already installed skills)
+   - Compare detected libraries (step 2) against catalog's `condition` fields
+   - If matching uninstalled skills exist, present them to the user:
+     ```
+     📦 On-demand skills available for your project:
+       - zustand — Zustand state management patterns
+       - shadcn — shadcn/ui component usage patterns
+
+     Install with: npx nextjs-claude-code skill-suggest
+     Or individually: npx nextjs-claude-code skill-add <skill-name>
+     ```
+   - If no matching skills, skip silently
+
+13. **Present summary to user**
    - List all files written
    - Show detected stack: framework, router, libraries, architecture
+   - Show git branch strategy status (configured / skipped)
    - Highlight sections marked `[inferred]` that need human review
    - Ask: "Please review the generated docs and let me know if anything needs correction."
 

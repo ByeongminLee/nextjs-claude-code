@@ -1,6 +1,6 @@
 ---
 name: loop
-description: REQ-level compliance loop. Runs reviewer to check each REQ in spec.md, then spawns executor to fix only failing REQs, runs a de-sloppify cleanup pass, and repeats until 100% compliance or max iterations. Uses LOOP_NOTES.md to bridge context across iterations. Invoked by the /loop skill.
+description: REQ-level compliance loop. Runs reviewer to check each REQ in spec.md, then spawns lead-engineer to fix only failing REQs, runs a de-sloppify cleanup pass, and repeats until 100% compliance or max iterations. Uses LOOP_NOTES.md to bridge context across iterations. Invoked by the /loop skill.
 tools: Read, Write, Edit, Glob, Grep, Agent
 model: sonnet
 ---
@@ -52,11 +52,17 @@ Before each iteration, read `spec/feature/[name]/LOOP_NOTES.md` to understand:
 Spawn `reviewer` agent with `model: haiku` (REQ pass/fail checks are pattern matching):
 
 ```
-Review feature "[name]" against its spec.
-For EACH REQ item in spec.md, report:
-- REQ-NNN: PASS (with brief evidence) or FAIL (with specific reason why it fails)
-Be specific about failure reasons — describe what the code does vs what the spec requires.
-Do not suggest features beyond the spec.
+[HANDOFF]
+TO: reviewer (haiku)
+TASK: Check each REQ for feature "[name]"
+DONE-WHEN:
+  - Every REQ-NNN has PASS or FAIL with evidence
+MUST-NOT:
+  - Modify any file
+  - Suggest features beyond the spec
+READS:
+  - spec/feature/[name]/spec.md
+[/HANDOFF]
 ```
 
 **Step C — Parse results and check completion**
@@ -68,54 +74,73 @@ REQ-003: PASS — redirects to /dashboard after login
 ```
 
 - If ALL REQs are `PASS` → exit loop, go to step 7
+- If ALL remaining failing REQs are `BLOCKED` (see below) → exit loop, go to step 8
 - If iteration count >= max iterations → exit loop, go to step 8
 
+**Impossible REQ detection:**
+If a REQ has failed with the **same root cause** for 3 consecutive iterations (check LOOP_NOTES.md failure history), and the failure reason suggests a spec issue (e.g., "spec requires X but design.md contradicts", "dependency Y does not support Z"):
+- Mark the REQ as `BLOCKED` (not FAIL)
+- Report to user immediately: `[REQ-NNN] appears to be a spec issue, not an implementation issue. Blocked for 3 iterations with the same cause: [reason]. Please review the spec.`
+- Continue fixing other failing REQs
+- If ALL remaining failing REQs are BLOCKED, exit the loop early (go to step 8)
+
 **Step D — Analyze failures and plan strategy**
-Before spawning executor, analyze the failing REQs:
+Before spawning lead-engineer, analyze the failing REQs:
 - Compare with previous iteration's failure reasons (from LOOP_NOTES.md)
 - If the same REQ failed for the same reason → the previous fix didn't work, try a different approach
 - Write a brief strategy for each failing REQ
 
 **Step E — Targeted fix**
 For failing REQs only, assess size: if ≤2 failing REQs with single-file fixes → `model: haiku`, otherwise → `model: sonnet`.
-Spawn `executor` agent (with assessed model) with prompt:
+Spawn `lead-engineer` agent (with assessed model):
 ```
-Fix the following failing requirements for feature "[name]".
-This is a TARGETED FIX — do not re-implement passing requirements.
+[HANDOFF]
+TO: lead-engineer ({assessed model})
+TASK: Fix failing REQs for feature "[name]"
+DONE-WHEN:
+  - All listed failing REQs are fixed
+  - npx tsc --noEmit passes
+MUST-NOT:
+  - Re-implement passing requirements
+  - Refactor or change working code
+  - Modify spec.md or design.md
+READS:
+  - spec/feature/[name]/PLAN.md
+  - spec/feature/[name]/CONTEXT.md
+  - spec/feature/[name]/spec.md
+  - spec/feature/[name]/design.md
+[/HANDOFF]
 
 Failing REQs:
 - REQ-NNN: [description]
   Failure reason: [reviewer's specific failure reason]
   Previous attempts: [summary from LOOP_NOTES.md, if any]
   Strategy: [what to try this time, and why it's different from previous attempts]
-
-Read the feature spec and design:
-  spec/feature/[name]/spec.md
-  spec/feature/[name]/design.md
-Plan is at: spec/feature/[name]/PLAN.md
-Context is at: spec/feature/[name]/CONTEXT.md
-
-Fix ONLY the failing items. Do not refactor or change working code.
-After fixing, run type check: npx tsc --noEmit
 ```
 
 **Step F — De-Sloppify (cleanup pass)**
-After executor completes, spawn executor again with `model: haiku` (cleanup is mechanical):
+**Skip this step** if lead-engineer reported a build failure or auto-fix budget exhaustion in Step E. Only run cleanup when the fix step completed successfully (`tsc --noEmit` passes).
+
+After lead-engineer completes successfully, spawn lead-engineer again with `model: haiku` (cleanup is mechanical):
 
 ```
-Review all files changed in the working tree by the previous fix.
-This is a CLEANUP PASS — do not add new functionality.
+[HANDOFF]
+TO: lead-engineer (haiku)
+TASK: Cleanup pass for feature "[name]" — remove slop from recent fix
+DONE-WHEN:
+  - No console.log, commented-out code, or unused imports remain in changed files
+  - npx tsc --noEmit passes
+MUST-NOT:
+  - Add new functionality
+  - Remove business logic or change behavior
+  - Touch files not changed by the previous fix
+READS:
+  - (no spec files needed — review only changed files in working tree)
+[/HANDOFF]
 
-Remove:
-- Tests that verify language/framework behavior rather than business logic
-- Redundant type checks that TypeScript already enforces
-- Over-defensive error handling for impossible states
-- console.log statements and commented-out code
-- Empty catch blocks and meaningless TODO comments
-- Unused imports and variables
-
+Remove: tests that verify language/framework behavior, redundant type checks,
+over-defensive error handling, console.log, commented-out code, empty catch blocks, unused imports.
 Keep all business logic tests and code.
-After cleanup, run type check: npx tsc --noEmit
 ```
 
 **Step G — Update LOOP_NOTES.md**
@@ -158,9 +183,23 @@ Updated: YYYY-MM-DD / Iteration: N/5
 7. **On success (all REQs pass)**
 
 After all REQs pass, run verification (Level 1-3) before declaring completion:
-- Spawn `verifier` agent with `model: haiku` to run Level 1-3 checks
-- If verifier fails, apply fix (counts toward current iteration's auto-fix budget) and re-verify
-- Level 4 (human-verify) is optional — ask user: "All REQs pass and Level 1-3 verified. Would you like to do a browser check (Level 4)?"
+- Spawn `verifier` agent:
+  ```
+  [HANDOFF]
+  TO: verifier (haiku)
+  TASK: Verify feature "[name]" post-loop implementation
+  DONE-WHEN:
+    - Level 1-3 all pass
+  MUST-NOT:
+    - Modify any file
+  READS:
+    - spec/feature/[name]/PLAN.md
+    - spec/feature/[name]/spec.md
+  [/HANDOFF]
+  ```
+- If verifier fails and auto-fix budget is still available for this iteration: apply fix and re-verify
+- If verifier fails and auto-fix budget is exhausted: exit with partial success — report: `All REQs passed review but verification failed with budget exhausted. Failing verification: [details]. Manual fix needed.` Update STATE.md to `idle` with failing verification info.
+- Level 4 (human-verify) is optional in `/loop` — ask user: "All REQs pass and Level 1-3 verified. Would you like to do a browser check (Level 4)?" (Level 4 is mandatory in `/dev` flow but optional in `/loop` since the user has already seen the feature iterating.)
 
 ```
 [Loop Complete — All REQs Satisfied]
@@ -208,7 +247,7 @@ Manual intervention required.
 
 ## Auto-fix budget interaction
 
-- Each iteration's executor fix attempts count toward a **per-iteration budget of 3**
+- Each iteration's lead-engineer fix attempts count toward a **per-iteration budget of 3**
 - The budget resets at the start of each loop iteration (unlike /dev which has a single shared budget)
 - This prevents a single stubborn build error from exhausting the entire loop
 - The de-sloppify pass does NOT count toward the budget (it's a cleanup, not a fix)
