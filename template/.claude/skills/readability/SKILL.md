@@ -1,6 +1,7 @@
 ---
 name: readability
 description: Use when 삼항 연산자가 중첩되거나, 복잡한 조건식 `a && !b || c`가 이름 없이 사용되거나, 동시에 실행되지 않는 코드가 한 컴포넌트에 섞여 있을 때
+disable-model-invocation: true
 ---
 
 # 가독성

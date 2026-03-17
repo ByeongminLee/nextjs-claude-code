@@ -4,6 +4,7 @@ description: "Applies principles from Robert C. Martin's 'Clean Code'. Use this 
 risk: safe
 source: "ClawForge (https://github.com/jackjin1997/ClawForge)"
 date_added: "2026-02-27"
+disable-model-invocation: true
 ---
 
 # Clean Code Skill
