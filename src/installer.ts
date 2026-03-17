@@ -1,8 +1,9 @@
 import fs from 'fs';
 import path from 'path';
-import { InstallOptions, TemplateVars, FrameworkType } from './types';
+import { InstallOptions, TemplateVars } from './types';
 import { render, buildTemplateVars } from './renderer';
 import { installSkills, SKILLS } from './skills-installer';
+import { detectFromPackageJson } from './detect';
 import { progress } from './logger';
 
 const TEMPLATE_DIR = path.resolve(__dirname, '../template');
@@ -17,75 +18,35 @@ ${FS_MARKER_START}
 ## NCC — Session Start
 
 Before any work, always read:
-1. \`spec/STATE.md\` — understand current progress and active feature
-2. \`spec/RULE.md\` — follow all coding rules and checkpoint conditions
+1. \`spec/STATE.md\` — current progress and active features
+2. \`spec/RULE.md\` — workflow rules, checkpoint conditions, team mode rules
 
 Before modifying code:
-- Read the relevant \`spec/feature/[name]/spec.md\` (what to build)
-- Read the relevant \`spec/feature/[name]/design.md\` (how to build it)
+- Read \`spec/feature/[name]/spec.md\` (what to build)
+- Read \`spec/feature/[name]/design.md\` (how to build it)
 - If \`spec/feature/[name]/CONTEXT.md\` exists, its decisions are non-negotiable
 
-Use the available skills:
-- \`/init\` — first-time setup: analyze codebase and populate spec docs
-- \`/spec\` — define or update a feature spec
-- \`/dev\` — implement a feature
-- \`/review\` — check spec compliance
-- \`/status\` — show project status
-- \`/debug\` — fix a bug systematically
-- \`/rule\` — add or update a project coding rule
-- \`/loop\` — force-complete: loop until all REQs in spec.md are satisfied
+### Commands
+
+| Command | Description |
+|---------|-------------|
+| \`/init\` | First-time setup |
+| \`/spec [name] "desc"\` | Define a feature spec |
+| \`/dev [name]\` | Implement a feature (solo mode) |
+| \`/dev [name] --team\` | Implement with parallel engineer team (db/ui/worker) |
+| \`/review [name]\` | Check spec compliance |
+| \`/loop [name]\` | Force-complete until all REQs pass |
+| \`/debug "desc"\` | Systematic bug fixing |
+| \`/status\` | Project status |
+| \`/commit\` | Auto-generate commit message |
+| \`/pr\` | Create PR with spec-based body |
+
+### Navigation
+- Agents: \`.claude/agents/\` — lead-engineer, db-engineer, ui-engineer, worker-engineer, planner, verifier
+- Skills: \`.claude/skills/\` — on-demand reference, loaded by skill name
+- Rules: \`spec/rules/\` — project coding rules (read before writing code)
 ${FS_MARKER_END}
 `;
-
-// ─── package.json 자동 감지 ──────────────────────────────────────────────────
-
-function detectFromPackageJson(targetDir: string): { framework: FrameworkType; libraries: string[] } {
-  const pkgPath = path.join(targetDir, 'package.json');
-  if (!fs.existsSync(pkgPath)) {
-    return { framework: 'nextjs-app', libraries: [] };
-  }
-
-  const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf-8')) as {
-    dependencies?: Record<string, string>;
-    devDependencies?: Record<string, string>;
-  };
-  const deps = { ...pkg.dependencies, ...pkg.devDependencies };
-
-  let framework: FrameworkType = 'react';
-  if ('next' in deps) {
-    const hasAppDir =
-      fs.existsSync(path.join(targetDir, 'app')) ||
-      fs.existsSync(path.join(targetDir, 'src', 'app'));
-    framework = hasAppDir ? 'nextjs-app' : 'nextjs-pages';
-  }
-
-  const libraryMap: Record<string, string> = {
-    'react-hook-form':        'react-hook-form',
-    'zod':                    'zod',
-    'axios':                  'axios',
-    'zustand':                'zustand',
-    'jotai':                  'jotai',
-    '@tanstack/react-query':  'tanstack-query',
-    'swr':                    'swr',
-    'tailwindcss':            'tailwind',
-    'framer-motion':          'framer-motion',
-    'better-auth':            'better-auth',
-    'next-auth':              'next-auth',
-    'prisma':                 'prisma',
-    'drizzle-orm':            'drizzle',
-    'turbo':                  'monorepo',
-  };
-
-  const libraries: string[] = [];
-  if (fs.existsSync(path.join(targetDir, 'components.json'))) {
-    libraries.push('shadcn');
-  }
-  for (const [pkgName, slug] of Object.entries(libraryMap)) {
-    if (pkgName in deps) libraries.push(slug);
-  }
-
-  return { framework, libraries };
-}
 
 // ─── Main install ────────────────────────────────────────────────────────────
 

@@ -3,7 +3,7 @@ import prompts from 'prompts';
 import pc from 'picocolors';
 import { log, banner } from './logger';
 import { install } from './installer';
-import { updateSkills } from './skills-installer';
+import { updateSkills, installSingleSkill, listAvailableSkills, suggestAndInstallSkills } from './skills-installer';
 import { UserAnswers } from './types';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -13,12 +13,44 @@ export async function run(): Promise<void> {
   const args = process.argv.slice(2);
   const command = args[0];
 
-  // ── skill-update 명령어 ────────────────────────────────────────────────
+  // ── skill-update: 설치된 스킬 최신화 ────────────────────────────────────
   if (command === 'skill-update') {
     banner(pkg.version);
     log.info('Updating skills to latest versions...');
     log.blank();
     await updateSkills(process.cwd());
+    log.blank();
+    return;
+  }
+
+  // ── skill-add <name>: on-demand 스킬 1개 설치 ───────────────────────────
+  if (command === 'skill-add') {
+    const skillName = args[1];
+    if (!skillName) {
+      banner(pkg.version);
+      log.error('Usage: npx nextjs-claude-code skill-add <skill-name>');
+      log.info('Run "npx nextjs-claude-code skill-list" to see available skills.');
+      process.exit(1);
+    }
+    banner(pkg.version);
+    log.blank();
+    await installSingleSkill(process.cwd(), skillName);
+    log.blank();
+    return;
+  }
+
+  // ── skill-list: 전체 스킬 목록 + 설치 상태 ─────────────────────────────
+  if (command === 'skill-list') {
+    banner(pkg.version);
+    listAvailableSkills(process.cwd());
+    return;
+  }
+
+  // ── skill-suggest: package.json 기반 추천 + 설치 ────────────────────────
+  if (command === 'skill-suggest') {
+    banner(pkg.version);
+    log.blank();
+    await suggestAndInstallSkills(process.cwd());
     log.blank();
     return;
   }
@@ -71,7 +103,11 @@ export async function run(): Promise<void> {
   console.log(`  3. Run ${pc.cyan('/spec [feature-name] "description"')} to define features`);
   console.log(`  4. Run ${pc.cyan('/dev [feature-name]')} to implement`);
   console.log();
-  console.log(pc.dim(`  Update skills anytime: ${pc.cyan('npx nextjs-claude-code skill-update')}`));
+  console.log(pc.dim(`  Manage skills:`));
+  console.log(pc.dim(`    ${pc.cyan('npx nextjs-claude-code skill-list')}     — see all available skills`));
+  console.log(pc.dim(`    ${pc.cyan('npx nextjs-claude-code skill-suggest')}  — auto-detect & install matching skills`));
+  console.log(pc.dim(`    ${pc.cyan('npx nextjs-claude-code skill-add <n>')}  — install a specific skill`));
+  console.log(pc.dim(`    ${pc.cyan('npx nextjs-claude-code skill-update')}   — update installed skills`));
   console.log(pc.dim('  Docs: https://github.com/ByeongminLee/nextjs-claude-code'));
   console.log();
 }
