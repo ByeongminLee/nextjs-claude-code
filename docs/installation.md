@@ -40,9 +40,10 @@ Skills are namespaced as `/nextjs-claude-code:spec`, `/nextjs-claude-code:dev`, 
 
 ```
 .claude/
-  agents/          Specialized agents (init, spec-writer, planner, executor,
-                   verifier, reviewer, code-quality-reviewer, loop,
-                   status, debugger, rule-writer)
+  agents/          Specialized agents (init, spec-writer, planner, lead-engineer,
+                   db-engineer, ui-engineer, worker-engineer, verifier,
+                   reviewer, code-quality-reviewer, loop, status, debugger,
+                   rule-writer)
   skills/          Reference skills from skills.sh + skills-manifest.json
   scripts/         validate-spec.sh, reflect-spec.sh (PostToolUse hooks)
   settings.json    Hook configuration (merged, preserves existing hooks)
