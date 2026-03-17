@@ -228,6 +228,61 @@ After every `/dev` completion, the verifier runs automatically with 4 levels:
 - `/review` runs `reviewer` (spec compliance) then `code-quality-reviewer` (code quality) sequentially
 - `debugger` shares the same auto-fix budget concept: after 3 failed fix attempts, stop and escalate to user
 
+## Delegation Protocol
+
+When spawning a sub-agent via the Agent tool, use this format in the prompt:
+
+```
+[HANDOFF]
+TO: agent-name (model)
+TASK: One-line imperative description
+DONE-WHEN:
+  - Observable completion criterion 1
+  - Observable completion criterion 2
+MUST-NOT:
+  - Explicit constraint 1
+  - Explicit constraint 2
+READS:
+  - file path the sub-agent must read
+[/HANDOFF]
+```
+
+Rules:
+- DONE-WHEN items must be observable (file exists, test passes, build succeeds) — not subjective
+- MUST-NOT applies only to this specific handoff — agent-level constraints are already in the agent definition
+- READS lists only essential files — do not list files the agent already knows to read from its own instructions
+- Keep each handoff under 15 lines total
+- All agent spawns must use this format — free-form prompts are not allowed
+
+## AGENTS.md Navigation Index
+
+`AGENTS.md` files are per-directory navigation indices in the project source directories.
+
+Format:
+```markdown
+# [directory-path]/
+
+## Files
+- FileName.tsx — One-line purpose description. Key exports or props
+- utils.ts — Two-line description if needed
+  Helpers for X and Y
+
+## Directories
+- sub-dir/ — One-line purpose
+```
+
+Rules:
+- Generated during `/init` for source directories with 3+ files
+- Updated by executor when files are created, modified significantly, or deleted
+- Max 300 lines per file — if too many files, group by pattern
+- File entries: 1-2 lines max (name + purpose + key exports/props)
+- Directory entries: 1 line (name + purpose)
+- Cover only direct children — not recursive
+- No frontmatter, no prose — navigation only
+- Target directories: `src/`, `app/`, `components/`, `lib/`, `hooks/`, `features/`, `pages/`, `utils/`, `services/`, and their subdirectories
+- Excluded: `node_modules/`, `.next/`, `dist/`, `.turbo/`, `spec/`, `.claude/`
+- Agents should read `AGENTS.md` before globbing/grepping a directory
+
 ## Required Document Format
 
 ### Writing Rules
