@@ -1,0 +1,182 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+import { en } from '../content/en';
+import { ko } from '../content/ko';
+
+const contents = [en, ko];
+---
+
+<Layout title="NCC — nextjs-claude-code">
+  <Header />
+  <main class="max-w-2xl mx-auto px-6 py-16">
+    {contents.map((c) => (
+      <div data-lang={c.lang} style={c.lang === 'ko' ? 'display:none' : ''}>
+        {/* Hero */}
+        <section class="mb-16">
+          <h1 class="font-mono font-bold text-3xl mb-2">{c.title} <span class="text-gray-400 font-normal">— {c.subtitle}</span></h1>
+          <p class="text-gray-600 text-lg leading-relaxed mb-3">{c.tagline}</p>
+          <p class="text-gray-500 leading-relaxed">{c.description}</p>
+        </section>
+
+        <hr class="border-gray-100 mb-12" />
+
+        {/* Features */}
+        <section class="mb-12">
+          <h2 class="font-mono font-bold text-xl mb-6">{c.features.title}</h2>
+          <ul class="space-y-2 text-gray-700">
+            {c.features.items.map((item) => (
+              <li class="flex gap-2">
+                <span class="text-gray-300 select-none">—</span>
+                <span><strong class="text-gray-900">{item.bold}</strong> {item.text}</span>
+              </li>
+            ))}
+          </ul>
+        </section>
+
+        <hr class="border-gray-100 mb-12" />
+
+        {/* Prerequisites */}
+        <section class="mb-12">
+          <h2 class="font-mono font-bold text-xl mb-4">{c.prerequisites.title}</h2>
+          <ul class="space-y-1 text-gray-700">
+            {c.prerequisites.items.map((item) => (
+              <li class="flex gap-2">
+                <span class="text-gray-300 select-none">—</span>
+                <span>{item}</span>
+              </li>
+            ))}
+          </ul>
+        </section>
+
+        <hr class="border-gray-100 mb-12" />
+
+        {/* Installation */}
+        <section class="mb-12">
+          <h2 class="font-mono font-bold text-xl mb-4">{c.installation.title}</h2>
+          <p class="text-gray-700 mb-3">
+            <a href={c.installation.humanLink} target="_blank" rel="noopener noreferrer" class="underline underline-offset-2 hover:text-gray-900">{c.installation.human}</a>
+          </p>
+          <p class="text-gray-700 mb-3">{c.installation.claude}</p>
+          <pre class="bg-gray-50 border border-gray-200 rounded-lg p-4 overflow-x-auto text-sm font-mono text-gray-800">{c.installation.command}</pre>
+        </section>
+
+        <hr class="border-gray-100 mb-12" />
+
+        {/* Why SDD */}
+        <section class="mb-12">
+          <h2 class="font-mono font-bold text-xl mb-4">{c.whySdd.title}</h2>
+          {c.whySdd.paragraphs.map((p) => (
+            <p class="text-gray-700 leading-relaxed mb-4">{p}</p>
+          ))}
+          <pre class="bg-gray-50 border border-gray-200 rounded-lg p-4 overflow-x-auto text-sm font-mono text-gray-800 mb-6">{c.whySdd.example}</pre>
+          <ul class="space-y-3 text-gray-700 mb-6">
+            {c.whySdd.points.map((point) => (
+              <li class="flex gap-2">
+                <span class="text-gray-300 select-none">—</span>
+                <span><strong class="text-gray-900">{point.bold}</strong> {point.text}</span>
+              </li>
+            ))}
+          </ul>
+          <h3 class="font-mono font-semibold text-base mb-2">{c.whySdd.who.title}</h3>
+          <p class="text-gray-700 leading-relaxed">{c.whySdd.who.text}</p>
+        </section>
+
+        <hr class="border-gray-100 mb-12" />
+
+        {/* Workflow */}
+        <section class="mb-12">
+          <h2 class="font-mono font-bold text-xl mb-4">{c.workflow.title}</h2>
+          <p class="text-gray-700 mb-4">{c.workflow.description}</p>
+          <pre class="bg-gray-50 border border-gray-200 rounded-lg p-4 overflow-x-auto text-sm font-mono text-gray-800">{c.workflow.commands}</pre>
+        </section>
+
+        <hr class="border-gray-100 mb-12" />
+
+        {/* Commands */}
+        <section class="mb-12">
+          <h2 class="font-mono font-bold text-xl mb-6">{c.ops.title}</h2>
+          {c.ops.sections.map((section) => (
+            <div class="mb-8">
+              <h3 class="font-mono font-semibold text-base mb-3 text-gray-600">{section.subtitle}</h3>
+              <div class="border border-gray-200 rounded-lg overflow-hidden">
+                <table class="w-full text-sm">
+                  <tbody>
+                    {section.commands.map((cmd, i) => (
+                      <tr class={i % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                        <td class="px-4 py-2.5 font-mono text-gray-900 whitespace-nowrap">{cmd.cmd}</td>
+                        <td class="px-4 py-2.5 text-gray-600">{cmd.desc}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          ))}
+        </section>
+
+        <hr class="border-gray-100 mb-12" />
+
+        {/* Agent Roles */}
+        <section class="mb-12">
+          <h2 class="font-mono font-bold text-xl mb-4">{c.agents.title}</h2>
+          <p class="text-gray-700 mb-6">{c.agents.description}</p>
+
+          <h3 class="font-mono font-semibold text-base mb-3 text-gray-600">{c.agents.core.subtitle}</h3>
+          <div class="border border-gray-200 rounded-lg overflow-hidden mb-6">
+            <table class="w-full text-sm">
+              <tbody>
+                {c.agents.core.items.map((agent, i) => (
+                  <tr class={i % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                    <td class="px-4 py-2.5 font-mono text-gray-900 whitespace-nowrap">{agent.name}</td>
+                    <td class="px-4 py-2.5 text-gray-600">{agent.role}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          <h3 class="font-mono font-semibold text-base mb-3 text-gray-600">{c.agents.team.subtitle}</h3>
+          <div class="border border-gray-200 rounded-lg overflow-hidden">
+            <table class="w-full text-sm">
+              <tbody>
+                {c.agents.team.items.map((agent, i) => (
+                  <tr class={i % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                    <td class="px-4 py-2.5 font-mono text-gray-900 whitespace-nowrap">{agent.name}</td>
+                    <td class="px-4 py-2.5 text-gray-600">{agent.role}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <hr class="border-gray-100 mb-12" />
+
+        {/* Safety */}
+        <section class="mb-12">
+          <h2 class="font-mono font-bold text-xl mb-6">{c.safety.title}</h2>
+          <ul class="space-y-3 text-gray-700">
+            {c.safety.items.map((item) => (
+              <li class="flex gap-2">
+                <span class="text-gray-300 select-none">—</span>
+                <span><strong class="text-gray-900">{item.bold}</strong> {item.text}</span>
+              </li>
+            ))}
+          </ul>
+        </section>
+
+        <hr class="border-gray-100 mb-12" />
+
+        {/* Contributing + License */}
+        <footer class="text-gray-500 text-sm space-y-2">
+          <p>
+            {c.contributing.text}{' '}
+            <a href={c.contributing.repo} target="_blank" rel="noopener noreferrer" class="underline underline-offset-2 hover:text-gray-900">GitHub</a>
+          </p>
+          <p>{c.license}</p>
+        </footer>
+      </div>
+    ))}
+  </main>
+</Layout>
