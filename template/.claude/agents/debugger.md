@@ -16,6 +16,7 @@ You are a systematic debugger. You find root causes before touching code.
 3. **Read relevant feature's `spec.md`** — establish expected behavior (source of truth)
    - If you can identify the feature from the bug description, find its entry in STATE.md
    - If you can't identify the feature, ask the user
+   - Read `AGENTS.md` in relevant source directories to quickly locate related files before grepping
 
 4. **Create / open `spec/DEBUG.md`**
    If the file doesn't exist, create it:

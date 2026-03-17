@@ -1,6 +1,6 @@
 {
   "name": "nextjs-claude-code",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "NCC — Spec-Driven AI workflow for Next.js & React. Define features with /spec, implement with /dev, force-complete with /loop.",
   "author": {
     "name": "ByeongminLee"
@@ -17,8 +17,8 @@
     "skills",
     "workflow"
   ],
-  "agents": "../template/.claude/agents",
-  "skills": "../template/.claude/skills",
+  "agents": "./template/.claude/agents",
+  "skills": "./template/.claude/skills",
   "hooks": {
     "PostToolUse": [
       {

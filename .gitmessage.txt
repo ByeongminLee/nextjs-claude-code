@@ -1,0 +1,22 @@
+# <type>(<scope>): <subject>
+#
+# |<----  Using a Maximum Of 72 Characters  ---->|
+#
+# Body: Explain WHY this change is being made, not WHAT changed.
+# The diff shows what changed.
+#
+# Footer:
+# Refs: #issue-number
+# BREAKING CHANGE: description (triggers MAJOR version bump)
+#
+# --- Commit Convention Reference ---
+# Types: feat, fix, refactor, docs, test, chore, style, perf, ci, build
+# Scope: feature name or module (optional)
+# Subject: imperative mood, no period, max 72 chars
+#
+# Examples:
+#   feat(agents): add lead-engineer team mode orchestration
+#   fix(plugin): correct relative paths in plugin.json
+#   refactor(skills): simplify commit skill model routing
+#   docs(readme): sync safety feature sections between EN/KO
+#   chore(ci): update GitHub Actions workflow

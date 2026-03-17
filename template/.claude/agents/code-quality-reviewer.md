@@ -25,16 +25,21 @@ You do NOT modify code. You only read and report.
 4. **Read project rules**
    - Read all rule files in `spec/rules/`
 
-5. **Run code quality review**
+5. **Read quality metric skills** (when relevant to findings)
+   - `.claude/skills/cohesion/` — when evaluating file/module organization
+   - `.claude/skills/coupling/` — when evaluating dependency relationships
+   - `.claude/skills/predictability/` — when evaluating control flow clarity
+   - `.claude/skills/readability/` — when evaluating naming and structure
+   - `.claude/skills/clean-code/` — general clean code principles
+
+6. **Run code quality review**
 
 Check the feature's implementation files across these categories:
 
 ### Security (CRITICAL — blocks merge)
-- Hardcoded credentials, API keys, or secrets in source files
-- XSS vulnerabilities (dangerouslySetInnerHTML with unescaped user input)
-- CSRF gaps on state-mutating endpoints
-- Authentication/authorization logic that can be bypassed
-- Sensitive data exposed in logs or error messages
+Full security audits are handled by `security-reviewer` (runs via `/security` or `/review` when SECURITY_STRATEGY.md exists).
+Here, flag only **obvious hardcoded secrets** (API keys, passwords, tokens in source code) as CRITICAL.
+All other security concerns (XSS, CSRF, auth bypass, etc.) are deferred to `security-reviewer`.
 
 ### React / Next.js patterns (HIGH)
 - Missing dependency arrays in `useEffect` (stale closures)
@@ -61,7 +66,7 @@ Check the feature's implementation files across these categories:
 - Misleading variable or function names
 - Missing comments on non-obvious logic
 
-6. **Output code quality report**
+7. **Output code quality report**
 
 ```
 # Code Quality Review: [feature name]

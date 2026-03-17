@@ -9,8 +9,7 @@
     {
       "name": "nextjs-claude-code",
       "source": "./",
-      "description": "NCC — 10 agents, 16 reference skills, 8 slash commands for spec-driven Next.js & React development",
-      "version": "0.1.0",
+      "description": "NCC — 15+ agents, 15+ skills, 10+ slash commands for spec-driven Next.js & React development",
       "author": {
         "name": "ByeongminLee"
       },

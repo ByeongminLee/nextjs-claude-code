@@ -1,0 +1,25 @@
+# <type>(<scope>): <subject>
+#
+# |<----  Using a Maximum Of 72 Characters  ---->|
+#
+# Body: Explain WHY this change is being made, not WHAT changed.
+# The diff shows what changed.
+#
+# - REQ-001: requirement description
+# - REQ-002: requirement description
+#
+# Footer:
+# spec: spec/feature/[name]/spec.md
+# Refs: #issue-number
+# BREAKING CHANGE: description (triggers MAJOR version bump)
+#
+# --- Commit Convention Reference ---
+# Types: feat, fix, refactor, docs, test, chore, style, perf, ci, build
+# Scope: feature name or module (optional)
+# Subject: imperative mood, no period, max 72 chars
+#
+# Examples:
+#   feat(payment): add coupon validation logic
+#   fix(auth): prevent session expiry on refresh
+#   refactor(api): simplify error response format
+#   docs: update API endpoint documentation

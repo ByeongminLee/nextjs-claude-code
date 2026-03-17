@@ -1,4 +1,7 @@
 {
+  "env": {
+    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
+  },
   "hooks": {
     "PostToolUse": [
       {
@@ -13,6 +16,21 @@
             "type": "command",
             "command": "bash .claude/scripts/reflect-spec.sh",
             "statusMessage": "Checking spec reflection..."
+          },
+          {
+            "type": "command",
+            "command": "bash .claude/scripts/suggest-skills.sh",
+            "statusMessage": "Checking for matching skills..."
+          },
+          {
+            "type": "command",
+            "command": "bash .claude/scripts/security-suggest.sh",
+            "statusMessage": "Checking security-sensitive changes..."
+          },
+          {
+            "type": "command",
+            "command": "bash .claude/scripts/update-agents-index.sh",
+            "statusMessage": "Checking AGENTS.md freshness..."
           }
         ]
       }

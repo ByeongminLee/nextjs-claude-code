@@ -17,8 +17,8 @@ spec/
     [name]/
       spec.md            ← what to build
       design.md          ← how to build it
-      PLAN.md            ← WHAT to do — task list, checkpoints, auto-fix budget (planner writes, executor executes)
-      CONTEXT.md         ← WHY — locked decisions, constraints, non-negotiables (planner writes, executor references)
+      PLAN.md            ← WHAT to do — task list, checkpoints, auto-fix budget (planner writes, lead-engineer executes)
+      CONTEXT.md         ← WHY — locked decisions, constraints, non-negotiables (planner writes, lead-engineer references)
       LOOP_NOTES.md      ← cross-iteration context for /loop (created/deleted by loop agent)
       history/           ← change history archive
 ```
@@ -61,7 +61,7 @@ Valid phases: `idle`, `planning`, `executing`, `verifying`, `looping`
 |---|---|
 | `/init` | First-time setup: analyze codebase, populate spec docs |
 | `/spec` | Define or update a feature spec (usage: `/spec [feature-name] [description]`) |
-| `/dev` | Plan → implement → verify a feature |
+| `/dev` | Plan → implement → verify a feature. Use `--team` for parallel team mode |
 | `/review` | Check spec compliance |
 | `/status` | Show project status |
 | `/debug` | Systematic bug fixing |
@@ -75,7 +75,7 @@ Valid phases: `idle`, `planning`, `executing`, `verifying`, `looping`
 ```
 /loop "feature name"
   → reviewer checks each REQ (PASS/FAIL)
-  → executor fixes only failing REQs (with context from previous attempts)
+  → lead-engineer fixes only failing REQs (with context from previous attempts)
   → de-sloppify: cleanup pass removes unnecessary code/tests
   → update LOOP_NOTES.md with results and next strategy
   → re-review
@@ -103,6 +103,39 @@ Valid phases: `idle`, `planning`, `executing`, `verifying`, `looping`
 |---|---|
 | `looping` | Loop agent is running review → fix → cleanup cycles |
 
+## Team Mode (`/dev --team`)
+
+When a feature requires work across multiple domains (business logic, database, UI), the user can invoke `/dev feature-name --team` to activate team mode. The planner performs domain analysis and creates a `## Team Composition` section in PLAN.md. The lead-engineer then creates a Claude Code agent team.
+
+### Engineer Roles
+
+| Role | Domain | Spawned when | Model |
+|------|--------|-------------|-------|
+| `lead-engineer` | Types, utils, hooks, API, server actions, page wiring | Always (team leader) | sonnet |
+| `db-engineer` | Schema, migrations, queries, RLS, seed data | Feature has `[db]` tasks | sonnet |
+| `ui-engineer` | Components, styling, animations, responsive design | Feature has 2+ `[ui]` tasks | sonnet |
+| `worker-engineer` | Simple utilities, type defs, config files | Feature has `[worker]` tasks | haiku |
+
+### Task Tagging
+
+The planner tags each task in PLAN.md: `[lead]`, `[db]`, `[ui]`, or `[worker]`.
+- `[worker]`: single-sentence definition, single file, ~200 lines, no architecture decisions
+- Tasks touching the same file must be assigned to the same engineer
+
+### Coordination Rules
+
+- **Lead has authority**: lead-engineer's decisions override all other engineers
+- **Auto-fix budget is centralized**: teammates message lead before fix attempts; lead manages the shared budget (3 total)
+- **No broadcast**: all team communication is point-to-point (lead ↔ teammate)
+- **Worker is always subagent**: worker-engineer is spawned via Agent tool (not as a team member) for token optimization
+- **File conflict prevention**: planner ensures no two engineers modify the same file
+
+### Token Optimization
+
+- `/dev` (solo) uses lead-engineer alone + worker subagents — minimal cost
+- `/dev --team` adds independent context windows per teammate — use only when parallelism justifies the cost
+- Worker is always a subagent (results summarized back) — never a team member
+
 ## Checkpoint Conditions
 
 | Type | Condition | Action |
@@ -129,8 +162,8 @@ Default model for all agents is **sonnet**. Opus is never used.
 
 | Flow | Who decides | How |
 |------|------------|-----|
-| `/dev` | **planner** | Analyzes task size → writes `## Model Assignment` in feature's PLAN.md → dev skill and executor read it |
-| `/loop` | **loop agent** | Assesses failing REQ count per iteration → chooses model for executor/reviewer spawns |
+| `/dev` | **planner** | Analyzes task size → writes `## Model Assignment` in feature's PLAN.md → dev skill and lead-engineer read it |
+| `/loop` | **loop agent** | Assesses failing REQ count per iteration → chooses model for lead-engineer/reviewer spawns |
 | `/review`, `/spec`, `/debug` | **skill** | Assesses task size before spawning agent |
 | `/status`, `/rule` | **fixed** | Always haiku (frontmatter) |
 | `/init` | **fixed** | Always sonnet (frontmatter) |
@@ -147,7 +180,10 @@ Default model for all agents is **sonnet**. Opus is never used.
 | Agent | When to use haiku |
 |-------|-------------------|
 | `planner` | Never — always sonnet (architectural decisions need deeper reasoning) |
-| `executor` | Planner assigns in PLAN.md: ≤3 simple tasks AND no checkpoint conditions |
+| `lead-engineer` | Planner assigns in PLAN.md: ≤3 simple tasks AND no checkpoint conditions |
+| `db-engineer` | ≤2 DB tasks, all single-file changes |
+| `ui-engineer` | ≤2 UI tasks, all single-file changes |
+| `worker-engineer` | Always haiku (fixed — token optimization for trivial tasks) |
 | `verifier` | Always haiku — pattern matching, grep, file existence checks |
 | `code-quality-reviewer` | Always haiku — static analysis, pattern detection |
 | `reviewer` | Feature has ≤5 REQs AND implementation is <5 files |
@@ -176,12 +212,13 @@ If `/dev` is interrupted (session crash, timeout, context limit), running `/dev`
 | Phase | On `/dev` resume |
 |---|---|
 | `idle` | Fresh start → planner |
-| `planning` | Check feature's PLAN.md status → resume planning or skip to executor |
+| `planning` | Check feature's PLAN.md status → resume planning or skip to lead-engineer |
 | `executing` | Skip completed tasks → continue from first `- [ ]` |
 | `verifying` | Re-run verifier |
 
 ## Context Management
-- Executor marks each task `[x]` in `spec/feature/[name]/PLAN.md` immediately upon completion — this enables resume after interruption
+- Lead-engineer marks each task `[x]` in `spec/feature/[name]/PLAN.md` immediately upon completion — this enables resume after interruption
+- On team mode resume: PLAN.md `## Team Composition` auto-detected — only engineers with uncompleted tasks are re-spawned
 - Before long operations, save current state so work is recoverable after context compaction
 - Keep `spec/STATE.md` under 100 lines — archive old entries to feature history
 
@@ -203,7 +240,7 @@ After every `/dev` completion, the verifier runs automatically with 4 levels:
 
 - Levels 1-3 run automatically; Level 4 triggers `checkpoint:human-verify`
 - Level 2b behavior depends on `spec.md` `testing` frontmatter: `required` = blocking, `optional`/`none` = advisory
-- When `testing: required`, executor writes tests after implementation and before spawning verifier
+- When `testing: required`, lead-engineer writes tests after implementation and before spawning verifier
 - Verifier failures count toward the shared auto-fix budget (3 retries total)
 - Verifier never modifies code — it only reports
 
@@ -214,19 +251,88 @@ After every `/dev` completion, the verifier runs automatically with 4 levels:
 | `init` | No | Yes | — |
 | `spec-writer` | No | Yes (spec.md, design.md) | — |
 | `planner` | No | Yes (CONTEXT.md, PLAN.md in feature dir) | — |
-| `executor` | **Yes** | Partial (STATE.md, feature PLAN.md, history) | — |
+| `lead-engineer` | **Yes** | Partial (STATE.md, feature PLAN.md, history) | — |
+| `db-engineer` | **Yes** (DB files only) | Partial (PLAN.md budget via lead) | — |
+| `ui-engineer` | **Yes** (UI files only) | Partial (PLAN.md budget via lead) | — |
+| `worker-engineer` | **Yes** (assigned file only) | No | — |
 | `verifier` | No | No | **Yes** |
 | `reviewer` | No | No | **Yes** |
 | `code-quality-reviewer` | No | No | **Yes** |
 | `status` | No | No | **Yes** |
 | `debugger` | **Yes** | Yes (DEBUG.md, STATE.md) | — |
 | `rule-writer` | No | Yes (spec/rules/) | — |
-| `loop` | **Yes** (via executor) | Partial (STATE.md, feature PLAN.md, LOOP_NOTES.md, history) | — |
+| `loop` | **Yes** (via lead-engineer) | Partial (STATE.md, feature PLAN.md, LOOP_NOTES.md, history) | — |
 
-- Only `executor`, `debugger`, and `loop` (which spawns executor) may modify source code
+- Only `lead-engineer`, `db-engineer`, `ui-engineer`, `worker-engineer`, `debugger`, and `loop` (which spawns lead-engineer) may modify source code
 - `verifier`, `reviewer`, `code-quality-reviewer`, `status` are strictly read-only — they never modify any file
 - `/review` runs `reviewer` (spec compliance) then `code-quality-reviewer` (code quality) sequentially
 - `debugger` shares the same auto-fix budget concept: after 3 failed fix attempts, stop and escalate to user
+
+## Agent Responsibility Matrix
+
+| Domain | Primary Agent | Trigger | Secondary |
+|--------|--------------|---------|-----------|
+| Test execution | `tester` | `/test`, `/review` (if TEST_STRATEGY.md exists) | `lead-engineer` runs tests only for build verification |
+| Test generation | `tester` | post-dev or TDD mode (via lead-engineer) | — |
+| Security audit | `security-reviewer` | `/security`, `/review` (if SECURITY_STRATEGY.md exists) | `code-quality-reviewer` flags obvious hardcoded secrets only |
+| Logging audit | `log-auditor` | `/log`, `/review` (if LOG_STRATEGY.md exists) | — |
+| Code quality | `code-quality-reviewer` | `/review` | — |
+| Spec compliance | `reviewer` | `/review`, `/loop` | — |
+
+## Delegation Protocol
+
+When spawning a sub-agent via the Agent tool, use this format in the prompt:
+
+```
+[HANDOFF]
+TO: agent-name (model)
+TASK: One-line imperative description
+DONE-WHEN:
+  - Observable completion criterion 1
+  - Observable completion criterion 2
+MUST-NOT:
+  - Explicit constraint 1
+  - Explicit constraint 2
+READS:
+  - file path the sub-agent must read
+[/HANDOFF]
+```
+
+Rules:
+- DONE-WHEN items must be observable (file exists, test passes, build succeeds) — not subjective
+- MUST-NOT applies only to this specific handoff — agent-level constraints are already in the agent definition
+- READS lists only essential files — do not list files the agent already knows to read from its own instructions
+- Keep each handoff under 15 lines total
+- All agent spawns must use this format — free-form prompts are not allowed
+
+## AGENTS.md Navigation Index
+
+`AGENTS.md` files are per-directory navigation indices in the project source directories.
+
+Format:
+```markdown
+# [directory-path]/
+
+## Files
+- FileName.tsx — One-line purpose description. Key exports or props
+- utils.ts — Two-line description if needed
+  Helpers for X and Y
+
+## Directories
+- sub-dir/ — One-line purpose
+```
+
+Rules:
+- Generated during `/init` for source directories with 3+ files
+- Updated by lead-engineer (or db-engineer/ui-engineer in team mode) when files are created, modified significantly, or deleted
+- Max 300 lines per file — if too many files, group by pattern
+- File entries: 1-2 lines max (name + purpose + key exports/props)
+- Directory entries: 1 line (name + purpose)
+- Cover only direct children — not recursive
+- No frontmatter, no prose — navigation only
+- Target directories: `src/`, `app/`, `components/`, `lib/`, `hooks/`, `features/`, `pages/`, `utils/`, `services/`, and their subdirectories
+- Excluded: `node_modules/`, `.next/`, `dist/`, `.turbo/`, `spec/`, `.claude/`
+- Agents should read `AGENTS.md` before globbing/grepping a directory
 
 ## Required Document Format
 
@@ -251,8 +357,8 @@ testing: none                # none | optional | required
 ```
 
 `testing` field values:
-- `required`: executor writes tests after implementation; verifier Level 2b blocks if tests missing
-- `optional`: executor skips test phase; verifier Level 2b warns but does not block
+- `required`: lead-engineer writes tests after implementation; verifier Level 2b blocks if tests missing
+- `optional`: lead-engineer skips test phase; verifier Level 2b warns but does not block
 - `none`: no test expectations for this feature
 
 `max-iterations` field (optional):
@@ -290,7 +396,7 @@ Sections (required):
 ## Plan Approval Protocol
 - PLAN.md (inside the feature directory) must include an `## Approval` section with `Status:` and `Approved-at:` fields
 - Planner must set `Status: pending` on creation and update to `Status: approved` with timestamp only after explicit user confirmation
-- Executor must verify `Status: approved` before starting any work — if pending or missing, executor must stop immediately
+- Lead-engineer must verify `Status: approved` before starting any work — if pending or missing, lead-engineer must stop immediately
 
 ## History Entry Format
 History entries in `spec/feature/[name]/history/` are validated by PostToolUse hook.
