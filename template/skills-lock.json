@@ -1,0 +1,165 @@
+{
+  "version": 1,
+  "skills": {
+    "agent-browser": {
+      "source": "vercel-labs/agent-browser",
+      "sourceType": "github",
+      "computedHash": "3c1e3549339c98c44c8c75f676f56ebc0adcd4494ec27b7f1851f7c5a7c2deaf"
+    },
+    "analytics-tracking": {
+      "source": "coreyhaines31/marketingskills",
+      "sourceType": "github",
+      "computedHash": "1ad3893d31e5df78cb4b4e16801f49acbdf82daed5f775748859ca7dc638d6d0"
+    },
+    "apollo-client": {
+      "source": "apollographql/skills",
+      "sourceType": "github",
+      "computedHash": "ae82ac8ee2b1de548a83ebee3c470391aa11ba2948ccd79448b9c9101384016e"
+    },
+    "better-auth-best-practices": {
+      "source": "better-auth/skills",
+      "sourceType": "github",
+      "computedHash": "a4c830509e85557b59339d8d93a4e243e9e59c686e7678854d39230e12c2a6dc"
+    },
+    "clean-code": {
+      "source": "sickn33/antigravity-awesome-skills",
+      "sourceType": "github",
+      "computedHash": "af77b8995f255140f1643de753007baf87b734e8b87175489524aadc3559c42a"
+    },
+    "cohesion": {
+      "source": "toss/frontend-fundamentals",
+      "sourceType": "github",
+      "computedHash": "df9617a46889464780076c40b905eebd320a095a87bd5946ed663b848fb9305c"
+    },
+    "coupling": {
+      "source": "toss/frontend-fundamentals",
+      "sourceType": "github",
+      "computedHash": "2de669a509671c65e0c674ff461dc307033cec457477b644e9c6516e40a86bdd"
+    },
+    "create-github-action-workflow-specification": {
+      "source": "github/awesome-copilot",
+      "sourceType": "github",
+      "computedHash": "527e6c77d921d58a9d0059aa95d0d14b441d2166f9c20518263048a56ca8fbbb"
+    },
+    "emilkowal-animations": {
+      "source": "pproenca/dot-skills",
+      "sourceType": "github",
+      "computedHash": "5044cbfc49bba2122b1cef3dcb960b8e415867db90f097f9e9bcdb24df695d11"
+    },
+    "error-handling-patterns": {
+      "source": "wshobson/agents",
+      "sourceType": "github",
+      "computedHash": "824c53fa080765f05862d3ec0ef829aaff9f8d544f9de0039b8fcafa6bc1a899"
+    },
+    "frontend-design": {
+      "source": "anthropics/skills",
+      "sourceType": "github",
+      "computedHash": "063a0e6448123cd359ad0044cc46b0e490cc7964d45ef4bb9fd842bd2ffbca67"
+    },
+    "github-actions-templates": {
+      "source": "wshobson/agents",
+      "sourceType": "github",
+      "computedHash": "8604814828637308a8cdc45c53e647f0029395328184937312330e4b8e8c587f"
+    },
+    "javascript-testing-patterns": {
+      "source": "wshobson/agents",
+      "sourceType": "github",
+      "computedHash": "d101563edd4d9c61c11eb75e583862e47babd497c442924c6ac757052477f76e"
+    },
+    "javascript-typescript-jest": {
+      "source": "github/awesome-copilot",
+      "sourceType": "github",
+      "computedHash": "0073d19ab0275eb6a8200aced6789a53744667bd717b5d1f44ce708a1740e5d4"
+    },
+    "log-analysis": {
+      "source": "supercent-io/skills-template",
+      "sourceType": "github",
+      "computedHash": "ddb7887f71ae4730fccc90a3430b3b24303f112d23c499cfa069d070c5c3f52c"
+    },
+    "marketing-psychology": {
+      "source": "coreyhaines31/marketingskills",
+      "sourceType": "github",
+      "computedHash": "ddec844d01d102687f89749e1d3a9f7a9019010dce1039a7d442189f39726ad4"
+    },
+    "next-best-practices": {
+      "source": "vercel-labs/next-skills",
+      "sourceType": "github",
+      "computedHash": "515ba75178bd44875812d9a560bdf14651f86709f89cf1d4f209638e879807f3"
+    },
+    "nextjs-app-router-fundamentals": {
+      "source": "wsimmonds/claude-nextjs-skills",
+      "sourceType": "github",
+      "computedHash": "2d73efbbc227187a78d547d80e7e778d179048d592530dc9f69c8307eee6ae76"
+    },
+    "playwright-best-practices": {
+      "source": "currents-dev/playwright-best-practices-skill",
+      "sourceType": "github",
+      "computedHash": "320eaf861e3a0a923bfaad0726cb311a3fe30093378f8d26c89b9c5ae5c42b35"
+    },
+    "predictability": {
+      "source": "toss/frontend-fundamentals",
+      "sourceType": "github",
+      "computedHash": "46eeb9ad76c2adfe1e5ddd336ecd4a064f737f79a68fefa1260e37fab255b366"
+    },
+    "react-hook-form-zod": {
+      "source": "ovachiever/droid-tings",
+      "sourceType": "github",
+      "computedHash": "1ee0fc6e35b6b6973d6117657e644605a5646bd7e6c2d0c55f52ec073679ac65"
+    },
+    "readability": {
+      "source": "toss/frontend-fundamentals",
+      "sourceType": "github",
+      "computedHash": "23adeac7a9041f7a026bb46bb58f0ac56872b02531838c418acac71944a9df2f"
+    },
+    "seo-audit": {
+      "source": "coreyhaines31/marketingskills",
+      "sourceType": "github",
+      "computedHash": "ec3109d213dde1747614ad1112ef0e498e04b24e464538968e156dfbfadb2121"
+    },
+    "shadcn": {
+      "source": "shadcn/ui",
+      "sourceType": "github",
+      "computedHash": "1ec42c9b918b315d8e5c6c856b78c3c4725fc93dea30b9b7e9975c69848fcce6"
+    },
+    "tailwind-design-system": {
+      "source": "wshobson/agents",
+      "sourceType": "github",
+      "computedHash": "7ff2f4650597e98ca4cd8f01231fb432ab4d187d6b12e641485aa871a04448cc"
+    },
+    "tanstack-query-best-practices": {
+      "source": "deckardger/tanstack-agent-skills",
+      "sourceType": "github",
+      "computedHash": "21d2e8b7468a81d772b6527ad8ca178cc2f3f08af777bb9061333013ee88a0c9"
+    },
+    "turborepo": {
+      "source": "vercel/turborepo",
+      "sourceType": "github",
+      "computedHash": "fa46b4bc06589ff6acdd0a5837ab280302908f6c817be2caa8cbae1989feb434"
+    },
+    "ui-ux-pro-max": {
+      "source": "nextlevelbuilder/ui-ux-pro-max-skill",
+      "sourceType": "github",
+      "computedHash": "0a413bf988d06481f69bb81df2070741c3ba12dd9f1be2706d57f259c905992d"
+    },
+    "vercel-composition-patterns": {
+      "source": "vercel-labs/agent-skills",
+      "sourceType": "github",
+      "computedHash": "f98931159fa9c7fed043bcd18a891a46dcf89ababa38df13a4c5b7b30dc0ce07"
+    },
+    "vercel-react-best-practices": {
+      "source": "vercel-labs/agent-skills",
+      "sourceType": "github",
+      "computedHash": "afeca00ac2f492d88fdd010e73d91719a5b57c564bb4a73325b0bd77e11323ab"
+    },
+    "web-design-guidelines": {
+      "source": "vercel-labs/agent-skills",
+      "sourceType": "github",
+      "computedHash": "a6a44d5498f7e8f68289902f3dedfc6f38ae0cee1e96527c80724cf27f727c2a"
+    },
+    "zustand": {
+      "source": "lobehub/lobehub",
+      "sourceType": "github",
+      "computedHash": "ef9a6e8dea1837804918bc6533e52b6e05b4589dbe9c26af692111413328a13c"
+    }
+  }
+}
