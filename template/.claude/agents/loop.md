@@ -49,21 +49,11 @@ Before each iteration, read `spec/feature/[name]/LOOP_NOTES.md` to understand:
 - What strategy was planned for this iteration
 
 **Step B — Review**
-Spawn `reviewer` agent with `model: haiku` (REQ pass/fail checks are pattern matching):
-
-```
-[HANDOFF]
-TO: reviewer (haiku)
-TASK: Check each REQ for feature "[name]"
-DONE-WHEN:
-  - Every REQ-NNN has PASS or FAIL with evidence
-MUST-NOT:
-  - Modify any file
-  - Suggest features beyond the spec
-READS:
-  - spec/feature/[name]/spec.md
-[/HANDOFF]
-```
+Spawn `reviewer` (model: haiku) using HANDOFF format from `spec/rules/_delegation.md`:
+- TO: reviewer (haiku), TASK: Check each REQ for feature "[name]"
+- DONE-WHEN: every REQ-NNN has PASS or FAIL with evidence
+- MUST-NOT: modify any file, suggest features beyond spec
+- READS: spec/feature/[name]/spec.md
 
 **Step C — Parse results and check completion**
 Read the reviewer's output and update tracking:
@@ -92,26 +82,14 @@ Before spawning lead-engineer, analyze the failing REQs:
 
 **Step E — Targeted fix**
 For failing REQs only, assess size: if ≤2 failing REQs with single-file fixes → `model: haiku`, otherwise → `model: sonnet`.
-Spawn `lead-engineer` agent (with assessed model):
-```
-[HANDOFF]
-TO: lead-engineer ({assessed model})
-TASK: Fix failing REQs for feature "[name]"
-DONE-WHEN:
-  - All listed failing REQs are fixed
-  - npx tsc --noEmit passes
-  - No console.log, commented-out code, or unused imports in changed files
-MUST-NOT:
-  - Re-implement passing requirements
-  - Refactor or change working code
-  - Modify spec.md or design.md
-READS:
-  - spec/feature/[name]/PLAN.md
-  - spec/feature/[name]/CONTEXT.md
-  - spec/feature/[name]/spec.md
-  - spec/feature/[name]/design.md
-[/HANDOFF]
+Spawn `lead-engineer` using HANDOFF format from `spec/rules/_delegation.md`:
+- TO: lead-engineer ({assessed model}), TASK: Fix failing REQs for feature "[name]"
+- DONE-WHEN: all listed failing REQs fixed, tsc passes, no console.log/commented-out code/unused imports
+- MUST-NOT: re-implement passing REQs, refactor working code, modify spec/design
+- READS: PLAN.md, CONTEXT.md, spec.md, design.md
 
+Append to the HANDOFF prompt:
+```
 Failing REQs:
 - REQ-NNN: [description]
   Failure reason: [reviewer's specific failure reason]
@@ -120,7 +98,8 @@ Failing REQs:
 ```
 
 **Step F — Update LOOP_NOTES.md**
-Write/update `spec/feature/[name]/LOOP_NOTES.md` with the current iteration's results:
+Write/update `spec/feature/[name]/LOOP_NOTES.md` with the current iteration's results.
+**Size limit:** Keep LOOP_NOTES.md under 200 lines. If exceeding, summarize older iterations (keep only last 3 iterations in detail; condense earlier ones to single-line entries like `- Iteration 1: REQ-001 PASS, REQ-002 FAIL (auth validation)`).
 
 ```markdown
 # Loop Notes — [feature name]
@@ -157,6 +136,11 @@ Updated: YYYY-MM-DD / Iteration: N/5
 ---
 
 7. **On loop exit** — read `.claude/agents/loop-completion.md` for success (all REQs pass) or exhaustion (max iterations) handling.
+
+8. **After loop-completion finishes** — spawn `learning-extractor` (haiku) using HANDOFF format from `spec/rules/_delegation.md`:
+   - TASK: Extract patterns from loop session for "[name]" ([N] iterations, [X/Y] REQs passed)
+   - READS: spec/feature/[name]/LOOP_NOTES.md
+   - Fire-and-forget — do not wait for output.
 
 ## Auto-fix budget interaction
 

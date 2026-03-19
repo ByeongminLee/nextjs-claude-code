@@ -97,44 +97,31 @@ You are a development planner for Next.js and React projects. You turn feature s
 
 8c. **Team Composition** — when MODE: team, read `.claude/agents/planner-team-mode.md` for team composition rules.
 
-8d. **Write `spec/feature/[name]/PLAN.md`**
+8d. **Assign parallel groups** — team mode only
 
-   ```markdown
-   # [Feature Name] — Development Plan
-   Created: YYYY-MM-DD
+   After tagging domains, identify which tasks can run simultaneously:
 
-   ## Target Feature
-   spec/feature/[name]/
+   | Same group (parallel:A) | Different groups |
+   |------------------------|-----------------|
+   | Tasks touch different files | Task B reads output of Task A |
+   | Tasks belong to different domains (db + ui) | Both tasks modify the same file |
+   | No logical dependency between them | One task sets up types/schemas the other uses |
 
-   ## Tasks
-   - [ ] Task 1: [description] → [target file(s)] [lead]
-   - [ ] Task 2: [description] → [target file(s)] [db]
-   - [ ] Task 3: [description] → [target file(s)] [worker]
-   - [ ] Task 4: [description] → [target file(s)] [ui]
+   Use single uppercase letters (A, B, C…) for group IDs. A runs before B, B before C.
+   In solo mode: omit `parallel` field entirely — it will be ignored.
 
-   ## Team Composition
-   (only in team mode — omit entirely in solo mode)
+8e. **Write `spec/feature/[name]/PLAN.md`**
 
-   ## Checkpoints
-   - [ ] checkpoint:human-verify — [what to verify] (after Task N)
-
-   ## Completion Criteria
-   - [ ] Criterion 1 (observable behavior)
-   - [ ] Criterion 2
-
-   ## Model Assignment
-   lead-engineer: [sonnet or haiku]
-   db-engineer: sonnet
-   ui-engineer: sonnet
-   worker-engineer: haiku
-   verifier: haiku
-
-   ## Auto-fix Budget
-   Max retries: 3 / Used: 0
-
-   ## Approval
-   Status: pending
-   ```
+   Structure:
+   - `# [Feature Name] — Development Plan` + `Created: YYYY-MM-DD`
+   - `## Target Feature`: `spec/feature/[name]/`
+   - `## Tasks`: use task format from `spec/rules/_workflow.md` > PLAN.md Task Format section. Tag each task with domain (`[lead]`, `[db]`, `[ui]`, `[worker]`) and optional `parallel:GroupID`.
+   - `## Team Composition`: (team mode only — omit in solo mode)
+   - `## Checkpoints`: list checkpoint types after relevant tasks
+   - `## Completion Criteria`: observable behaviors
+   - `## Model Assignment`: per `spec/rules/_model-routing.md`
+   - `## Auto-fix Budget`: `Max retries: 3 / Used: 0`
+   - `## Approval`: `Status: pending`
 
 ## Model Assignment
 
@@ -158,25 +145,12 @@ For task-to-file mapping: each task maps to 1-3 files maximum with exact paths.
     - Update `spec/STATE.md` — change the feature's phase to `executing`: `### [feature-name] [executing]`
 
 12. **Spawn lead-engineer after confirmation**
-    - Use the Agent tool to invoke the `lead-engineer` agent
-    - Read the model from PLAN.md `## Model Assignment` → `lead-engineer:` field
-    - Prompt must use the delegation format:
-      ```
-      [HANDOFF]
-      TO: lead-engineer ({model from PLAN.md})
-      TASK: Implement feature "[feature-name]"
-      DONE-WHEN:
-        - All tasks in PLAN.md marked [x]
-        - npx tsc --noEmit passes
-        - Verifier passes Level 1-3
-      MUST-NOT:
-        - Modify spec.md or design.md
-        - Refactor code outside the feature scope
-      READS:
-        - spec/feature/[feature-name]/PLAN.md
-        - spec/feature/[feature-name]/CONTEXT.md
-      [/HANDOFF]
-      ```
+    - Use the Agent tool to invoke `lead-engineer` (model from PLAN.md `## Model Assignment` → `lead-engineer:` field)
+    - Use HANDOFF format from `spec/rules/_delegation.md` with:
+      - TO: lead-engineer, TASK: Implement feature "[feature-name]"
+      - DONE-WHEN: all tasks [x], tsc passes, verifier L1-3 passes
+      - MUST-NOT: modify spec/design, refactor outside scope
+      - READS: PLAN.md, CONTEXT.md
 
 ## Hard constraints
 - Never start implementation before user confirms the plan
