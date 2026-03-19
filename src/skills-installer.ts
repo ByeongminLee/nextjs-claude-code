@@ -100,21 +100,21 @@ export const SKILLS: SkillDef[] = [
     description: 'Marketing psychology and mental models for UX conversion optimization',
     tier: 'on-demand',
   },
-  // ── Core: Skill Discovery ───────────────────────────────────────────────────
+  // ── On-demand: Skill Discovery ──────────────────────────────────────────────
   {
     name: 'find-skills',
     url: 'https://skills.sh/vercel-labs/skills/find-skills',
     cli: 'npx skills add vercel-labs/skills --skill find-skills --agent claude-code --yes --copy',
     description: 'Skill finder — search and install skills dynamically',
-    tier: 'core',
+    tier: 'on-demand',
   },
-  // ── Core: Changelog ────────────────────────────────────────────────────────
+  // ── On-demand: Changelog ──────────────────────────────────────────────────
   {
     name: 'changelog-maintenance',
     url: 'https://skills.sh/supercent-io/skills-template/changelog-maintenance',
     cli: 'npx skills add supercent-io/skills-template --skill changelog-maintenance --agent claude-code --yes --copy',
     description: 'Keep a Changelog + Semantic Versioning maintenance',
-    tier: 'core',
+    tier: 'on-demand',
   },
   // ── Core: DevOps / CI ───────────────────────────────────────────────────────
   {
@@ -372,7 +372,6 @@ export async function installSkills(
       if (fs.existsSync(path.join(bundledDir, 'SKILL.md'))) {
         copyDirRecursive(bundledDir, destDir);
       } else {
-        installed++;
         continue;
       }
     }
