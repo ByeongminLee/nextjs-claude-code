@@ -19,7 +19,7 @@ ${FS_MARKER_START}
 
 Before any work, always read:
 1. \`spec/STATE.md\` — current progress and active features
-2. \`spec/RULE.md\` — workflow rules, checkpoint conditions, team mode rules
+2. \`spec/rules/_workflow.md\` — core workflow rules (extended rules in \`spec/rules/_*.md\`)
 
 Before modifying code:
 - Read \`spec/feature/[name]/spec.md\` (what to build)
@@ -175,16 +175,36 @@ async function mergeSettingsJson(
   }
 
   const existing = JSON.parse(fs.readFileSync(destPath, 'utf-8'));
-  const existingPostToolUse: Array<{ matcher?: string }> = existing.hooks?.PostToolUse ?? [];
-  const hasFsHook = existingPostToolUse.some(
-    (h) => h.matcher === 'Write|Edit' && JSON.stringify(h).includes('validate-spec'),
-  );
-  if (hasFsHook) return;
+  if (!existing.hooks) existing.hooks = {};
+  if (!existing.hooks.PostToolUse) existing.hooks.PostToolUse = [];
+
+  const existingPostToolUse: Array<{ matcher?: string; hooks?: Array<{ command?: string }> }> = existing.hooks.PostToolUse;
+
+  // Collect all existing hook commands across all matcher groups
+  const existingCommands = new Set<string>();
+  for (const group of existingPostToolUse) {
+    for (const h of group.hooks ?? []) {
+      if (h.command) existingCommands.add(h.command);
+    }
+  }
+
+  // For each template hook group, merge missing hooks into matching existing group or add new group
+  for (const templateGroup of fsHooks) {
+    const templateHooks: Array<{ command?: string }> = (templateGroup as any).hooks ?? [];
+    const newHooks = templateHooks.filter((h: any) => h.command && !existingCommands.has(h.command));
+    if (newHooks.length === 0) continue;
+
+    // Find existing group with same matcher
+    const matchingGroup = existingPostToolUse.find((g) => g.matcher === (templateGroup as any).matcher);
+    if (matchingGroup) {
+      if (!matchingGroup.hooks) matchingGroup.hooks = [];
+      matchingGroup.hooks.push(...newHooks);
+    } else {
+      existingPostToolUse.push({ ...(templateGroup as any), hooks: newHooks });
+    }
+  }
 
   if (!dryRun) {
-    if (!existing.hooks) existing.hooks = {};
-    if (!existing.hooks.PostToolUse) existing.hooks.PostToolUse = [];
-    existing.hooks.PostToolUse.push(...fsHooks);
     fs.writeFileSync(destPath, JSON.stringify(existing, null, 2) + '\n', 'utf-8');
   }
 }
