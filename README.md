@@ -11,12 +11,12 @@ Define your feature. Claude builds exactly what the spec says — with every cha
 ## Features
 
 - **Spec-Driven**: Feature specs with REQ-NNN traceability, compliance reporting
-- **Curated skills** from [skills.sh](https://skills.sh) (community skill registry for Claude Code) — includes React, Next.js, UI/UX, testing, and library-specific best practices
-- **Architecture guides** — Flat, Feature-Based, FSD, Monorepo (chosen by team size)
+- **Curated skills** from [skills.sh](https://skills.sh) (community skill registry for Claude Code) — bundled core skills installed automatically, on-demand skills for library-specific best practices. Includes React, Next.js, UI/UX, testing patterns
+- **Architecture guides** — Flat, Feature-Based, FSD, Monorepo (auto-detected from project structure; refined via `/init`)
 - **Library-aware agents** — agents read your selected stack and follow its patterns
 - **Next.js native** — App Router, Server Components, Server Actions, Pages Router
 - **React support** — Vite and other React setups
-- **Monorepo ready** — Turborepo workspace-aware installation
+- **Monorepo ready** — detects monorepo patterns (Turborepo, apps/packages) and adapts skills/rules during `/init`
 - **Claude Code native** — slash commands, multi-agent coordination, PostToolUse hooks (validation scripts that run after Claude writes or edits files)
 
 ---
@@ -36,6 +36,17 @@ Define your feature. Claude builds exactly what the spec says — with every cha
 
 ```bash
 curl -s https://raw.githubusercontent.com/ByeongminLee/nextjs-claude-code/main/docs/installation.md
+```
+
+---
+
+## Quick Start
+
+```bash
+npx nextjs-claude-code@latest     # install SDD workflow
+/init                              # analyze codebase, populate spec docs
+/spec auth "user login with email" # define a feature spec
+/dev auth                          # implement the feature
 ```
 
 ---
@@ -135,7 +146,7 @@ Independent commands — use any of them whenever you need.
 
 | Command | Description |
 |---------|-------------|
-| `/cicd` | Set up CI/CD pipeline. Uses find-skills for platform-specific skill discovery. Generates spec/CICD.md. |
+| `/cicd` | (experimental) Set up CI/CD pipeline. Uses find-skills for platform-specific skill discovery. Generates spec/CICD.md. |
 
 ### Dev Utilities
 
@@ -166,7 +177,9 @@ Independent commands — use any of them whenever you need.
 |-------|------|:---:|:---:|
 | `db-engineer` | Schema, migrations, ORM, queries, RLS | sonnet | Yes (DB files only) |
 | `ui-engineer` | Components, styling, animations, responsive | sonnet | Yes (UI files only) |
-| `worker-engineer` | Simple utils, types, config (~200 lines) | haiku | Yes (assigned file only) |
+| `worker-engineer` | Simple utils, types, config (≤200 lines) | haiku | Yes (assigned file only) |
+
+> **Note:** Team mode requires `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` environment variable. npx install sets this in `.claude/settings.json`; plugin install provides it via `plugin.json` env.
 
 ### Ops Agents
 
@@ -175,13 +188,13 @@ Independent commands — use any of them whenever you need.
 | `reviewer` | Spec compliance report | No | No (read-only) |
 | `code-quality-reviewer` | Code quality review | No | No (read-only) |
 | `tester` | Test execution + TEST.md management | Creates test files only | Yes (TEST.md) |
-| `browser-tester` | Browser tests + Figma comparison | No | No (read-only) |
+| `browser-tester` | (experimental) Browser tests + Figma comparison | No | No (read-only) |
 | `committer` | Auto-generate commit messages | No | No |
 | `pr-creator` | PR creation + changelog + version bump | No (CHANGELOG.md + version only) | Yes (CHANGELOG.md) |
 | `git-strategy-detector` | Detect branch strategy + generate templates | No | Yes (GIT_STRATEGY.md) |
 | `log-auditor` | Logging audit and fixes | Fix mode only (`/log [name]`) | No (read-only) |
 | `security-reviewer` | Security audit (OWASP Top 10) | No | No (read-only) |
-| `cicd-builder` | CI/CD pipeline generation | Yes | Yes (CICD.md) |
+| `cicd-builder` | (experimental) CI/CD pipeline generation | Yes | Yes (CICD.md) |
 | `loop` | Force-complete REQ compliance | Yes (via lead-engineer) | Partial (STATE, history) |
 | `status` | Project status summary | No | No (read-only) |
 | `debugger` | Bug fixing | Yes | Yes (DEBUG.md) |
@@ -231,23 +244,42 @@ All `/dev` completions auto-trigger the verifier:
 
 If `/dev` is interrupted (session crash, timeout, context limit), running `/dev` again resumes from where it left off:
 
+- `spec/STATE.md` tracks each feature's phase independently: `idle` → `planning` → `executing` → `verifying` → `idle` (or `looping` during `/loop`)
+- `/dev` reads the feature's phase and routes to the appropriate agent instead of restarting from scratch
+- Completed tasks (`- [x]`) in `spec/feature/[name]/PLAN.md` are skipped on resume
+- Auto-fix budget (`Used: N`) persists across sessions
+- If spec.md was modified after PLAN.md was created, a warning is shown with a re-planning suggestion
+- **Model routing**: sonnet by default, haiku for small/mechanical tasks (verifier, cleanup, simple fixes). Opus is never used. See `spec/rules/_model-routing.md` for criteria.
+
 | Phase | Resume behavior |
 |-------|----------------|
 | `idle` | Fresh start → planner |
 | `planning` | Check PLAN.md status → continue or advance to lead-engineer |
 | `executing` | Skip completed tasks (`- [x]`) → continue from first `- [ ]` |
 | `verifying` | Re-run verifier via lead-engineer |
-| `looping` | Redirect to `/loop` command |
+| `looping` | Read LOOP_NOTES.md and resume from current iteration |
 
 ### Additional safeguards
 
 - **Spec validation**: PostToolUse hooks block malformed spec.md and design.md writes
 - **Spec reflection**: advisory hook reminds you to update the spec when code changes add new exports or routes
 - **Plan staleness check**: `/dev` warns if spec.md has been modified since the feature's PLAN.md was created
-- **Model routing**: agents use sonnet by default, haiku for small/mechanical tasks (verifier, cleanup, simple fixes). Opus is never used. See `spec/RULE.md` Model Routing for criteria.
+- **Model routing**: agents use sonnet by default, haiku for small/mechanical tasks (verifier, cleanup, simple fixes). Opus is never used. See `spec/rules/_model-routing.md` for criteria.
 - **Branch strategy awareness**: `/commit` and `/pr` auto-detect branch strategy and enforce commit conventions
 - **Conditional review agents**: tester, log-auditor, and security-reviewer only join `/review` when their strategy files exist (TEST_STRATEGY.md, LOG_STRATEGY.md, SECURITY_STRATEGY.md)
 - **Changelog automation**: `/pr` auto-updates CHANGELOG.md and bumps package.json version based on commit types (Semantic Versioning)
+
+---
+
+## Troubleshooting
+
+| Issue | Solution |
+|-------|----------|
+| Plan approval stuck at "pending" | Re-run `/dev [name]` to restart the planning flow |
+| Auto-fix budget exhausted | Lead-engineer stops after 3 attempts. Review the error manually and provide guidance |
+| Team mode not working | Verify `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` is set in `.claude/settings.json` |
+| Spec validation blocking writes | Check that section headers match the expected format (English or Korean) |
+| Hook errors on every file write | Edit `.claude/settings.json` to remove or disable specific hooks |
 
 ---
 

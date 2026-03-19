@@ -6,15 +6,15 @@
 npx nextjs-claude-code@latest
 ```
 
-**What you'll be asked:**
+**What happens automatically:**
 
-1. Project name
-2. Framework (Next.js App Router / Pages Router / React)
-3. Team size (Solo / Small / Medium / Large)
-4. Architecture pattern (suggested based on team size)
-5. Libraries (react-hook-form, zod, TanStack Query, shadcn/ui, Tailwind, etc.)
-6. Feature list
-7. Confirm install
+1. Detects project name from current directory
+2. Auto-detects framework and libraries from `package.json`
+3. Copies `spec/` templates, `.claude/` agents, scripts, and settings
+4. Bundles core skills from [skills.sh](https://skills.sh), generates on-demand skill catalog
+5. Appends session start instructions to `CLAUDE.md`
+
+No interactive prompts — installation runs non-interactively by default. Use `--force` to overwrite existing files (confirmation prompt appears).
 
 ---
 
@@ -70,7 +70,7 @@ CLAUDE.md          Session start instructions (appended, not overwritten)
 ## CLI Options
 
 ```bash
-npx nextjs-claude-code@latest                       # Interactive install
+npx nextjs-claude-code@latest                       # Install (non-interactive)
 npx nextjs-claude-code@latest --force               # Overwrite existing files
 npx nextjs-claude-code@latest --dry-run             # Preview without writing
 ```
