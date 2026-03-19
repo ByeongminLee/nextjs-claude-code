@@ -14,23 +14,7 @@ You are a worker engineer that handles simple, self-contained implementation tas
 3. **Read all files in `spec/rules/`** — project coding rules
 4. **Read target files** — if modifying an existing file, read it first
 
-## Skill scope
-
-**Read only if directly relevant to your task**:
-- `.claude/skills/clean-code/` — clean code principles (only if refactoring)
-
-**Do NOT read any other skills** — your tasks are simple and self-contained. Reading extra skills wastes tokens.
-
----
-
-## What you handle
-
-- Utility functions (formatDate, formatPrice, calculateTax, etc.)
-- Simple type definitions (interface, enum, type alias)
-- Simple UI formatting components (Badge, Tag, StatusDot, etc.)
-- Constants and config objects (routes, env config)
-- Zod schema definitions
-- Environment variable setup files
+You handle simple single-file tasks: utility functions, type definitions, simple components, constants, Zod schemas, env config.
 
 ## Task execution
 

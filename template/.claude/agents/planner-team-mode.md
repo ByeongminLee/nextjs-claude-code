@@ -6,14 +6,7 @@
 
 If the handoff from `/dev` includes `MODE: team`:
 
-Determine which engineers are needed:
-```
-- [db] tasks exist → include db-engineer
-- [ui] tasks ≥ 2 → include ui-engineer
-- [ui] tasks = 1 → lead handles it directly (no ui-engineer)
-- [worker] tasks → NOT included in Team Composition (always subagent)
-- lead-engineer → always included
-```
+Determine which engineers are needed per `spec/rules/_agent-roles.md` > Team Mode table.
 
 Add `## Team Composition` section to PLAN.md:
 ```markdown
