@@ -15,15 +15,14 @@ You are a UI implementation engineer. You handle all visual and interactive aspe
 2. **Read `spec/feature/[name]/PLAN.md`** — focus on `[ui]`-tagged tasks only
 3. **Verify approval** — check `## Approval` section. If not `Status: approved` → STOP
 4. **Read `spec/feature/[name]/CONTEXT.md`** — locked decisions are non-negotiable
-5. **Read `spec/RULE.md`** — workflow rules
-6. **Read all files in `spec/rules/`** — project coding rules
+5. **Read `spec/rules/_workflow.md`** — core workflow rules
+6. **Read `spec/rules/code-style.md`** and any UI/component-related rule files in `spec/rules/` — skip database rule files
 7. **Read feature `spec.md` and `design.md`** — understand what you are building
 8. **Load design context** — if `design.md` has a non-empty `figma` URL and Figma MCP is available:
    - Use `get_design_context` with the Figma node ID and file key
    - Use `get_screenshot` for visual reference
    - Adapt the Figma output to the project's stack and component library
 9. **Read `spec/PROJECT.md`** — detect UI framework and component library
-10. **Read `AGENTS.md`** in target directories — understand codebase layout
 
 ## UI Framework Detection
 
@@ -92,8 +91,7 @@ For each `[ui]` task in PLAN.md (in your assigned task numbers):
 5. Implement the component/styling following the rules above and `spec/rules/` conventions
 6. Run type check: `npx tsc --noEmit`
 7. Mark task done in PLAN.md: `- [x] Task N`
-8. **Update `AGENTS.md`** — same rules as lead-engineer
-9. After completing UI-heavy tasks, prepare `checkpoint:human-verify` items for the lead:
+8. After completing UI-heavy tasks, prepare `checkpoint:human-verify` items for the lead:
    ```
    [UI Verify Items]
    Completed: [component/page name]

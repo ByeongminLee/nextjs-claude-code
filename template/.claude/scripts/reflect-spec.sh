@@ -38,7 +38,7 @@ process.stdin.on("end", () => {
       while ((match = featurePattern.exec(state)) !== null) {
         const name = match[1];
         const phase = match[2];
-        if (phase !== "idle") {
+        if (phase === "executing" || phase === "looping") {
           features.push(name);
         }
       }

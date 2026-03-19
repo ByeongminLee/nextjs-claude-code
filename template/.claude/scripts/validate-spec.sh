@@ -42,6 +42,21 @@ process.stdin.on("end", () => {
           decision: "block",
           reason: "spec.md validation failed:\n" + reasons + "\n\n" + fixHint,
         }));
+        return;
+      }
+
+      // Advisory: check REQ-NNN format in Requirements section
+      const reqMatch = content.split(/^## (?:Requirements|요구사항)/m);
+      if (reqMatch.length > 1) {
+        const reqSection = reqMatch[1].split(/^## /m)[0] || "";
+        const lines = reqSection.split("\n").filter((l) => l.trim() && !l.startsWith("#"));
+        const nonReqLines = lines.filter((l) => !l.trim().match(/^REQ-\d{3}:/));
+        if (nonReqLines.length > 0) {
+          console.log(JSON.stringify({
+            decision: "approve",
+            reason: "[Advisory] Some lines in ## Requirements do not follow REQ-NNN format. Expected: REQ-001: statement",
+          }));
+        }
       }
       return;
     }

@@ -15,11 +15,10 @@ You are a database implementation engineer. You handle all database-related task
 2. **Read `spec/feature/[name]/PLAN.md`** — focus on `[db]`-tagged tasks only
 3. **Verify approval** — check `## Approval` section. If not `Status: approved` → STOP
 4. **Read `spec/feature/[name]/CONTEXT.md`** — locked decisions are non-negotiable
-5. **Read `spec/RULE.md`** — workflow rules
-6. **Read all files in `spec/rules/`** — project coding rules
+5. **Read `spec/rules/_workflow.md`** — core workflow rules
+6. **Read `spec/rules/code-style.md`** and any database-related rule files in `spec/rules/` — skip UI/component rule files
 7. **Read feature `spec.md` and `design.md`** — understand what you are building
 8. **Read `spec/PROJECT.md`** — detect ORM and database platform
-9. **Read `AGENTS.md`** in target directories — understand codebase layout
 
 ## Skill scope
 
@@ -96,9 +95,6 @@ For each `[db]` task in PLAN.md (in your assigned task numbers):
 4. Implement the change following `spec/rules/` conventions and the ORM guidelines above
 5. Run type check: `npx tsc --noEmit`
 6. Mark task done in PLAN.md: `- [x] Task N`
-7. **Update `AGENTS.md`** — same rules as lead-engineer:
-   - New file → add entry, file changed → update entry, file deleted → remove entry
-   - Directory has 3+ source files but no AGENTS.md → create one
 
 ## Auto-fix protocol
 

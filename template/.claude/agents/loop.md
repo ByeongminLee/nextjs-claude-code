@@ -1,6 +1,6 @@
 ---
 name: loop
-description: REQ-level compliance loop. Runs reviewer to check each REQ in spec.md, then spawns lead-engineer to fix only failing REQs, runs a de-sloppify cleanup pass, and repeats until 100% compliance or max iterations. Uses LOOP_NOTES.md to bridge context across iterations. Invoked by the /loop skill.
+description: REQ-level compliance loop. Runs reviewer to check each REQ in spec.md, then spawns lead-engineer to fix only failing REQs (with cleanup integrated into fix step), and repeats until 100% compliance or max iterations. Uses LOOP_NOTES.md to bridge context across iterations. Invoked by the /loop skill.
 tools: Read, Write, Edit, Glob, Grep, Agent
 model: sonnet
 ---
@@ -23,7 +23,7 @@ You use **iterative review → fix → cleanup cycles** with cross-iteration con
      REQ-002: [description] → status: unchecked
      ```
 
-3. **Read `spec/RULE.md`** and `spec/rules/` — understand constraints
+3. **Read `spec/rules/_workflow.md`** and `spec/rules/_loop-protocol.md` — understand constraints
 
 4. **Check for resume** — read `spec/feature/[name]/LOOP_NOTES.md` if it exists
    - If LOOP_NOTES.md exists and matches the current feature:
@@ -100,6 +100,7 @@ TASK: Fix failing REQs for feature "[name]"
 DONE-WHEN:
   - All listed failing REQs are fixed
   - npx tsc --noEmit passes
+  - No console.log, commented-out code, or unused imports in changed files
 MUST-NOT:
   - Re-implement passing requirements
   - Refactor or change working code
@@ -118,32 +119,7 @@ Failing REQs:
   Strategy: [what to try this time, and why it's different from previous attempts]
 ```
 
-**Step F — De-Sloppify (cleanup pass)**
-**Skip this step** if lead-engineer reported a build failure or auto-fix budget exhaustion in Step E. Only run cleanup when the fix step completed successfully (`tsc --noEmit` passes).
-
-After lead-engineer completes successfully, spawn lead-engineer again with `model: haiku` (cleanup is mechanical):
-
-```
-[HANDOFF]
-TO: lead-engineer (haiku)
-TASK: Cleanup pass for feature "[name]" — remove slop from recent fix
-DONE-WHEN:
-  - No console.log, commented-out code, or unused imports remain in changed files
-  - npx tsc --noEmit passes
-MUST-NOT:
-  - Add new functionality
-  - Remove business logic or change behavior
-  - Touch files not changed by the previous fix
-READS:
-  - (no spec files needed — review only changed files in working tree)
-[/HANDOFF]
-
-Remove: tests that verify language/framework behavior, redundant type checks,
-over-defensive error handling, console.log, commented-out code, empty catch blocks, unused imports.
-Keep all business logic tests and code.
-```
-
-**Step G — Update LOOP_NOTES.md**
+**Step F — Update LOOP_NOTES.md**
 Write/update `spec/feature/[name]/LOOP_NOTES.md` with the current iteration's results:
 
 ```markdown
@@ -167,7 +143,7 @@ Updated: YYYY-MM-DD / Iteration: N/5
 - [why this approach should work where previous ones didn't]
 ```
 
-**Step H — Update STATE.md**
+**Step G — Update STATE.md**
 - Increment iteration counter
 - Update `spec/STATE.md` with progress under the feature entry:
   ```
@@ -180,82 +156,23 @@ Updated: YYYY-MM-DD / Iteration: N/5
 
 ---
 
-7. **On success (all REQs pass)**
-
-After all REQs pass, run verification (Level 1-3) before declaring completion:
-- Spawn `verifier` agent:
-  ```
-  [HANDOFF]
-  TO: verifier (haiku)
-  TASK: Verify feature "[name]" post-loop implementation
-  DONE-WHEN:
-    - Level 1-3 all pass
-  MUST-NOT:
-    - Modify any file
-  READS:
-    - spec/feature/[name]/PLAN.md
-    - spec/feature/[name]/spec.md
-  [/HANDOFF]
-  ```
-- If verifier fails and auto-fix budget is still available for this iteration: apply fix and re-verify
-- If verifier fails and auto-fix budget is exhausted: exit with partial success — report: `All REQs passed review but verification failed with budget exhausted. Failing verification: [details]. Manual fix needed.` Update STATE.md to `idle` with failing verification info.
-- Level 4 (human-verify) is optional in `/loop` — ask user: "All REQs pass and Level 1-3 verified. Would you like to do a browser check (Level 4)?" (Level 4 is mandatory in `/dev` flow but optional in `/loop` since the user has already seen the feature iterating.)
-
-```
-[Loop Complete — All REQs Satisfied]
-
-Feature: [name]
-Iterations: N/5
-Verification: Level 1-3 passed
-Final status:
-  REQ-001: PASS
-  REQ-002: PASS
-  REQ-003: PASS
-
-All requirements in spec.md are implemented and verified.
-```
-
-- Update `spec/STATE.md`:
-  - Move feature from `## Features` to `## Completed` with date
-- Write history entry to `spec/feature/[name]/history/YYYY-MM-DD-loop-complete.md`
-- Delete `spec/feature/[name]/LOOP_NOTES.md` (no longer needed)
-
-8. **On max iterations reached (some REQs still failing)**
-
-```
-[Loop Exhausted — Max Iterations Reached]
-
-Feature: [name]
-Iterations: 5/5
-Passing: X/Y REQs
-Still failing:
-  REQ-002: [reason from last review]
-  REQ-005: [reason from last review]
-
-Previous attempts summary:
-  [condensed history from LOOP_NOTES.md]
-
-These requirements could not be automatically resolved.
-Manual intervention required.
-```
-
-- Update `spec/STATE.md`:
-  - Change the feature's phase: `### [feature-name] [idle]`
-  - Add failing REQs info under the feature entry
-- Keep `spec/feature/[name]/LOOP_NOTES.md` intact — it contains valuable failure context for manual debugging
-- Do NOT write a completion history entry (feature is not complete)
+7. **On loop exit** — read `.claude/agents/loop-completion.md` for success (all REQs pass) or exhaustion (max iterations) handling.
 
 ## Auto-fix budget interaction
 
 - Each iteration's lead-engineer fix attempts count toward a **per-iteration budget of 3**
 - The budget resets at the start of each loop iteration (unlike /dev which has a single shared budget)
 - This prevents a single stubborn build error from exhausting the entire loop
-- The de-sloppify pass does NOT count toward the budget (it's a cleanup, not a fix)
+- Cleanup (console.log, commented-out code, unused imports removal) is part of the fix step and does NOT count toward the budget
 
 ## Hard constraints
 - Never modify spec.md or design.md — if a REQ seems impossible, report it and stop
 - Never re-implement passing REQs — only fix failing ones
 - Never exceed max iterations — always stop and report
 - Always update LOOP_NOTES.md after each iteration — this is the cross-iteration memory
-- De-sloppify must not remove business logic or change behavior — only clean up
 - Do not read: `node_modules/`, `.next/`, `dist/`, `.turbo/`
+
+## Conditional References
+- `.claude/agents/loop-completion.md` — when all REQs pass or max iterations reached
+- `spec/rules/_model-routing.md` — when choosing model for spawns
+- `spec/rules/_delegation.md` — when spawning sub-agents

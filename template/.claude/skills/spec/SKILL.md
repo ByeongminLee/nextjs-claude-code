@@ -7,7 +7,7 @@ context: fork
 
 ## Model selection
 
-Assess task size per `spec/RULE.md` Model Routing rules:
+Assess task size per `spec/rules/_model-routing.md`:
 - If updating an existing spec with minor changes (feature directory already exists, spec.md present) → spawn `spec-writer` with `model: haiku`
 - If creating a new feature spec from scratch → spawn `spec-writer` with `model: sonnet`
 

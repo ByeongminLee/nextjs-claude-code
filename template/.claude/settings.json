@@ -26,11 +26,6 @@
             "type": "command",
             "command": "bash .claude/scripts/security-suggest.sh",
             "statusMessage": "Checking security-sensitive changes..."
-          },
-          {
-            "type": "command",
-            "command": "bash .claude/scripts/update-agents-index.sh",
-            "statusMessage": "Checking AGENTS.md freshness..."
           }
         ]
       }
