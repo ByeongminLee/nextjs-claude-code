@@ -7,7 +7,7 @@ context: fork
 
 ## Model selection
 
-Before spawning agents, assess task size per `spec/RULE.md` Model Routing rules:
+Before spawning agents, assess task size per `spec/rules/_model-routing.md`:
 - **reviewer**: Read spec.md REQ count and count implementation files. If ≤5 REQs AND <5 files → haiku. Otherwise → sonnet.
 - **code-quality-reviewer**: always haiku (static analysis, pattern detection).
 - **tester**: sonnet (test analysis requires reasoning). Only if `spec/TEST_STRATEGY.md` exists.

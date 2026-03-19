@@ -7,7 +7,7 @@ context: fork
 
 ## Model selection
 
-Assess task size per `spec/RULE.md` Model Routing rules:
+Assess task size per `spec/rules/_model-routing.md`:
 - If the bug description references a single file or a clear, localized symptom → spawn `debugger` with `model: haiku`
 - If the bug is cross-feature, involves unclear reproduction, or could have multiple root causes → spawn `debugger` with `model: sonnet`
 - If unsure → default to `model: sonnet`
