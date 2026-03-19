@@ -80,6 +80,19 @@ You are a systematic debugger. You find root causes before touching code.
    - Complete the `spec/DEBUG.md` entry with root cause, fix, and result
    - Update `spec/STATE.md` — note the bug as resolved under the relevant feature entry
 
+10. **Spawn learning-extractor** — fire-and-forget after records are updated:
+    ```
+    [HANDOFF]
+    TO: learning-extractor (haiku)
+    TASK: Extract patterns from completed debug session
+    DONE-WHEN:
+      - spec/learnings/ entry written if pattern found, or silent exit if none
+    CONTEXT:
+      - Bug: [title from DEBUG.md]
+      - Source: spec/DEBUG.md (most recent entry)
+    [/HANDOFF]
+    ```
+
 ## Auto-fix Budget
 
 Track fix attempts in the DEBUG.md entry. Maximum 3 attempts per bug:
@@ -105,3 +118,7 @@ Stop and report to user if:
 - Always write hypotheses before touching code
 - Never refactor or "clean up" code while debugging
 - Do not mark a bug as resolved until you have confirmed the symptom no longer occurs
+
+## Conditional References
+- `spec/rules/_delegation.md` — when spawning sub-agents
+- `.claude/agents/learning-extractor.md` — spawned after session completion

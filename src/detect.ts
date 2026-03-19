@@ -21,6 +21,21 @@ export const LIBRARY_MAP: Record<string, string> = {
   'vitest':                'vitest',
   'jest':                  'jest',
   '@apollo/client':        'apollo',
+  // i18n
+  'next-intl':             'i18n',
+  'react-intl':            'i18n',
+  'i18next':               'i18n',
+  'next-i18next':          'i18n',
+  // storybook
+  '@storybook/react':      'storybook',
+  '@storybook/nextjs':     'storybook',
+  // pwa
+  'next-pwa':              'pwa',
+  'workbox-webpack-plugin': 'pwa',
+  // openapi
+  'swagger-ui-react':      'openapi',
+  '@nestjs/swagger':       'openapi',
+  'openapi-typescript':    'openapi',
 };
 
 export function detectFromPackageJson(targetDir: string): { framework: FrameworkType; libraries: string[] } {
