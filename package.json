@@ -37,6 +37,7 @@
     "build": "tsc",
     "dev": "tsc --watch",
     "fetch-skills": "npx ts-node scripts/fetch-skills.ts",
+    "publish:quick": "npm run build && npm publish --ignore-scripts",
     "prepublishOnly": "npm run fetch-skills && npm run build"
   },
   "dependencies": {
