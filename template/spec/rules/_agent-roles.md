@@ -15,6 +15,7 @@
 | `ui-engineer` | **Yes** (UI files only) | Partial (PLAN.md budget via lead) | — |
 | `worker-engineer` | **Yes** (assigned file only) | No | — |
 | `verifier` | No | No | **Yes** |
+| `performance-optimizer` | No | No | **Yes** |
 | `reviewer` | No | No | **Yes** |
 | `code-quality-reviewer` | No | No | **Yes** |
 | `task-spec-reviewer` | No | No | **Yes** |
@@ -56,7 +57,7 @@
 | UI files | React components, CSS/style, layout markup, animation | `components/**/*.tsx`, `*.css`, `*.module.css` |
 | Lead domain (shared) | Server actions, API routes, hooks, utilities, types, page wiring | `actions/*`, `app/api/*`, `hooks/*`, `utils/*`, `types/*` |
 
-Files with ambiguous boundaries (e.g., server actions with DB queries) belong to lead-engineer.
+Files with ambiguous boundaries (e.g., server actions with DB queries) belong to `task-executor` (dispatched by lead-engineer as a `[lead]` domain task).
 
 Coordination:
 - Lead-engineer is the **orchestrator** — it dispatches tasks but never writes implementation code

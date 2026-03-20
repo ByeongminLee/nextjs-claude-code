@@ -81,7 +81,7 @@ TDD is the default development approach. If `spec/TEST_STRATEGY.md` exists with 
      - spec/feature/[feature-name]/spec.md
    [/HANDOFF]
    ```
-6. If verifier fails: apply fix (counts toward auto-fix budget), re-spawn verifier
+6. If verifier fails: dispatch a `task-executor` subagent with the fix instructions (counts toward auto-fix budget), then re-spawn verifier
 7. After verification passes: move feature to `## Completed` in STATE.md with date
 8. Write history entry `spec/feature/[name]/history/YYYY-MM-DD-[description].md`
 9. Reset CONTEXT.md to: `# Context\n\nNo active context.`

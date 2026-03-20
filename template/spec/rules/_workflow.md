@@ -19,6 +19,7 @@ spec/
     _verification.md      <- 4-level verification protocol
     _loop-protocol.md     <- /loop rules and cross-iteration context
     _agent-roles.md       <- agent role boundaries and responsibilities
+    _skill-budget.md      <- skill injection budget per agent
     _nextjs-ordering.md   <- Next.js task dependency ordering
     code-style.md         <- project coding rules (mutable)
     testing.md            <- project testing rules (mutable)
@@ -182,3 +183,4 @@ Read ONLY when the condition applies to your current task:
 - `spec/rules/_loop-protocol.md` — when running /loop
 - `spec/rules/_agent-roles.md` — when checking agent boundaries or responsibilities
 - `spec/rules/_nextjs-ordering.md` — when project is Next.js
+- `spec/rules/_skill-budget.md` — when deciding which skills to read (budget limits per agent)

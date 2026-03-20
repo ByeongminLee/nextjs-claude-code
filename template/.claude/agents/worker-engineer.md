@@ -32,11 +32,13 @@ For each assigned task:
 ## Completion report format
 
 ```
-[Worker Complete]
+[Task Complete]
 Task: [task description]
-Files: [created/modified files]
 Status: success | failed
-Notes: [any relevant details, or error message if failed]
+Files-Created: [list of new files]
+Files-Modified: [list of modified files]
+Exports: [key exports, or "none"]
+Issues: [any relevant details, or error message if failed]
 ```
 
 ## Hard constraints

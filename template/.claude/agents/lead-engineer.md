@@ -22,9 +22,8 @@ Each task is executed by a subagent with a clean context window. This prevents *
    - If `Status: pending` or missing → **STOP immediately**. Report: "PLAN.md has not been approved."
 4. **Read `spec/feature/[name]/CONTEXT.md`** — all decisions here are non-negotiable
 5. **Read `spec/rules/_workflow.md`** — core workflow rules
-6. **Read all files in `spec/rules/`** — project coding rules. Follow these when writing code.
+6. **Skim `spec/rules/`** — understand project coding rules (subagents will read these in full)
 7. **Read feature `spec.md` and `design.md`** — understand what you are building
-   - If `design.md` has a non-empty `figma` URL and Figma MCP is available, use `get_design_context` or `get_screenshot`
 8. **Update `spec/STATE.md`** — set phase to `executing`: `### [feature-name] [executing]`
 9. **Restore auto-fix budget** — read `Auto-fix Budget: Max retries: 3 / Used: N` from PLAN.md
 10. **Determine mode** — check PLAN.md for `## Team Composition`:
@@ -120,20 +119,13 @@ For each task in PLAN.md (in order):
 
 ---
 
-## Build & type check commands
+## Build & type check (subagent responsibility)
 
-After each task, run the appropriate check:
+Each subagent runs `npx tsc --noEmit` after completing its task. The orchestrator does NOT run builds directly.
 
-| Scenario | Command |
-|----------|---------|
-| Next.js (preferred) | `npx next build --no-lint` |
-| TypeScript only | `npx tsc --noEmit` |
-| Linting | `npx next lint` or `npx eslint . --ext .ts,.tsx` |
-| Tests | `npx vitest run` or `npx jest --passWithNoTests` |
-
-Run `tsc --noEmit` first — faster than a full build and catches most errors.
-
-When a build error occurs → read `.claude/agents/lead-engineer-autofix.md` for resolution protocol.
+If you need a full project build check after all tasks complete, run:
+- `npx tsc --noEmit` — type check only (fast)
+- `npx next build --no-lint` — full build (slower, catches more)
 
 ## Skill scope
 
@@ -161,8 +153,6 @@ When all tasks are marked `[x]` → read `.claude/agents/lead-engineer-completio
 
 ## Conditional References
 - `.claude/agents/lead-engineer-team-mode.md` — when PLAN.md contains `## Team Composition`
-- `.claude/agents/lead-engineer-msw-mock.md` — when a task targets `mocks/` files
-- `.claude/agents/lead-engineer-autofix.md` — when a build or type error occurs
 - `.claude/agents/lead-engineer-completion.md` — when a checkpoint is triggered OR all tasks done
-- `spec/rules/_nextjs-ordering.md` — when project is Next.js
 - `spec/rules/_delegation.md` — when spawning sub-agents
+- `spec/rules/_skill-budget.md` — for understanding subagent skill limits

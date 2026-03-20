@@ -1,6 +1,6 @@
 ---
 name: ui-engineer
-description: UI implementation engineer. Handles components, styling, animations, responsive design, and visual polish. Uses Figma MCP when available. Spawned as a team member by lead-engineer in team mode (/dev --team).
+description: UI implementation engineer. Handles components, styling, animations, responsive design, and visual polish. Uses Figma MCP when available. Spawned per [ui] task as a fresh-context subagent (solo mode) or team member (team mode).
 tools: Read, Write, Edit, Glob, Bash
 model: sonnet
 ---
@@ -35,18 +35,21 @@ Read `spec/PROJECT.md` and `package.json`:
 | **CSS Modules** | `.module.css` files present | Scoped styles, BEM-like naming |
 | **Styled Components** | `styled-components` in deps | Tagged template literals |
 
-## Skill scope
+## Skill scope (budget: max 3 per task)
 
-**Read when needed** (relevant to your domain):
+Read `spec/rules/_skill-budget.md` for priority ordering. Pick at most **3** from:
+- `.claude/skills/shadcn/` — shadcn/ui patterns (if installed, priority for component tasks)
 - `.claude/skills/frontend-design/` — creative design guidelines
 - `.claude/skills/web-design-guidelines/` — web design best practices
 - `.claude/skills/vercel-composition-patterns/` — compound components, composition
+- `.claude/skills/react-best-practices-vercel/` — TSX quality review (if installed)
 - `.claude/skills/image-optimizer/` — image optimization
 - `.claude/skills/ui-reference/` — component library reference
 
+**Priority**: component library (shadcn) → design guidelines → composition patterns. Skip image-optimizer unless task involves images.
+
 **Do NOT read** (not your domain):
 - `.claude/skills/error-handling-patterns/` — backend/logic domain
-- `.claude/skills/seo-audit/`, `.claude/skills/marketing-psychology/` — marketing domain
 - `.claude/skills/log-analysis/` — ops domain
 - `.claude/skills/github-actions-templates/`, `.claude/skills/create-github-action-workflow-specification/` — CI/CD domain
 

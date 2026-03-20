@@ -44,14 +44,17 @@ For `[worker]` tasks → `worker-engineer` is spawned instead.
    - If still failing after 2 attempts → STOP and report the error
 4. If the task targets `mocks/` files → also read `.claude/agents/lead-engineer-msw-mock.md` for mock patterns
 
-## Skill scope
+## Skill scope (budget: max 3 per task)
 
-**Read when relevant to your task:**
+Read `spec/rules/_skill-budget.md` for priority ordering. Pick at most **3** from:
 - `.claude/skills/error-handling-patterns/` — error handling
 - `.claude/skills/clean-code/` — clean code principles
 - `.claude/skills/vercel-react-best-practices/` — React patterns
 - `.claude/skills/vercel-composition-patterns/` — composition patterns
 - `.claude/skills/architectures/` — architecture reference
+- `.claude/skills/nextjs-vercel/` — Next.js 16 patterns (if installed)
+
+**Priority**: task-specific skill first → domain match → general quality skill last. Skip skills irrelevant to this specific task.
 
 ## Completion report
 
