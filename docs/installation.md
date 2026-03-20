@@ -45,7 +45,7 @@ Skills are namespaced as `/nextjs-claude-code:spec`, `/nextjs-claude-code:dev`, 
                    reviewer, code-quality-reviewer, loop, status, debugger,
                    rule-writer)
   skills/          Reference skills from skills.sh + skills-manifest.json
-  scripts/         validate-spec.sh, reflect-spec.sh (PostToolUse hooks)
+  scripts/         validate-post-write.sh, advisory-post-write.sh, security-guard.sh (hooks)
   settings.json    Hook configuration (merged, preserves existing hooks)
 
 spec/
