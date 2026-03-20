@@ -88,12 +88,14 @@ Maximum retries: **3**
 - `/dev`: shared counter across session. Persists via PLAN.md `Used: N`.
 - `/loop`: resets per iteration. Each iteration gets budget of 3.
 - `/debug`: 3 attempts per bug. Tracked in DEBUG.md.
+- Cleanup (console.log removal, unused imports, commented-out code) does NOT count toward budget in any flow.
+
 After 3 failed attempts: stop and escalate to user.
 
 ## Language
 - Default language for spec documents is **English**
 - If user writes in another language, match that language
-- Section headers: **English or Korean** (recognized by `validate-spec.sh`)
+- Section headers: **English or Korean** (recognized by `validate-post-write.sh`)
 
 ## Context Management
 - Mark each task `[x]` in PLAN.md immediately upon completion

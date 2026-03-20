@@ -99,7 +99,7 @@ Failing REQs:
 
 **Step F — Update LOOP_NOTES.md**
 Write/update `spec/feature/[name]/LOOP_NOTES.md` with the current iteration's results.
-**Size limit:** Keep LOOP_NOTES.md under 200 lines. If exceeding, summarize older iterations (keep only last 3 iterations in detail; condense earlier ones to single-line entries like `- Iteration 1: REQ-001 PASS, REQ-002 FAIL (auth validation)`).
+**Size limit:** Keep LOOP_NOTES.md under 50 lines. Retain only the latest 2 iterations in detail; condense older iterations to single-line entries like `- Iteration 1: REQ-001 PASS, REQ-002 FAIL (auth validation)`.
 
 ```markdown
 # Loop Notes — [feature name]

@@ -40,9 +40,9 @@ The planner writes a `## Model Assignment` section in the feature's PLAN.md with
 When spawning agents, read PLAN.md and use the assigned model:
 - **planner**: always sonnet (no PLAN.md exists yet at this point)
 - **lead-engineer**: read `lead-engineer:` from PLAN.md `## Model Assignment`
-- **verifier**: read `verifier:` from PLAN.md `## Model Assignment` (typically haiku)
+- **verifier**: always haiku (fixed — see `spec/rules/_model-routing.md`)
 
-If `## Model Assignment` is missing, default to sonnet.
+If `## Model Assignment` is missing for lead-engineer, default to sonnet.
 
 ### Phase-based routing:
 
