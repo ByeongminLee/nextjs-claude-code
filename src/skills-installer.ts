@@ -283,6 +283,64 @@ export const SKILLS: SkillDef[] = [
     tier: 'on-demand',
     condition: ['jest'],
   },
+
+  // ── On-demand: Accessibility & Performance ──────────────────────────────────
+  {
+    name: 'accessibility',
+    url: 'https://www.w3.org/WAI/WCAG21/quickref/',
+    cli: 'npx skills add vercel-labs/agent-skills --skill accessibility --agent claude-code --yes --copy',
+    description: 'WCAG 2.1 accessibility standards and React ARIA patterns',
+    tier: 'on-demand',
+    framework: ['nextjs-app', 'nextjs-pages', 'react'],
+  },
+  {
+    name: 'web-vitals',
+    url: 'https://web.dev/vitals/',
+    cli: 'npx skills add vercel-labs/agent-skills --skill web-vitals --agent claude-code --yes --copy',
+    description: 'Core Web Vitals optimization — LCP, FID, CLS',
+    tier: 'on-demand',
+    framework: ['nextjs-app', 'nextjs-pages'],
+  },
+
+  // ── On-demand: i18n ─────────────────────────────────────────────────────────
+  {
+    name: 'i18n-best-practices',
+    url: 'https://next-intl-docs.vercel.app/',
+    cli: 'npx skills add vercel-labs/agent-skills --skill i18n-best-practices --agent claude-code --yes --copy',
+    description: 'Internationalization patterns — next-intl, react-intl, i18next',
+    tier: 'on-demand',
+    condition: ['i18n'],
+  },
+
+  // ── On-demand: Storybook ─────────────────────────────────────────────────────
+  {
+    name: 'storybook',
+    url: 'https://storybook.js.org/docs/react/get-started/introduction',
+    cli: 'npx skills add vercel-labs/agent-skills --skill storybook --agent claude-code --yes --copy',
+    description: 'Component documentation and Storybook story patterns',
+    tier: 'on-demand',
+    condition: ['storybook'],
+  },
+
+  // ── On-demand: PWA ──────────────────────────────────────────────────────────
+  {
+    name: 'pwa-patterns',
+    url: 'https://web.dev/progressive-web-apps/',
+    cli: 'npx skills add vercel-labs/agent-skills --skill pwa-patterns --agent claude-code --yes --copy',
+    description: 'PWA service workers, offline support, and caching strategies',
+    tier: 'on-demand',
+    condition: ['pwa'],
+  },
+
+  // ── On-demand: OpenAPI ───────────────────────────────────────────────────────
+  {
+    name: 'openapi-spec',
+    url: 'https://swagger.io/specification/',
+    cli: 'npx skills add vercel-labs/agent-skills --skill openapi-spec --agent claude-code --yes --copy',
+    description: 'OpenAPI 3.x specification writing and API documentation patterns',
+    tier: 'on-demand',
+    condition: ['openapi'],
+  },
 ];
 
 // ─── Helpers ────────────────────────────────────────────────────────────────────
@@ -546,6 +604,8 @@ export async function updateSkills(targetDir: string): Promise<void> {
     const installedNames = new Set(manifest.map((m) => m.name));
     toUpdate = SKILLS.filter((s) => installedNames.has(s.name));
   } else {
+    log.warn('No skills-manifest.json found. Attempting to update all known skills.');
+    log.info('Run "npx nextjs-claude-code" first to install skills.');
     toUpdate = SKILLS;
   }
 
@@ -562,15 +622,15 @@ export async function updateSkills(targetDir: string): Promise<void> {
     }
   }
 
-  // manifest 갱신
+  // manifest 갱신 — Dedup key: hook.command field. All NCC hooks must have a unique command string.
   if (fs.existsSync(manifestPath)) {
-    const manifest: SkillManifestEntry[] = JSON.parse(fs.readFileSync(manifestPath, 'utf-8'));
+    const updatedManifest: SkillManifestEntry[] = JSON.parse(fs.readFileSync(manifestPath, 'utf-8'));
     const now = new Date().toISOString();
-    for (const entry of manifest) {
+    for (const entry of updatedManifest) {
       entry.installedAt = now;
       entry.source = 'cli';
     }
-    fs.writeFileSync(manifestPath, JSON.stringify(manifest, null, 2) + '\n', 'utf-8');
+    fs.writeFileSync(manifestPath, JSON.stringify(updatedManifest, null, 2) + '\n', 'utf-8');
   }
 
   if (failed > 0) {

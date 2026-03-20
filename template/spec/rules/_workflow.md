@@ -10,6 +10,7 @@ spec/
   ARCHITECTURE.md        <- feature map, cross-feature dependencies
   STATE.md               <- all features and their current phases (multi-feature)
   DEBUG.md               <- debug log (created by /debug)
+  learnings/             <- recurring patterns extracted from /loop and /debug sessions
   rules/
     _workflow.md          <- THIS FILE (core workflow rules, immutable)
     _document-format.md   <- spec.md, design.md, history format
@@ -28,6 +29,7 @@ spec/
       PLAN.md             <- task list, checkpoints, auto-fix budget
       CONTEXT.md          <- locked decisions, constraints
       LOOP_NOTES.md       <- cross-iteration context for /loop
+      PRODUCT_REVIEW.md   <- product review result (created by /office-hours)
       history/            <- change history archive
 ```
 
@@ -64,6 +66,7 @@ Rules:
 |---|---|
 | `/init` | First-time setup: analyze codebase, populate spec docs |
 | `/spec` | Define or update a feature spec |
+| `/office-hours [name]` | Product review before development (business value, scope, metrics) |
 | `/dev` | Plan, implement, verify a feature. `--team` for parallel team mode |
 | `/review` | Check spec compliance + code quality |
 | `/status` | Show project status |
@@ -85,12 +88,14 @@ Maximum retries: **3**
 - `/dev`: shared counter across session. Persists via PLAN.md `Used: N`.
 - `/loop`: resets per iteration. Each iteration gets budget of 3.
 - `/debug`: 3 attempts per bug. Tracked in DEBUG.md.
+- Cleanup (console.log removal, unused imports, commented-out code) does NOT count toward budget in any flow.
+
 After 3 failed attempts: stop and escalate to user.
 
 ## Language
 - Default language for spec documents is **English**
 - If user writes in another language, match that language
-- Section headers: **English or Korean** (recognized by `validate-spec.sh`)
+- Section headers: **English or Korean** (recognized by `validate-post-write.sh`)
 
 ## Context Management
 - Mark each task `[x]` in PLAN.md immediately upon completion
@@ -98,6 +103,18 @@ After 3 failed attempts: stop and escalate to user.
 
 ## Excluded Paths
 Do not read: `node_modules/`, `.next/`, `dist/`, `.turbo/`, `.cache/`, lock files
+
+## PLAN.md Task Format
+
+```
+- [ ] [domain] Task description → target file(s) (REQ-NNN) model:haiku|sonnet [parallel:GroupID]
+```
+
+**`parallel` field rules** (team mode only):
+- Tasks sharing the same `parallel:GroupID` (e.g., `parallel:A`) can execute simultaneously
+- Groups execute in alphabetical order: all `parallel:A` tasks before any `parallel:B` tasks
+- Omit the field for sequential execution (default, compatible with solo mode)
+- Never assign the same file to two tasks in the same parallel group
 
 ## Plan Approval Protocol
 - PLAN.md must include `## Approval` with `Status:` and `Approved-at:` fields

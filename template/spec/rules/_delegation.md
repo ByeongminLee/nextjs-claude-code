@@ -42,4 +42,5 @@ If `/dev` is interrupted (session crash, timeout, context limit), running `/dev`
 | `idle` | Fresh start -> planner |
 | `planning` | Check PLAN.md -> resume or skip to lead-engineer |
 | `executing` | Skip completed tasks -> continue from first `- [ ]` |
+| `executing` (PLAN.md missing) | Reset to `idle` in STATE.md, warn user, restart from planner |
 | `verifying` | Re-run verifier |

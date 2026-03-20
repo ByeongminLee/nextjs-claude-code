@@ -4,6 +4,7 @@ import pc from 'picocolors';
 import { log, banner } from './logger';
 import { install } from './installer';
 import { updateSkills, installSingleSkill, listAvailableSkills, suggestAndInstallSkills } from './skills-installer';
+import { runDoctor } from './doctor';
 import { UserAnswers } from './types';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -55,6 +56,13 @@ export async function run(): Promise<void> {
     return;
   }
 
+  // ── doctor: 설치 상태 진단 ────────────────────────────────────────────────
+  if (command === 'doctor') {
+    banner(pkg.version);
+    await runDoctor(process.cwd());
+    return;
+  }
+
   // ── 기본 설치 ─────────────────────────────────────────────────────────
   const force = args.includes('--force');
   const dryRun = args.includes('--dry-run');
@@ -73,6 +81,12 @@ export async function run(): Promise<void> {
       name: 'proceed',
       message: 'This may overwrite your customized files. Continue?',
       initial: false,
+    }, {
+      onCancel: () => {
+        log.blank();
+        log.info('Cancelled.');
+        process.exit(0);
+      },
     });
     if (!proceed) {
       log.blank();
@@ -108,6 +122,7 @@ export async function run(): Promise<void> {
   console.log(pc.dim(`    ${pc.cyan('npx nextjs-claude-code skill-suggest')}  — auto-detect & install matching skills`));
   console.log(pc.dim(`    ${pc.cyan('npx nextjs-claude-code skill-add <n>')}  — install a specific skill`));
   console.log(pc.dim(`    ${pc.cyan('npx nextjs-claude-code skill-update')}   — update installed skills`));
+  console.log(pc.dim(`    ${pc.cyan('npx nextjs-claude-code doctor')}         — diagnose installation health`));
   console.log(pc.dim('  Docs: https://github.com/ByeongminLee/nextjs-claude-code'));
   console.log();
 }

@@ -38,6 +38,7 @@ Before modifying code:
 | \`/loop [name]\` | Force-complete until all REQs pass |
 | \`/debug "desc"\` | Systematic bug fixing |
 | \`/status\` | Project status |
+| \`/office-hours [name]\` | Product review before development |
 | \`/commit\` | Auto-generate commit message |
 | \`/pr\` | Create PR with spec-based body |
 
@@ -177,31 +178,49 @@ async function mergeSettingsJson(
   const existing = JSON.parse(fs.readFileSync(destPath, 'utf-8'));
   if (!existing.hooks) existing.hooks = {};
   if (!existing.hooks.PostToolUse) existing.hooks.PostToolUse = [];
+  if (!existing.hooks.PreToolUse) existing.hooks.PreToolUse = [];
 
-  const existingPostToolUse: Array<{ matcher?: string; hooks?: Array<{ command?: string }> }> = existing.hooks.PostToolUse;
+  type HookGroup = { matcher?: string; hooks?: Array<{ command?: string }> };
+
+  const existingPostToolUse: HookGroup[] = existing.hooks.PostToolUse;
+  const existingPreToolUse: HookGroup[] = existing.hooks.PreToolUse;
 
   // Collect all existing hook commands across all matcher groups
   const existingCommands = new Set<string>();
-  for (const group of existingPostToolUse) {
+  for (const group of [...existingPostToolUse, ...existingPreToolUse]) {
     for (const h of group.hooks ?? []) {
       if (h.command) existingCommands.add(h.command);
     }
   }
 
-  // For each template hook group, merge missing hooks into matching existing group or add new group
-  for (const templateGroup of fsHooks) {
-    const templateHooks: Array<{ command?: string }> = (templateGroup as any).hooks ?? [];
-    const newHooks = templateHooks.filter((h: any) => h.command && !existingCommands.has(h.command));
-    if (newHooks.length === 0) continue;
+  // Helper: merge template hook groups into existing hook groups
+  function mergeHookGroups(templateGroups: HookGroup[], existingGroups: HookGroup[]): void {
+    for (const templateGroup of templateGroups) {
+      const templateHooks = (templateGroup.hooks ?? []) as Array<{ command?: string }>;
+      const newHooks = templateHooks.filter((h) => h.command && !existingCommands.has(h.command));
+      if (newHooks.length === 0) continue;
 
-    // Find existing group with same matcher
-    const matchingGroup = existingPostToolUse.find((g) => g.matcher === (templateGroup as any).matcher);
-    if (matchingGroup) {
-      if (!matchingGroup.hooks) matchingGroup.hooks = [];
-      matchingGroup.hooks.push(...newHooks);
-    } else {
-      existingPostToolUse.push({ ...(templateGroup as any), hooks: newHooks });
+      const matchingGroup = existingGroups.find((g) => g.matcher === templateGroup.matcher);
+      if (matchingGroup) {
+        if (!matchingGroup.hooks) matchingGroup.hooks = [];
+        matchingGroup.hooks.push(...newHooks);
+      } else {
+        existingGroups.push({ ...templateGroup, hooks: newHooks });
+      }
+      // Track newly added commands to avoid re-adding them
+      for (const h of newHooks) {
+        if (h.command) existingCommands.add(h.command);
+      }
     }
+  }
+
+  const fsPreHooks: HookGroup[] = templateContent.hooks?.PreToolUse ?? [];
+  mergeHookGroups(fsHooks, existingPostToolUse);
+  mergeHookGroups(fsPreHooks, existingPreToolUse);
+
+  // Remove empty PreToolUse array if none were added
+  if (existing.hooks.PreToolUse.length === 0) {
+    delete existing.hooks.PreToolUse;
   }
 
   if (!dryRun) {

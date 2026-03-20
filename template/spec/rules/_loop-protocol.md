@@ -26,6 +26,7 @@
 - Updated after each iteration with REQ status, failure analysis, and next strategy
 - Prevents repeating the same failed approach across iterations
 - Deleted on loop completion; kept on exhaustion (useful for manual debugging)
+- **Keep under 50 lines** — retain only the latest 2 iterations' details; summarize older iterations in a single line each
 
 ## Cleanup rules (integrated into fix step)
 
@@ -33,7 +34,7 @@ The fix step's DONE-WHEN includes cleanup. After fixing failing REQs, also ensur
 - No `console.log` in changed files
 - No commented-out code in changed files
 - No unused imports in changed files
-- Cleanup does NOT count toward auto-fix budget
+- Cleanup does NOT count toward auto-fix budget (applies to both `/dev` and `/loop`)
 
 | Phase in STATE.md | Meaning |
 |---|---|

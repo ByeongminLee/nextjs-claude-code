@@ -14,47 +14,34 @@ Create a Claude Code agent team. You are the leader.
 
 ### Step 2 — Spawn teammates
 
-For each engineer listed in `## Team Composition` under `Engineers:`:
+For each engineer listed in `## Team Composition` under `Engineers:`, create a teammate using this template:
 
-**db-engineer** (if listed):
 ```
-Create a teammate named "db-engineer".
-You are the db-engineer for feature "[feature-name]".
-Read your full instructions from .claude/agents/db-engineer.md.
-Your tasks in spec/feature/[feature-name]/PLAN.md are tagged [db].
-Implement tasks: [task numbers from Team Composition].
-
-Rules:
-- Only work on [db]-tagged tasks
-- Message me before attempting any auto-fix (I manage the budget)
-- Message me when all tasks are complete or if you are blocked
-- My decisions take priority
+Create a teammate named "{role}".
+You are the {role} for feature "[feature-name]".
+Read .claude/agents/{role}.md. Implement [{tag}] tasks: [numbers from Team Composition].
+Rules: only [{tag}] tasks, message me before auto-fix, message on complete/blocked, my decisions take priority.
 ```
 
-**ui-engineer** (if listed):
-```
-Create a teammate named "ui-engineer".
-You are the ui-engineer for feature "[feature-name]".
-Read your full instructions from .claude/agents/ui-engineer.md.
-Your tasks in spec/feature/[feature-name]/PLAN.md are tagged [ui].
-Implement tasks: [task numbers from Team Composition].
+Where `{role}` is `db-engineer` or `ui-engineer`, and `{tag}` is `[db]` or `[ui]` respectively.
 
-Rules:
-- Only work on [ui]-tagged tasks
-- Message me before attempting any auto-fix (I manage the budget)
-- Message me when all tasks are complete or if you are blocked
-- My decisions take priority
-```
+**worker-engineer** — always spawn as **subagent** (not a teammate), using Agent tool with model: haiku.
 
-**worker-engineer** — always spawn as **subagent** (not a teammate):
-- Use the Agent tool with model: haiku, same as solo mode
+### Step 2b — Read parallel groups from PLAN.md
+
+Before spawning teammates, scan PLAN.md tasks for `parallel:GroupID` fields:
+- Group all tasks by their `parallel:` value (A, B, C…)
+- Tasks without a `parallel:` field are sequential — execute after all parallel groups complete
+- **Start Group A first**: spawn all engineers whose Group A tasks are ready simultaneously
+- **Wait for Group A** before starting Group B tasks
+- If `parallel:` field is absent on all tasks: execute sequentially (fallback to solo-style ordering)
 
 ### Step 3 — Work on your own tasks
 
 While teammates work:
-1. Implement `[lead]` tasks yourself, following solo execution protocol
+1. Implement `[lead]` tasks in the current parallel group yourself
 2. Delegate `[worker]` tasks to worker-engineer subagents
-3. Respect Task Dependencies from PLAN.md
+3. Respect parallel group boundaries — do not start Group B tasks until Group A is fully complete
 
 ### Step 4 — Coordinate
 
