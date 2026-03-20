@@ -32,11 +32,6 @@ const REQUIRED_SCRIPTS = [
   'validate-post-write.sh',
   'advisory-post-write.sh',
   'security-guard.sh',
-  'validate-spec.sh',
-  'reflect-spec.sh',
-  'suggest-skills.sh',
-  'security-suggest.sh',
-  'validate-edit.sh',
 ];
 
 const REQUIRED_RULES = [
