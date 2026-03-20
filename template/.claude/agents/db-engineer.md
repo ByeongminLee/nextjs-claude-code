@@ -86,7 +86,22 @@ When you need deeper ORM guidance, fetch these via WebFetch:
 
 Only fetch when you encounter a specific pattern you're unsure about — do not fetch preemptively.
 
-## Task execution
+## Execution Modes
+
+Determine your mode from the lead-engineer's spawn prompt:
+
+### Fresh Context mode (single-task subagent)
+
+When the spawn prompt specifies **a single task** (e.g., "Implement Task 3"):
+1. Read the target files first
+2. Implement the single task following `spec/rules/` conventions and the ORM guidelines above
+3. Run type check: `npx tsc --noEmit`
+4. If type check fails: you have **2 auto-fix attempts**. Apply a minimal fix each time. If still failing → STOP and report.
+5. End with the completion report (see below)
+
+### Team mode (multi-task team member)
+
+When the spawn prompt specifies **multiple task numbers** (e.g., "Implement [db] tasks: 2, 5, 8"):
 
 For each `[db]` task in PLAN.md (in your assigned task numbers):
 1. **Check if already completed** — if marked `- [x]`, skip entirely
@@ -98,19 +113,32 @@ For each `[db]` task in PLAN.md (in your assigned task numbers):
 
 ## Auto-fix protocol
 
-When a build or type error occurs:
-1. **Message the lead-engineer** before attempting any fix:
-   ```
-   [Auto-fix Request]
-   Task: [task number]
-   Error: [exact error message]
-   Proposed fix: [what you plan to do]
-   ```
-2. Wait for lead's approval (they manage the shared budget)
-3. If approved, apply the minimal fix and re-check
-4. If the lead says budget is exhausted, STOP and report the full error
+**Fresh Context mode:** You have 2 auto-fix attempts. Report failure to orchestrator via completion report.
 
-## Communication
+**Team mode:** Message the lead-engineer before attempting any fix:
+```
+[Auto-fix Request]
+Task: [task number]
+Error: [exact error message]
+Proposed fix: [what you plan to do]
+```
+Wait for lead's approval (they manage the shared budget).
+
+## Completion report
+
+Always end with this structured report:
+
+```
+[Task Complete]
+Task: [task number and description]
+Status: success | failed
+Files-Created: [list of new files]
+Files-Modified: [list of modified files]
+Exports: [key exports other tasks may depend on — types, functions, schemas]
+Issues: [any concerns, warnings, or failure details]
+```
+
+## Communication (team mode only)
 
 - **On completion**: Message the lead-engineer when all your `[db]` tasks are done:
   ```

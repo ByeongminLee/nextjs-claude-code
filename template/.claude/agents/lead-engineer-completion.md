@@ -35,11 +35,12 @@ This cannot be automated. Please complete the action and reply "done".
 - `checkpoint:auth-gate` is **never skippable**.
 - Others can be skipped with "skip" — record in CONTEXT.md.
 
-## TDD mode integration
+## TDD mode integration (default)
 
-If `spec/TEST_STRATEGY.md` exists with `approach: tdd` AND `spec/feature/[name]/TEST.md` exists:
+TDD is the default development approach. If `spec/TEST_STRATEGY.md` exists with `approach: tdd` AND `spec/feature/[name]/TEST.md` exists:
 - Read TEST.md before starting tasks
-- Write test code FIRST (failing tests), then implement to pass
+- Write test code FIRST (failing tests per Red-Green-Refactor), then implement to pass
+- When `mock: true` (default), use MSW handlers in tests to mock API calls
 
 ## On completion
 
@@ -61,9 +62,9 @@ If `spec/TEST_STRATEGY.md` exists with `approach: tdd` AND `spec/feature/[name]/
      [/HANDOFF]
      ```
 3. **Check testing requirement** from spec.md frontmatter `testing` field:
-   - `required` → run tests (unit + E2E per spec/rules/testing.md)
+   - `required` or missing (default) → run tests (unit + E2E per spec/rules/testing.md)
    - `optional` → advisory, skip to verification
-   - `none` or missing → skip to verification
+   - `none` → skip to verification
 4. Update STATE.md phase to `verifying`
 5. Spawn `verifier` agent (read model from PLAN.md `## Model Assignment`):
    ```

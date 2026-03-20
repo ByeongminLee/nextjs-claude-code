@@ -11,6 +11,7 @@ Define your feature. Claude builds exactly what the spec says — with every cha
 ## Features
 
 - **Spec-Driven**: Feature specs with REQ-NNN traceability, compliance reporting
+- **TDD by default**: Test-Driven Development with MSW API mocking out of the box — tests first, then implementation
 - **Curated skills** from [skills.sh](https://skills.sh) (community skill registry for Claude Code) — bundled core skills installed automatically, on-demand skills for library-specific best practices. Includes React, Next.js, UI/UX, testing patterns
 - **Architecture guides** — Flat, Feature-Based, FSD, Monorepo (auto-detected from project structure; refined via `/init`)
 - **Library-aware agents** — agents read your selected stack and follow its patterns
@@ -80,6 +81,7 @@ The core SDD loop — define what to build, then build it.
 /spec [name] "describe the feature"   →  spec-writer clarifies → writes spec.md + design.md
 /dev  [name]                           →  planner → lead-engineer → verifier → done
 /dev  [name] --team                    →  planner → lead-engineer (+ db/ui/worker team) → verifier → done
+/loop [name]                           →  review → fix → re-verify → repeat until all REQs pass
 ```
 
 ```
@@ -129,7 +131,7 @@ Independent commands — use any of them whenever you need.
 
 | Command | Description |
 |---------|-------------|
-| `/review [name]` | Spec compliance + code quality review. Conditionally runs tester, log-auditor, and security-reviewer if their strategy files exist (TEST_STRATEGY.md / LOG_STRATEGY.md / SECURITY_STRATEGY.md). |
+| `/review [name]` | Spec compliance + code quality review across the entire feature (cross-task integration). Conditionally runs tester, log-auditor, and security-reviewer if their strategy files exist (TEST_STRATEGY.md / LOG_STRATEGY.md / SECURITY_STRATEGY.md). |
 | `/loop [name]` | Repeat review → fix → re-review until all REQs pass (max 5 iterations). |
 | `/test [name]` | Run tests based on TEST_STRATEGY.md. `--browser` for visual tests + Figma comparison. `--setup` to configure. |
 | `/log [name]` | Audit logging practices. `--audit` for project-wide scan. `--setup` to configure LOG_STRATEGY.md. |
@@ -152,10 +154,19 @@ Independent commands — use any of them whenever you need.
 
 | Command | Description |
 |---------|-------------|
-| `/init` | Analyze existing codebase and populate spec documents. Run once after install. |
+| `/init` | Analyze codebase structure, detect framework and libraries, generate PROJECT.md (tech stack), ARCHITECTURE.md (architecture pattern), and STATE.md. Run once after install. |
 | `/debug "..."` | Hypothesis-driven bug analysis. Records process in spec/DEBUG.md. |
 | `/status` | Project status summary from spec/STATE.md. |
 | `/rule "..."` | Add or update coding rules in spec/rules/. |
+
+### Skill Management
+
+| Command | Description |
+|---------|-------------|
+| `npx nextjs-claude-code skill-list` | Show available and installed skills |
+| `npx nextjs-claude-code skill-add [name]` | Install a specific skill |
+| `npx nextjs-claude-code skill-update` | Update all installed skills to latest |
+| `npx nextjs-claude-code skill-suggest` | Suggest skills based on package.json dependencies |
 
 ---
 
@@ -211,7 +222,7 @@ lead-engineer pauses at these conditions and waits for user confirmation:
 | Type | Condition | Action |
 |------|-----------|--------|
 | `checkpoint:decision` | Implementation direction choice needed, type structure changes | Present options, wait for user |
-| `checkpoint:human-verify` | UI implementation complete (intermediate milestone) | Request browser verification, wait |
+| `checkpoint:human-verify` | UI implementation complete, verification Level 1-3 passed | Request browser verification, wait |
 | `checkpoint:auth-gate` | Payment/auth manual action required | Always stop, never simulate |
 
 ### Auto-fix Budget
@@ -236,7 +247,7 @@ All `/dev` completions auto-trigger the verifier:
 |-------|-------|--------|
 | 1 | All planned files exist | File existence check |
 | 2 | No stubs or placeholders | grep for TODO, empty functions, dummy values |
-| 2b | Test files exist (conditional) | Required if `testing: required`, warning otherwise |
+| 2b | Test files exist (default: blocking) | Blocking if `testing: required` or omitted (default), warning if `optional`/`none` |
 | 3 | Components/hooks/APIs wired correctly | Import and call tracing |
 | 4 | Actually works | Browser direct verification |
 
@@ -264,7 +275,6 @@ If `/dev` is interrupted (session crash, timeout, context limit), running `/dev`
 - **Spec validation**: PostToolUse hooks block malformed spec.md and design.md writes
 - **Spec reflection**: advisory hook reminds you to update the spec when code changes add new exports or routes
 - **Plan staleness check**: `/dev` warns if spec.md has been modified since the feature's PLAN.md was created
-- **Model routing**: agents use sonnet by default, haiku for small/mechanical tasks (verifier, cleanup, simple fixes). Opus is never used. See `spec/rules/_model-routing.md` for criteria.
 - **Branch strategy awareness**: `/commit` and `/pr` auto-detect branch strategy and enforce commit conventions
 - **Conditional review agents**: tester, log-auditor, and security-reviewer only join `/review` when their strategy files exist (TEST_STRATEGY.md, LOG_STRATEGY.md, SECURITY_STRATEGY.md)
 - **Changelog automation**: `/pr` auto-updates CHANGELOG.md and bumps package.json version based on commit types (Semantic Versioning)
@@ -276,10 +286,11 @@ If `/dev` is interrupted (session crash, timeout, context limit), running `/dev`
 | Issue | Solution |
 |-------|----------|
 | Plan approval stuck at "pending" | Re-run `/dev [name]` to restart the planning flow |
-| Auto-fix budget exhausted | Lead-engineer stops after 3 attempts. Review the error manually and provide guidance |
+| Auto-fix budget exhausted | Lead-engineer stops after 3 attempts. Review the error manually and provide guidance. To reset budget after manual fixes, edit `Used:` to `0` in PLAN.md |
 | Team mode not working | Verify `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` is set in `.claude/settings.json` |
 | Spec validation blocking writes | Check that section headers match the expected format (English or Korean) |
 | Hook errors on every file write | Edit `.claude/settings.json` to remove or disable specific hooks |
+| Spec changed after planning | Re-run `/dev [name]` — it detects spec staleness and suggests re-planning |
 
 ---
 

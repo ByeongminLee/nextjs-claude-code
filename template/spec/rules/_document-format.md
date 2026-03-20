@@ -19,15 +19,21 @@ Frontmatter (required):
 feature: [name]
 deps: [feature-name, ...]   # features this spec depends on; [] if none
 api: [METHOD /path, ...]    # API endpoints; omit if none
-testing: none                # none | optional | required
+testing: required            # none | optional | required
+mock: true                   # true | false
 ---
 ```
 
 `testing` field values:
-- `required`: lead-engineer writes tests; verifier Level 2b blocks if missing
+- `required`: lead-engineer writes tests (TDD if TEST_STRATEGY.md has `approach: tdd`); verifier Level 2b blocks if missing
 - `optional`: skip test phase; verifier Level 2b warns but does not block
 - `none`: no test expectations
-- Default if omitted: `none`
+- Default if omitted: `required`
+
+`mock` field values:
+- `true`: planner includes MSW mock setup (Layer 0) and handler generation (Layer 2.5) tasks. Verifier Level 2c blocks if handlers missing. Only effective when `api` field is non-empty — `mock: true` with empty `api` has no effect.
+- `false`: skip mock tasks entirely; verifier Level 2c skipped
+- Default if omitted: `true`
 
 `max-iterations` field (optional):
 - Controls `/loop` max iteration count. Default: 5 if omitted.
@@ -65,6 +71,10 @@ Sections (required):
 
 History entries in `spec/feature/[name]/history/` are validated by PostToolUse hook.
 Written **only after verification passes** (all 4 levels).
+
+Trigger: lead-engineer writes a history entry after `/dev` completion when all verification levels (1-4) pass. Also written after `/loop` completion.
+- If Level 4 (human verify) reveals issues, lead-engineer fixes and re-runs verifier. History entry is written only after final pass.
+- If Level 4 is skipped (backend-only feature), history entry is written after Level 1-3 pass.
 
 Required:
 - **Filename**: `YYYY-MM-DD-[description].md`

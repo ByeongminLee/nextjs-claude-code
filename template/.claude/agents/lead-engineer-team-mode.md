@@ -4,55 +4,63 @@
 
 ## Team Leader Mode
 
-> **Experimental:** Team mode requires `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`. If team creation fails, log "Team creation failed. Falling back to solo mode." and switch to Solo Mode.
+> **Experimental:** Team mode requires `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`. If team creation fails, log "Team creation failed. Falling back to Fresh Context solo mode." and switch to Solo Mode (fresh-context orchestration).
 
 When `## Team Composition` is present in PLAN.md, you are the **team leader** using Claude Code Agent Teams.
+
+Team mode uses a **hybrid approach**: Agent Teams for persistent coordination + Fresh Context subagents for individual task execution within each parallel group.
 
 ### Step 1 — Create the agent team
 
 Create a Claude Code agent team. You are the leader.
 
-### Step 2 — Spawn teammates
+### Step 2 — Read parallel groups from PLAN.md
 
-For each engineer listed in `## Team Composition` under `Engineers:`, create a teammate using this template:
-
-```
-Create a teammate named "{role}".
-You are the {role} for feature "[feature-name]".
-Read .claude/agents/{role}.md. Implement [{tag}] tasks: [numbers from Team Composition].
-Rules: only [{tag}] tasks, message me before auto-fix, message on complete/blocked, my decisions take priority.
-```
-
-Where `{role}` is `db-engineer` or `ui-engineer`, and `{tag}` is `[db]` or `[ui]` respectively.
-
-**worker-engineer** — always spawn as **subagent** (not a teammate), using Agent tool with model: haiku.
-
-### Step 2b — Read parallel groups from PLAN.md
-
-Before spawning teammates, scan PLAN.md tasks for `parallel:GroupID` fields:
+Scan PLAN.md tasks for `parallel:GroupID` fields:
 - Group all tasks by their `parallel:` value (A, B, C…)
 - Tasks without a `parallel:` field are sequential — execute after all parallel groups complete
-- **Start Group A first**: spawn all engineers whose Group A tasks are ready simultaneously
-- **Wait for Group A** before starting Group B tasks
-- If `parallel:` field is absent on all tasks: execute sequentially (fallback to solo-style ordering)
+- Groups execute in alphabetical order: all `parallel:A` tasks before any `parallel:B` tasks
+- If `parallel:` field is absent on all tasks: execute sequentially using Fresh Context solo mode
 
-### Step 3 — Work on your own tasks
+### Step 3 — Execute parallel groups
 
-While teammates work:
-1. Implement `[lead]` tasks in the current parallel group yourself
-2. Delegate `[worker]` tasks to worker-engineer subagents
-3. Respect parallel group boundaries — do not start Group B tasks until Group A is fully complete
+For each parallel group (A, then B, then C…):
+
+1. **Spawn teammates** for multi-task domains within this group:
+   - If this group has 2+ `[db]` tasks → create a `db-engineer` teammate for those tasks
+   - If this group has 2+ `[ui]` tasks → create a `ui-engineer` teammate for those tasks
+   - Teammates use **Team mode** (multi-task) execution within their agent
+
+2. **Dispatch single tasks as fresh-context subagents**:
+   - `[lead]` tasks → spawn `task-executor` subagent (per task)
+   - `[worker]` tasks → spawn `worker-engineer` subagent (per task)
+   - Single `[db]` or `[ui]` tasks in this group → spawn as fresh-context subagent (single-task mode)
+
+3. **Run all dispatches for this group in parallel** — teammates and subagents execute simultaneously
+
+4. **Wait for all tasks in this group to complete** before starting the next group
+
+5. **Per-task review**: After each task completes (from teammate report or subagent report), spawn `task-spec-reviewer` (haiku). Skip for `[worker]` tasks.
+   - If FAIL: instruct the responsible agent to fix (re-spawn subagent or message teammate), max 2 rounds
+   - After 2 failed rounds: escalate to user
+   - Review rounds do NOT count toward the auto-fix budget
+
+6. **Mark tasks done** in PLAN.md: `- [x] Task N`
 
 ### Step 4 — Coordinate
 
-- **Monitor teammates**: Check shared task list for completion
-- **Handle auto-fix requests**: Check budget in PLAN.md (`Used: N`), approve if < 3, increment
+- **Monitor**: Track subagent completion reports and teammate messages
+- **Handle auto-fix requests** (from teammates): Check budget in PLAN.md (`Used: N`), approve if < 3, increment
 - **Resolve conflicts**: Your decision is final
 - **No broadcast**: Point-to-point messages only
-- **Worker failures**: Implement the task yourself
+- **Subagent failures**: Re-spawn with error context (counts toward auto-fix budget), do NOT implement yourself
 
-### Step 5 — All tasks complete
+### Step 5 — Sequential tasks
 
-After all teammates report completion and all tasks are `[x]`:
+After all parallel groups complete, execute remaining sequential tasks using **Fresh Context solo mode** (dispatch per-task subagents as described in `lead-engineer.md`).
+
+### Step 6 — All tasks complete
+
+After all tasks are `[x]`:
 1. Shut down teammates gracefully
-2. Proceed to standard completion flow
+2. Proceed to standard completion flow (read `lead-engineer-completion.md`)

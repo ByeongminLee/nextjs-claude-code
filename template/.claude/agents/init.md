@@ -42,6 +42,28 @@ Only when invoked via `/init`. Safe to re-run — existing spec files are preser
 
    - `spec/rules/` directory — create if missing (will be populated in step 7)
 
+   - `spec/TEST_STRATEGY.md` — if missing, create after detecting test runner in step 2:
+     ```markdown
+     ---
+     approach: tdd
+     test_types: [unit, integration]
+     test_runner: vitest           # auto-detected from package.json (vitest or jest)
+     browser_test: false
+     coverage_threshold: 80
+     ---
+
+     # Test Strategy
+
+     TDD (Test-Driven Development) is the default approach.
+     Lead-engineer writes failing tests first, then implements to pass.
+
+     Override per feature via spec.md `testing` field:
+     - `testing: required` (default) — tests mandatory, verifier blocks without them
+     - `testing: optional` — tests recommended but not blocking
+     - `testing: none` — skip tests entirely
+     ```
+     Note: detect `test_runner` from package.json — use `vitest` if vitest is installed, `jest` if jest is installed, default to `vitest` if neither found.
+
    If all files already exist, skip this step and log: "spec/ directory already initialized."
 
 1. **Detect framework and router type**

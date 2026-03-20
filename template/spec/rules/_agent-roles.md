@@ -9,13 +9,15 @@
 | `init` | No | Yes | — |
 | `spec-writer` | No | Yes (spec.md, design.md) | — |
 | `planner` | No | Yes (CONTEXT.md, PLAN.md) | — |
-| `lead-engineer` | **Yes** | Partial (STATE.md, PLAN.md, history) | — |
+| `lead-engineer` | **No** (orchestrator only) | Partial (STATE.md, PLAN.md, history) | — |
+| `task-executor` | **Yes** (lead domain files) | No | — |
 | `db-engineer` | **Yes** (DB files only) | Partial (PLAN.md budget via lead) | — |
 | `ui-engineer` | **Yes** (UI files only) | Partial (PLAN.md budget via lead) | — |
 | `worker-engineer` | **Yes** (assigned file only) | No | — |
 | `verifier` | No | No | **Yes** |
 | `reviewer` | No | No | **Yes** |
 | `code-quality-reviewer` | No | No | **Yes** |
+| `task-spec-reviewer` | No | No | **Yes** |
 | `status` | No | No | **Yes** |
 | `debugger` | **Yes** | Yes (DEBUG.md, STATE.md) | — |
 | `rule-writer` | No | Yes (spec/rules/) | — |
@@ -34,18 +36,32 @@
 | Logging audit | `log-auditor` | `/log`, `/review` (if LOG_STRATEGY.md exists) |
 | Code quality | `code-quality-reviewer` | `/review` |
 | Spec compliance | `reviewer` | `/review`, `/loop` |
+| Per-task review (spec + quality) | `task-spec-reviewer` | `/dev` (after each task) |
 
 ## Team Mode (`/dev --team`)
 
-| Role | Domain | Spawned when | Model |
-|------|--------|-------------|-------|
-| `lead-engineer` | Types, utils, hooks, API, server actions, page wiring | Always (leader) | sonnet |
-| `db-engineer` | Schema, migrations, queries, RLS, seed data | Feature has `[db]` tasks | sonnet |
-| `ui-engineer` | Components, styling, animations, responsive | Feature has 2+ `[ui]` tasks | sonnet |
-| `worker-engineer` | Simple utilities, type defs, config | Feature has `[worker]` tasks | haiku |
+| Role | Domain | Spawned when | Model | Context |
+|------|--------|-------------|-------|---------|
+| `lead-engineer` | Orchestration only (no code) | Always (orchestrator) | sonnet | Persistent |
+| `task-executor` | Types, utils, hooks, API, server actions, page wiring | Each `[lead]` task | sonnet | **Fresh per task** |
+| `db-engineer` | Schema, migrations, queries, RLS, seed data | Each `[db]` task | sonnet | **Fresh per task** |
+| `ui-engineer` | Components, styling, animations, responsive | Each `[ui]` task | sonnet | **Fresh per task** |
+| `worker-engineer` | Single file, <=2 external deps, no business logic. <=200 lines | Each `[worker]` task | haiku | **Fresh per task** |
+
+### File Boundary Definitions
+
+| Domain | Includes | Examples |
+|--------|----------|---------|
+| DB files | Schema, migration, seed, ORM model, DB utility | `prisma/*`, `drizzle/*`, `supabase/*`, `db.ts`, `seed.ts` |
+| UI files | React components, CSS/style, layout markup, animation | `components/**/*.tsx`, `*.css`, `*.module.css` |
+| Lead domain (shared) | Server actions, API routes, hooks, utilities, types, page wiring | `actions/*`, `app/api/*`, `hooks/*`, `utils/*`, `types/*` |
+
+Files with ambiguous boundaries (e.g., server actions with DB queries) belong to lead-engineer.
 
 Coordination:
-- Lead has authority over all other engineers
-- Auto-fix budget is centralized: teammates message lead before fix attempts
-- Worker is always subagent (not a team member) for token optimization
+- Lead-engineer is the **orchestrator** — it dispatches tasks but never writes implementation code
+- All implementation agents (task-executor, db-engineer, ui-engineer, worker-engineer) run as **fresh-context subagents** per task
+- Auto-fix budget is centralized in PLAN.md: orchestrator tracks and manages across all subagents
+- In team mode with parallel groups: multi-task teammates may be used, but individual tasks within still get fresh context
 - Same file must never be assigned to multiple engineers
+- Planner must verify no duplicate file assignments exist within the same parallel group

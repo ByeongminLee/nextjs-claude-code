@@ -65,14 +65,33 @@ Rules:
 | Skill | Purpose |
 |---|---|
 | `/init` | First-time setup: analyze codebase, populate spec docs |
-| `/spec` | Define or update a feature spec |
+| `/brainstorm` | Explore feature design when the approach is unclear or you want to compare alternatives. Use before `/spec` |
+| `/spec` | Define or update a feature spec. TDD: auto-generates TEST.md skeleton. Mock + testing enabled by default |
 | `/office-hours [name]` | Product review before development (business value, scope, metrics) |
-| `/dev` | Plan, implement, verify a feature. `--team` for parallel team mode |
+| `/dev` | Plan, implement, verify a feature. TDD: writes tests first, then implements. `--team` for parallel team mode |
 | `/review` | Check spec compliance + code quality |
 | `/status` | Show project status |
 | `/debug` | Systematic bug fixing |
 | `/rule` | Add or update a project coding rule |
 | `/loop` | Loop until all REQs in spec.md are satisfied |
+
+## Per-Task Review (`/dev`)
+
+During `/dev`, each completed task (except `[worker]` tasks) gets an independent quick review via `task-spec-reviewer` (haiku) before being marked done. The reviewer checks spec compliance first, then code quality — in a single pass.
+
+Rules:
+- Max 2 review rounds per task (fix → re-review)
+- After 2 failed rounds: escalate to user
+- Review rounds do NOT count toward the auto-fix budget
+- `[worker]` tasks skip review (simple file operations)
+- `/review` remains available as a full-feature-level review after `/dev` completes (cross-task integration perspective)
+
+## /review vs /loop
+
+- `/review`: read-only snapshot review of current implementation (no modifications)
+- `/loop`: automated review → fix → re-verify cycles until all REQs pass
+- Typical sequence: `/dev` → `/review` (optional, status check) → `/loop` (if needed, auto-fix cycle)
+- `/loop` uses the same reviewer internally, so running `/review` before `/loop` is not required
 
 ## Checkpoint Conditions
 
@@ -92,10 +111,37 @@ Maximum retries: **3**
 
 After 3 failed attempts: stop and escalate to user.
 
+Budget reset: to reset after manual code fixes, edit `Used:` value to `0` in PLAN.md.
+
 ## Language
 - Default language for spec documents is **English**
 - If user writes in another language, match that language
 - Section headers: **English or Korean** (recognized by `validate-post-write.sh`)
+
+## Fresh Context Execution
+
+During `/dev`, the lead-engineer acts as a **thin orchestrator** that dispatches each task to a fresh-context subagent:
+
+| Task tag | Subagent | Model | Context |
+|----------|----------|-------|---------|
+| `[lead]` | `task-executor` | sonnet | Fresh per task |
+| `[db]` | `db-engineer` | sonnet | Fresh per task |
+| `[ui]` | `ui-engineer` | sonnet | Fresh per task |
+| `[worker]` | `worker-engineer` | haiku | Fresh per task |
+
+Benefits:
+- **No context rot** — each task starts with a clean context window
+- **Predictable quality** — task 10 executes with the same quality as task 1
+- **Safe failures** — a failed task doesn't pollute subsequent tasks
+- **Better resumability** — re-spawning picks up cleanly from the last `- [x]` in PLAN.md
+
+The orchestrator maintains a **task ledger** (in-memory) tracking each completed task's output files and exports, passing relevant upstream context to dependent tasks via the HANDOFF `UPSTREAM:` field.
+
+Rules:
+- The orchestrator never writes implementation code directly
+- Each subagent reads spec/design/context/rules independently (fresh load)
+- Auto-fix attempts within a subagent count toward the shared budget in PLAN.md
+- In team mode (`/dev --team`), parallel groups may use Agent Teams for multi-task coordination within a group, but individual tasks still get fresh context
 
 ## Context Management
 - Mark each task `[x]` in PLAN.md immediately upon completion

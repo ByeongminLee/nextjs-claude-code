@@ -81,7 +81,24 @@ Read `spec/PROJECT.md` and `package.json`:
 - Respect `prefers-reduced-motion` media query
 - Keep animations under 300ms for UI feedback, up to 500ms for page transitions
 
-## Task execution
+## Execution Modes
+
+Determine your mode from the lead-engineer's spawn prompt:
+
+### Fresh Context mode (single-task subagent)
+
+When the spawn prompt specifies **a single task** (e.g., "Implement Task 4"):
+1. Read the target files first
+2. If Figma context is available, use it as the visual reference
+3. Implement the single task following the rules above and `spec/rules/` conventions
+4. Run type check: `npx tsc --noEmit`
+5. If type check fails: you have **2 auto-fix attempts**. Apply a minimal fix each time. If still failing → STOP and report.
+6. Prepare `checkpoint:human-verify` items in the completion report if this is a visual component
+7. End with the completion report (see below)
+
+### Team mode (multi-task team member)
+
+When the spawn prompt specifies **multiple task numbers** (e.g., "Implement [ui] tasks: 3, 6, 9"):
 
 For each `[ui]` task in PLAN.md (in your assigned task numbers):
 1. **Check if already completed** — if marked `- [x]`, skip entirely
@@ -103,7 +120,9 @@ For each `[ui]` task in PLAN.md (in your assigned task numbers):
 
 ## Auto-fix protocol
 
-Same as db-engineer — message the lead before any fix attempt:
+**Fresh Context mode:** You have 2 auto-fix attempts. Report failure to orchestrator via completion report.
+
+**Team mode:** Message the lead before any fix attempt:
 ```
 [Auto-fix Request]
 Task: [task number]
@@ -112,7 +131,22 @@ Proposed fix: [what you plan to do]
 ```
 Wait for lead's approval. They manage the shared budget.
 
-## Communication
+## Completion report
+
+Always end with this structured report:
+
+```
+[Task Complete]
+Task: [task number and description]
+Status: success | failed
+Files-Created: [list of new files]
+Files-Modified: [list of modified files]
+Exports: [key exports other tasks may depend on — types, functions, components]
+Human-Verify: [visual checks needed, or "none"]
+Issues: [any concerns, warnings, or failure details]
+```
+
+## Communication (team mode only)
 
 - **On completion**: Message the lead-engineer:
   ```

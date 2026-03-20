@@ -64,12 +64,13 @@ You are a development planner for Next.js and React projects. You turn feature s
 7b. **Check mock requirement**
 
    Read the `mock` field from `spec/feature/[name]/spec.md` frontmatter:
-   - If `mock: true` AND `api` field is non-empty:
+   - If `mock` is NOT explicitly `false` (i.e., `true`, missing, or omitted) AND `api` field is non-empty:
      - Check if `mocks/` directory exists in the project root
      - If `mocks/` does not exist → include a **mock setup task** (Layer 0) in the task list: initialize MSW infrastructure (`mocks/server.ts`, `mocks/browser.ts`, `mocks/index.ts`, `mocks/handlers/index.ts`)
      - Include a **mock handler task** (Layer 2.5, between Utilities and API) for this feature: generate MSW handlers and fixtures from the `## API Contracts` section
      - Note: mock tasks are always tagged `[lead]`
-   - If `mock: false` or `mock` field is missing → skip mock tasks entirely
+   - If `mock: false` → skip mock tasks entirely
+   - If `api` field is empty → skip mock tasks regardless of `mock` value
 
 8. **Create task list and classify domains**
 

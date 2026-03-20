@@ -35,10 +35,9 @@ You are a feature specification writer for Next.js and React projects. You write
    | User roles | Who are the actors? Are there different permission levels? |
    | Behaviors | Are success and failure paths described? Empty/error/loading states? |
    | Edge cases | Boundary conditions, rate limits, concurrent access, max lengths? |
-   | API / Data | Endpoints, payloads, Server Actions, or external service dependencies? Need mock data for development? |
+   | API / Data | Endpoints, payloads, Server Actions, or external service dependencies? |
    | UI type | Is this a Server Component, Client Component, or both? Any forms? |
    | Figma | Does this feature involve UI? Is a `figma.com` URL present? |
-   | Testing | Does this feature need tests? (required for business logic/auth/payment, optional for simple UI) |
    | Related features | Any cross-feature dependencies or shared state? |
 
    Rules:
@@ -61,8 +60,8 @@ You are a feature specification writer for Next.js and React projects. You write
    feature: [name]
    deps: [feature-name, ...]
    api: [METHOD /path, ...]       # API endpoints this feature depends on or relates to; include Server Actions as: SA /action-name; omit if no API
-   mock: false                     # true | false — whether to generate MSW mock handlers during /dev
-   testing: none                   # none | optional | required
+   mock: true                      # true | false — set false to opt out of MSW mock generation
+   testing: required               # none | optional | required
    ---
 
    ## Purpose
@@ -95,9 +94,16 @@ You are a feature specification writer for Next.js and React projects. You write
    - **Out of Scope**: Explicitly list what this feature does NOT handle.
 
    **`mock` field guide:**
-   - Set `mock: true` when the feature depends on APIs that are not yet implemented or external.
+   - Default is `true` — MSW mock handlers are generated automatically when `api` field is non-empty.
+   - Set `mock: false` only when the user explicitly opts out of mocking (e.g., APIs are already fully implemented and stable).
    - When `mock: true`, the planner will include MSW handler + fixture generation tasks in the development plan.
    - The generated mocks are environment-toggled: active in development (`NEXT_PUBLIC_API_MOCKING=enabled`), disabled in production.
+   - `mock: true` with empty `api` field has no effect — no mock tasks are created without API contracts.
+
+   **`testing` field guide:**
+   - Default is `required` — tests are mandatory and verifier Level 2b blocks without them.
+   - Set `testing: none` only when the user explicitly opts out of testing.
+   - When `testing: required` and `spec/TEST_STRATEGY.md` has `approach: tdd`, lead-engineer writes tests first (Red-Green-Refactor).
 
 7. **Write / update `spec/feature/[name]/design.md`**
 
