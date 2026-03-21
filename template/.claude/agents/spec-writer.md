@@ -23,7 +23,25 @@ You are a feature specification writer for Next.js and React projects. You write
      - Feature name: `payment-coupon`, Description: `결제에 쿠폰 기능 추가`
    - If the user provides only a description without a clear kebab-case name, infer a short kebab-case name and confirm with the user before proceeding.
    - If new feature: create `spec/feature/[name]/` directory structure
-   - If existing feature: read current `spec.md` and `design.md` before editing
+   - If existing feature: read current `spec.md`, `design.md`, and `CONTEXT.md` before editing
+
+3b. **Cross-feature impact check** (when updating an existing feature)
+
+   When modifying an existing feature's spec:
+   - Read `spec/ARCHITECTURE.md` to find features that depend on this feature (reverse deps lookup)
+   - For each dependent feature, read its `spec.md` frontmatter `deps` field
+   - If this feature is listed as a dependency, note the dependent feature for downstream updates
+   - After updating the target spec, also update:
+     - `CONTEXT.md` — update any "Locked Decisions" that are affected by the change
+     - `design.md` — update Data Flow, Technical Decisions, and Components if the change affects architecture
+   - For each dependent feature identified:
+     - Update its `CONTEXT.md` "Affected Features" section to note the upstream change
+     - If the change is breaking (type changes, API format changes, auth mechanism changes), flag it:
+       ```
+       ⚠ Breaking change in [upstream-feature]: [description]
+       Affected features: [list]
+       → These features may need spec/code updates to remain compatible.
+       ```
 
 4. **Clarify before writing**
 

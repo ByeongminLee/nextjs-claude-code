@@ -282,4 +282,37 @@ if (/\.json$/.test(absPath)) {
     "   \u2192 See spec/rules/_nextjs-ordering.md for task ordering.\n\n"
   );
 })();
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// Part 5: PLAN.md approval format check — ADVISORY
+// ═══════════════════════════════════════════════════════════════════════════════
+
+(function checkPlanApproval() {
+  if (!filePath.endsWith("PLAN.md")) return;
+  if (!filePath.includes("spec/feature/") && !filePath.startsWith("spec/feature/")) return;
+
+  const planPath = path.isAbsolute(filePath) ? filePath : path.join(process.cwd(), filePath);
+  if (!fs.existsSync(planPath)) return;
+
+  const plan = fs.readFileSync(planPath, "utf-8");
+  const warnings = [];
+
+  if (!plan.includes("Status:")) {
+    warnings.push("Missing Status: field in ## Approval section");
+  }
+  if (plan.includes("Status: approved") && !plan.includes("Approved-at:")) {
+    warnings.push("Missing Approved-at: timestamp (required when Status: approved)");
+  }
+  if (!(/Max retries:\s*\d+\s*\/\s*Used:\s*\d+/.test(plan))) {
+    warnings.push("Missing Max retries: N / Used: N in ## Auto-fix Budget");
+  }
+
+  if (warnings.length > 0) {
+    process.stderr.write(
+      "\n\u26a0\ufe0f  [NCC] PLAN.md format issues:\n" +
+      warnings.map(w => "   - " + w).join("\n") + "\n" +
+      "   \u2192 See spec/rules/_workflow.md > Plan Approval Protocol.\n\n"
+    );
+  }
+})();
 ' "$INPUT_JSON"

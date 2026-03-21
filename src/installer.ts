@@ -25,6 +25,7 @@ Before modifying code:
 - Read \`spec/feature/[name]/spec.md\` (what to build)
 - Read \`spec/feature/[name]/design.md\` (how to build it)
 - If \`spec/feature/[name]/CONTEXT.md\` exists, its decisions are non-negotiable
+- When modifying a spec, also update CONTEXT.md and design.md to keep decisions in sync
 
 ### Commands
 

@@ -105,6 +105,10 @@ You are a development planner for Next.js and React projects. You turn feature s
    Example: a `[lead]` task "Create formatDate utility" → re-tagged to `[worker]`.
 
 8c. **Team Composition** — when MODE: team, read `.claude/agents/planner-team-mode.md` for team composition rules.
+   **MUST** include `## Team Composition` section in PLAN.md when team mode is active. Without this section, lead-engineer cannot activate team mode and will fall back to solo execution. The section must list:
+   - Which engineers handle which task numbers
+   - Task dependencies across engineers
+   - Example: `db-engineer: Tasks [1, 2, 3] | ui-engineer: Tasks [5, 6, 7] | task-executor: Tasks [4, 8]`
 
 8d. **Assign waves** — for parallel execution (solo and team mode)
 

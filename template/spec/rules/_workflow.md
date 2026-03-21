@@ -186,6 +186,16 @@ All source files MUST:
 - Follow single responsibility — one concern per function, under 30 lines preferred
 - Read the relevant quality skill (error-handling-patterns, clean-code) when the task involves error paths or complex logic
 
+## Document Sync on Modification
+
+When a feature's spec.md is modified (not initial creation):
+- **CONTEXT.md**: Review and update all "Locked Decisions" that are affected. Stale decisions MUST be corrected — they take priority over spec for downstream agents.
+- **design.md**: Update Data Flow, Technical Decisions, and Component sections if the change affects architecture, auth mechanism, data format, or API contracts.
+- **Dependent features**: Check `spec/ARCHITECTURE.md` for features that list this feature in their `deps`. Flag breaking changes to the user.
+- **History entry**: Create `spec/feature/[name]/history/YYYY-MM-DD-[description].md` for every modification.
+
+This rule prevents stale CONTEXT.md from overriding correct spec.md during `/dev`.
+
 ## Prohibited Actions
 - Do not modify immutable `_` prefixed rule files
 - Do not modify spec.md or design.md during `/dev` without user approval
