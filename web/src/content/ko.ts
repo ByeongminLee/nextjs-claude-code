@@ -9,13 +9,17 @@ export const ko = {
     title: '주요 기능',
     items: [
       { bold: 'Spec-Driven', text: 'REQ-NNN 추적 가능한 feature spec, 준수 보고서' },
-      { bold: '큐레이션 스킬', text: 'skills.sh (Claude Code 커뮤니티 스킬 레지스트리)에서 자동 업데이트. React, Next.js, UI/UX, 테스팅, 라이브러리별 best practices 포함' },
-      { bold: '아키텍처 가이드', text: 'Flat, Feature-Based, FSD, Monorepo (팀 규모별 권장)' },
+      { bold: 'TDD 기본', text: 'MSW API 목킹과 함께 Test-Driven Development가 기본' },
+      { bold: '큐레이션 스킬', text: 'skills.sh에서 core 스킬 자동 설치, package.json 기반 on-demand 스킬 매칭' },
+      { bold: '아키텍처 가이드', text: 'Flat, Feature-Based, FSD, Monorepo (프로젝트 구조에서 자동 감지)' },
       { bold: '라이브러리 인식 에이전트', text: '선택한 스택에 맞춰 코드 작성' },
       { bold: 'Next.js 네이티브', text: 'App Router, Server Components, Server Actions, Pages Router' },
       { bold: 'React 호환', text: 'Vite 등 다른 React 셋업도 지원' },
       { bold: 'Monorepo 지원', text: 'Turborepo 워크스페이스 인식 설치' },
-      { bold: 'Claude Code 네이티브', text: 'slash commands, 멀티 에이전트 조합, PostToolUse hooks' },
+      { bold: 'Claude Code 네이티브', text: 'slash commands, 멀티 에이전트 조합, lifecycle hooks (SessionStart, PreToolUse, PostToolUse, Stop)' },
+      { bold: 'Hook profiles', text: 'NCC_HOOK_PROFILE로 훅 강도 조절: minimal, standard (기본), strict' },
+      { bold: 'Wave 실행', text: '태스크를 의존성 기반 wave로 그룹화하여 병렬 디스패치' },
+      { bold: 'Path-specific rules', text: '.claude/rules/에 paths 프론트매터로 매칭 파일에서만 로드되는 코딩 패턴' },
     ],
   },
 
@@ -70,6 +74,7 @@ export const ko = {
         commands: [
           { cmd: '/review [이름]', desc: '스펙 준수 + 코드 품질 리뷰' },
           { cmd: '/loop [이름]', desc: '리뷰 → 수정 → 재검증 반복, 모든 REQ 통과까지 (최대 5회)' },
+          { cmd: '/qa', desc: 'Playwright E2E 테스트, visual regression, 접근성 감사' },
           { cmd: '/test [이름]', desc: 'TEST_STRATEGY.md 기반 테스트 실행' },
           { cmd: '/log [이름]', desc: '로깅 관행 감사' },
           { cmd: '/security [이름]', desc: '보안 감사 (OWASP Top 10)' },
@@ -107,9 +112,16 @@ export const ko = {
       subtitle: 'Core Agents',
       items: [
         { name: 'spec-writer', role: 'spec.md + design.md 작성' },
-        { name: 'planner', role: 'CONTEXT.md + PLAN.md 생성' },
-        { name: 'lead-engineer', role: '구현 (솔로 또는 팀 리더)' },
+        { name: 'planner', role: 'CONTEXT.md + PLAN.md 생성, 도메인 분석 + 태스크 태깅' },
+        { name: 'lead-engineer', role: 'fresh-context subagent로 구현 오케스트레이션. Wave 기반 병렬 디스패치.' },
         { name: 'verifier', role: '4단계 검증' },
+      ],
+    },
+    subagents: {
+      subtitle: 'Fresh-Context Subagents (/dev)',
+      items: [
+        { name: 'task-executor', role: '[lead] 태스크 구현 (타입, 유틸, 훅, API 라우트)' },
+        { name: 'task-spec-reviewer', role: '태스크별 스펙 준수 + 코드 품질 리뷰' },
       ],
     },
     team: {
@@ -129,6 +141,7 @@ export const ko = {
       { bold: 'Auto-fix Budget', text: '모드별 최대 3회 재시도 — 에러 분석 → 다른 접근법 → 최소 변경 → 에스컬레이션' },
       { bold: 'Verification Levels', text: '파일 존재부터 브라우저 검증까지 4단계' },
       { bold: 'Resume Protocol', text: '중단된 /dev 세션을 중단 지점부터 재개' },
+      { bold: 'Hook Profiles', text: 'minimal (보안만), standard (기본), strict (+ deprecation guard, comment checker, todo enforcer)' },
       { bold: '스펙 검증', text: 'PostToolUse 훅이 잘못된 스펙 작성을 차단하고 스펙 업데이트를 리마인드' },
     ],
   },

@@ -136,6 +136,24 @@ const contents = [en, ko];
             </table>
           </div>
 
+          {c.agents.subagents && (
+            <>
+              <h3 class="font-mono font-semibold text-base mb-3 text-gray-600">{c.agents.subagents.subtitle}</h3>
+              <div class="border border-gray-200 rounded-lg overflow-hidden mb-6">
+                <table class="w-full text-sm">
+                  <tbody>
+                    {c.agents.subagents.items.map((agent, i) => (
+                      <tr class={i % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                        <td class="px-4 py-2.5 font-mono text-gray-900 whitespace-nowrap">{agent.name}</td>
+                        <td class="px-4 py-2.5 text-gray-600">{agent.role}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </>
+          )}
+
           <h3 class="font-mono font-semibold text-base mb-3 text-gray-600">{c.agents.team.subtitle}</h3>
           <div class="border border-gray-200 rounded-lg overflow-hidden">
             <table class="w-full text-sm">
