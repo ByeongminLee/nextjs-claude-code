@@ -18,7 +18,11 @@ Define your feature. Claude builds exactly what the spec says — with every cha
 - **Next.js native** — App Router, Server Components, Server Actions, Pages Router
 - **React support** — Vite and other React setups
 - **Monorepo ready** — detects monorepo patterns (Turborepo, apps/packages) and adapts skills/rules during `/init`
-- **Claude Code native** — slash commands, multi-agent coordination, PostToolUse hooks (validation scripts that run after Claude writes or edits files)
+- **Claude Code native** — slash commands, multi-agent coordination, lifecycle hooks (SessionStart, PreToolUse, PostToolUse, Stop)
+- **Hook profiles** — `NCC_HOOK_PROFILE` controls hook intensity: `minimal` (security only), `standard` (default), `strict` (adds deprecation guard, comment checker, todo enforcer)
+- **Wave execution** — tasks grouped into dependency waves for parallel dispatch, reducing feature build time
+- **Path-specific rules** — `.claude/rules/` with `paths` frontmatter so coding patterns only load when working with matching files (App Router, DB, UI)
+- **Context optimization** — SessionStart repo profiler primes skill matching, compact recovery re-injects state after context compression, artifact size limits prevent context bloat
 
 ---
 
@@ -133,6 +137,7 @@ Independent commands — use any of them whenever you need.
 |---------|-------------|
 | `/review [name]` | Spec compliance + code quality review across the entire feature (cross-task integration). Conditionally runs tester, log-auditor, and security-reviewer if their strategy files exist (TEST_STRATEGY.md / LOG_STRATEGY.md / SECURITY_STRATEGY.md). |
 | `/loop [name]` | Repeat review → fix → re-review until all REQs pass (max 5 iterations). |
+| `/qa` | Run Playwright E2E tests, visual regression, accessibility audits. `--visual` for screenshot comparison. `--a11y` for axe-core audit. |
 | `/test [name]` | Run tests based on TEST_STRATEGY.md. `--browser` for visual tests + Figma comparison. `--setup` to configure. |
 | `/log [name]` | Audit logging practices. `--audit` for project-wide scan. `--setup` to configure LOG_STRATEGY.md. |
 | `/security [name]` | Security audit (OWASP Top 10). `--audit` for project-wide scan. `--diff` for changed files only. `--setup` to configure SECURITY_STRATEGY.md. |
@@ -179,8 +184,16 @@ Independent commands — use any of them whenever you need.
 | `init` | Codebase analysis, draft spec docs | No | Yes |
 | `spec-writer` | Write spec.md + design.md (+ TEST.md if TDD) | No | Yes |
 | `planner` | Create CONTEXT.md + PLAN.md, domain analysis + task tagging | No | Yes |
-| `lead-engineer` | Implement features (solo or team leader) | Yes | Partial (STATE, history) |
+| `lead-engineer` | Orchestrate feature implementation via fresh-context subagents (solo or team leader). Supports wave-based parallel dispatch. | No (orchestrator only) | Partial (STATE, history) |
 | `verifier` | 4-level verification | No | No (read-only) |
+
+### Fresh-Context Subagents (`/dev`)
+
+| Agent | Role | Model | Modifies code |
+|-------|------|:---:|:---:|
+| `task-executor` | Implements [lead] domain tasks (types, utils, hooks, API, server actions) | sonnet | Yes |
+| `task-spec-reviewer` | Per-task spec compliance + code quality review | haiku | No (read-only) |
+| `performance-optimizer` | Core Web Vitals diagnostics and rendering strategy | sonnet | No (read-only) |
 
 ### Team Engineers (`/dev --team`)
 
@@ -270,9 +283,25 @@ If `/dev` is interrupted (session crash, timeout, context limit), running `/dev`
 | `verifying` | Re-run verifier via lead-engineer |
 | `looping` | Read LOOP_NOTES.md and resume from current iteration |
 
+### Hook Profiles
+
+Control hook intensity via `NCC_HOOK_PROFILE` environment variable in `.claude/settings.json`:
+
+| Profile | Hooks Active |
+|---------|-------------|
+| `minimal` | security-guard only |
+| `standard` (default) | security-guard, validate-post-write, advisory-post-write, repo-profiler, compact-recovery |
+| `strict` | All standard + deprecation-guard, comment-checker, todo-enforcer |
+
 ### Additional safeguards
 
 - **Spec validation**: PostToolUse hooks block malformed spec.md and design.md writes
+- **Deprecation guard** (strict): PreToolUse hook blocks deprecated Next.js patterns (getStaticProps in App Router, next/legacy/image, @next/font) before they are written
+- **Comment checker** (strict): warns when AI-generated comment density exceeds 30%
+- **Todo enforcer** (strict): Stop hook warns about incomplete PLAN.md tasks and TODO/FIXME comments
+- **Repo profiler**: SessionStart hook scans package.json, tsconfig, and config files to prime context
+- **Compact recovery**: re-injects active feature state (progress, decisions) after context compression
+- **Artifact size limits**: advisory warnings when spec documents exceed recommended line counts (see `spec/rules/_artifact-limits.md`)
 - **Spec reflection**: advisory hook reminds you to update the spec when code changes add new exports or routes
 - **Plan staleness check**: `/dev` warns if spec.md has been modified since the feature's PLAN.md was created
 - **Branch strategy awareness**: `/commit` and `/pr` auto-detect branch strategy and enforce commit conventions
@@ -289,7 +318,8 @@ If `/dev` is interrupted (session crash, timeout, context limit), running `/dev`
 | Auto-fix budget exhausted | Lead-engineer stops after 3 attempts. Review the error manually and provide guidance. To reset budget after manual fixes, edit `Used:` to `0` in PLAN.md |
 | Team mode not working | Verify `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` is set in `.claude/settings.json` |
 | Spec validation blocking writes | Check that section headers match the expected format (English or Korean) |
-| Hook errors on every file write | Edit `.claude/settings.json` to remove or disable specific hooks |
+| Hook errors on every file write | Set `NCC_HOOK_PROFILE=minimal` in `.claude/settings.json` env to reduce hooks |
+| Deprecation guard blocking valid code | Set `NCC_HOOK_PROFILE=standard` to disable strict hooks, or edit `deprecation-rules.json` |
 | Spec changed after planning | Re-run `/dev [name]` — it detects spec staleness and suggests re-planning |
 
 ---

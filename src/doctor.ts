@@ -32,6 +32,15 @@ const REQUIRED_SCRIPTS = [
   'validate-post-write.sh',
   'advisory-post-write.sh',
   'security-guard.sh',
+  'hook-profile.sh',
+  'repo-profiler.sh',
+  'compact-recovery.sh',
+];
+
+const STRICT_SCRIPTS = [
+  'deprecation-guard.sh',
+  'comment-checker.sh',
+  'todo-enforcer.sh',
 ];
 
 const REQUIRED_RULES = [
@@ -43,6 +52,8 @@ const REQUIRED_RULES = [
   '_loop-protocol.md',
   '_agent-roles.md',
   '_nextjs-ordering.md',
+  '_skill-budget.md',
+  '_artifact-limits.md',
 ];
 
 export async function runDoctor(cwd: string = process.cwd()): Promise<void> {
@@ -83,6 +94,18 @@ export async function runDoctor(cwd: string = process.cwd()): Promise<void> {
       status: missing.length === 0 ? 'ok' : 'warn',
       message: missing.length > 0 ? `Missing: ${missing.join(', ')}` : undefined,
     });
+
+    // Check strict-profile scripts (advisory only)
+    const missingStrict = STRICT_SCRIPTS.filter(
+      (s) => !fs.existsSync(path.join(scriptsDir, s))
+    );
+    if (missingStrict.length > 0) {
+      results.push({
+        label: 'Strict hook scripts (optional)',
+        status: 'warn',
+        message: `Missing: ${missingStrict.join(', ')} — available with NCC_HOOK_PROFILE=strict`,
+      });
+    }
   }
 
   // ── 4. settings.json hooks ─────────────────────────────────────────────────
@@ -93,17 +116,21 @@ export async function runDoctor(cwd: string = process.cwd()): Promise<void> {
         hooks?: {
           PostToolUse?: unknown[];
           PreToolUse?: unknown[];
+          SessionStart?: unknown[];
         };
       };
       const hasPost = (settings?.hooks?.PostToolUse?.length ?? 0) > 0;
       const hasPre = (settings?.hooks?.PreToolUse?.length ?? 0) > 0;
+      const hasSession = (settings?.hooks?.SessionStart?.length ?? 0) > 0;
       results.push({
         label: 'settings.json hooks',
-        status: hasPost && hasPre ? 'ok' : 'warn',
+        status: hasPost && hasPre && hasSession ? 'ok' : 'warn',
         message: !hasPre
           ? 'PreToolUse hook missing — security-guard not active'
           : !hasPost
           ? 'PostToolUse hook missing'
+          : !hasSession
+          ? 'SessionStart hook missing — repo-profiler not active'
           : undefined,
       });
     } catch {

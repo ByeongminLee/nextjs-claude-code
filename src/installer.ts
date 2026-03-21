@@ -95,13 +95,18 @@ async function installClaude(
     claudeTemplateDir,
     path.join(targetDir, '.claude'),
     vars, force, dryRun,
-    ['settings.json', 'skills'],
+    ['settings.json', 'skills', 'rules'],
   );
   const skillCount = await copyDir(
     path.join(claudeTemplateDir, 'skills'),
     path.join(targetDir, '.claude', 'skills'),
     vars, force, dryRun,
     remoteSkillNames,
+  );
+  const rulesCount = await copyDir(
+    path.join(claudeTemplateDir, 'rules'),
+    path.join(targetDir, '.claude', 'rules'),
+    vars, force, dryRun,
   );
   await mergeSettingsJson(
     path.join(TEMPLATE_DIR, '.claude', 'settings.json'),
@@ -113,7 +118,7 @@ async function installClaude(
     FS_CLAUDE_MD_BLOCK,
     dryRun,
   );
-  return agentCount + skillCount;
+  return agentCount + skillCount + rulesCount;
 }
 
 // ─── Shared helpers ──────────────────────────────────────────────────────────
@@ -165,7 +170,6 @@ async function mergeSettingsJson(
   dryRun: boolean,
 ): Promise<void> {
   const templateContent = JSON.parse(fs.readFileSync(templatePath, 'utf-8'));
-  const fsHooks = templateContent.hooks?.PostToolUse ?? [];
 
   if (!fs.existsSync(destPath)) {
     if (!dryRun) {
@@ -176,20 +180,27 @@ async function mergeSettingsJson(
   }
 
   const existing = JSON.parse(fs.readFileSync(destPath, 'utf-8'));
+
+  // ── Merge env ───────────────────────────────────────────────────────────────
+  if (templateContent.env) {
+    if (!existing.env) existing.env = {};
+    for (const [key, val] of Object.entries(templateContent.env)) {
+      if (!(key in existing.env)) existing.env[key] = val;
+    }
+  }
+
+  // ── Merge hooks (generic — supports all hook types) ─────────────────────────
   if (!existing.hooks) existing.hooks = {};
-  if (!existing.hooks.PostToolUse) existing.hooks.PostToolUse = [];
-  if (!existing.hooks.PreToolUse) existing.hooks.PreToolUse = [];
 
   type HookGroup = { matcher?: string; hooks?: Array<{ command?: string }> };
 
-  const existingPostToolUse: HookGroup[] = existing.hooks.PostToolUse;
-  const existingPreToolUse: HookGroup[] = existing.hooks.PreToolUse;
-
-  // Collect all existing hook commands across all matcher groups
+  // Collect all existing hook commands across all hook types
   const existingCommands = new Set<string>();
-  for (const group of [...existingPostToolUse, ...existingPreToolUse]) {
-    for (const h of group.hooks ?? []) {
-      if (h.command) existingCommands.add(h.command);
+  for (const hookType of Object.keys(existing.hooks)) {
+    for (const group of (existing.hooks[hookType] as HookGroup[]) ?? []) {
+      for (const h of group.hooks ?? []) {
+        if (h.command) existingCommands.add(h.command);
+      }
     }
   }
 
@@ -207,20 +218,20 @@ async function mergeSettingsJson(
       } else {
         existingGroups.push({ ...templateGroup, hooks: newHooks });
       }
-      // Track newly added commands to avoid re-adding them
       for (const h of newHooks) {
         if (h.command) existingCommands.add(h.command);
       }
     }
   }
 
-  const fsPreHooks: HookGroup[] = templateContent.hooks?.PreToolUse ?? [];
-  mergeHookGroups(fsHooks, existingPostToolUse);
-  mergeHookGroups(fsPreHooks, existingPreToolUse);
-
-  // Remove empty PreToolUse array if none were added
-  if (existing.hooks.PreToolUse.length === 0) {
-    delete existing.hooks.PreToolUse;
+  // Merge all hook types from template
+  for (const hookType of Object.keys(templateContent.hooks || {})) {
+    if (!existing.hooks[hookType]) existing.hooks[hookType] = [];
+    mergeHookGroups(templateContent.hooks[hookType], existing.hooks[hookType]);
+    // Remove empty arrays
+    if (existing.hooks[hookType].length === 0) {
+      delete existing.hooks[hookType];
+    }
   }
 
   if (!dryRun) {
