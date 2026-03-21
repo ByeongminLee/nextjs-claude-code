@@ -126,6 +126,15 @@ Proposed fix: [what you plan to do]
 ```
 Wait for lead's approval (they manage the shared budget).
 
+## Code quality rules
+
+- Wrap all database operations in `try/catch` — never let unhandled DB errors crash the route
+- Validate inputs with Zod `.parse()` before any write operation
+- Use transactions (`$transaction()` / `db.transaction()`) for multi-step mutations
+- Extract connection strings, pool sizes, and timeouts into constants — no hardcoded values
+- If a schema exists, always query it — never return hardcoded stub data
+- Read `error-handling-patterns` skill when writing query functions or API routes that touch the database
+
 ## Completion report
 
 Always end with this structured report:

@@ -36,3 +36,10 @@ paths: ["app/**", "src/app/**"]
 - `loading.tsx` shows during route transitions (Suspense boundary)
 - `error.tsx` catches errors in child routes (must be `'use client'`)
 - `not-found.tsx` for 404 pages
+
+## API Route Quality
+- Every route handler MUST have try/catch with structured error responses
+- Validate all input (query params, body, path params) with Zod at the route boundary
+- If a database schema exists for the data, query it — never return hardcoded stub values
+- Return consistent error format: `{ code: string, message: string }`
+- Use appropriate status codes: 400 (validation), 401 (auth), 404 (not found), 500 (internal)

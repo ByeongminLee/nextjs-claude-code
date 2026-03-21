@@ -36,6 +36,18 @@ For `[worker]` tasks → `worker-engineer` is spawned instead.
 ## Task execution
 
 1. **Implement the change** following `spec/rules/` conventions
+
+   **API route / server action rules** (MUST follow for any `app/api/` or `actions/` file):
+   - Wrap the entire handler body in `try/catch` — no unhandled exceptions
+   - Classify errors: `ValidationError` (400), `NotFoundError` (404), `UnauthorizedError` (401), `InternalError` (500)
+   - Validate ALL input at the boundary: use Zod `.parse()` or `.safeParse()` on query params, request body, and path params
+   - Return structured error responses: `{ code: string, message: string }`
+   - Never swallow errors silently — log or re-throw
+   - Extract hardcoded values (timeouts, limits, magic numbers) into named constants
+   - If a database schema exists for the target data, query it — never use hardcoded stub values
+
+   **Read `error-handling-patterns` skill** for API routes, server actions, or any code that handles external input.
+
 2. **Run type check**: `npx tsc --noEmit`
 3. If type check fails:
    - You have **2 auto-fix attempts**

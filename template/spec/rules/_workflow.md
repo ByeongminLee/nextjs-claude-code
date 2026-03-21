@@ -171,6 +171,21 @@ Do not read: `node_modules/`, `.next/`, `dist/`, `.turbo/`, `.cache/`, lock file
 - Planner sets `Status: pending`; updates to `approved` only after user confirmation
 - Lead-engineer must verify `Status: approved` before starting
 
+## Code Quality Rules (all agents)
+
+API routes (`app/api/`) and server actions (`actions/`) MUST:
+- Wrap the entire handler in `try/catch` — return structured `{ code, message }` errors
+- Validate ALL input at the boundary with Zod `.parse()` or `.safeParse()`
+- Classify errors by status: 400 (validation), 401 (auth), 404 (not found), 500 (internal)
+- Never swallow errors silently — log or propagate
+- Never return hardcoded stub data if a database schema exists for the target data
+- Extract magic numbers and strings into named constants
+
+All source files MUST:
+- Use strict TypeScript — no `any`, no `as unknown` type assertions
+- Follow single responsibility — one concern per function, under 30 lines preferred
+- Read the relevant quality skill (error-handling-patterns, clean-code) when the task involves error paths or complex logic
+
 ## Prohibited Actions
 - Do not modify immutable `_` prefixed rule files
 - Do not modify spec.md or design.md during `/dev` without user approval

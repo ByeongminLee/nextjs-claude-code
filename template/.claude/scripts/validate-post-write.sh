@@ -183,6 +183,19 @@ if (/\.(js|ts|mjs|cjs)$/.test(absPath)) {
   }
 }
 
+// API route error handling check (advisory)
+if (/\.(ts|tsx)$/.test(absPath) && (absPath.includes("/api/") || absPath.includes("/actions/"))) {
+  const routeContent = fs.readFileSync(absPath, "utf-8");
+  const hasExportedHandler = /export\s+(async\s+)?function\s+(GET|POST|PUT|PATCH|DELETE|HEAD)\s*\(/m.test(routeContent);
+  if (hasExportedHandler && !routeContent.includes("catch")) {
+    process.stderr.write(
+      "\u26a0\ufe0f  [NCC] API route missing error handling: " + absPath.split("/").slice(-3).join("/") + "\n" +
+      "   \u2192 Wrap handler in try/catch with structured error response.\n" +
+      "   \u2192 See spec/rules/_workflow.md > Code Quality Rules.\n\n"
+    );
+  }
+}
+
 // JSON syntax check
 if (/\.json$/.test(absPath)) {
   try {
