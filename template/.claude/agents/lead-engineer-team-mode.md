@@ -14,17 +14,18 @@ Team mode uses a **hybrid approach**: Agent Teams for persistent coordination + 
 
 Create a Claude Code agent team. You are the leader.
 
-### Step 2 — Read parallel groups from PLAN.md
+### Step 2 — Read waves from PLAN.md
 
-Scan PLAN.md tasks for `parallel:GroupID` fields:
-- Group all tasks by their `parallel:` value (A, B, C…)
-- Tasks without a `parallel:` field are sequential — execute after all parallel groups complete
-- Groups execute in alphabetical order: all `parallel:A` tasks before any `parallel:B` tasks
-- If `parallel:` field is absent on all tasks: execute sequentially using Fresh Context solo mode
+Scan PLAN.md tasks for `wave:N` fields (or legacy `parallel:GroupID`):
+- Group all tasks by their `wave:` value (1, 2, 3…)
+- Legacy support: `parallel:A` = `wave:1`, `parallel:B` = `wave:2`, etc.
+- Tasks without a `wave:` or `parallel:` field are sequential — execute after all waves complete
+- Waves execute in numeric order: all `wave:1` tasks before any `wave:2` tasks
+- If neither field is present on any task: execute sequentially using Fresh Context solo mode
 
-### Step 3 — Execute parallel groups
+### Step 3 — Execute waves
 
-For each parallel group (A, then B, then C…):
+For each wave (1, then 2, then 3…):
 
 1. **Spawn teammates** for multi-task domains within this group:
    - If this group has 2+ `[db]` tasks → create a `db-engineer` teammate for those tasks

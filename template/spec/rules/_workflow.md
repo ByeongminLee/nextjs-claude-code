@@ -154,14 +154,17 @@ Do not read: `node_modules/`, `.next/`, `dist/`, `.turbo/`, `.cache/`, lock file
 ## PLAN.md Task Format
 
 ```
-- [ ] [domain] Task description → target file(s) (REQ-NNN) model:haiku|sonnet [parallel:GroupID]
+- [ ] [domain] Task description → target file(s) (REQ-NNN) model:haiku|sonnet [wave:N]
 ```
 
-**`parallel` field rules** (team mode only):
-- Tasks sharing the same `parallel:GroupID` (e.g., `parallel:A`) can execute simultaneously
-- Groups execute in alphabetical order: all `parallel:A` tasks before any `parallel:B` tasks
+**`wave` field rules**:
+- Tasks sharing the same `wave:N` (e.g., `wave:1`) can execute simultaneously
+- Waves execute in numeric order: all `wave:1` tasks complete before any `wave:2` tasks begin
+- Between waves, the orchestrator syncs the task ledger (files + exports from completed tasks)
 - Omit the field for sequential execution (default, compatible with solo mode)
-- Never assign the same file to two tasks in the same parallel group
+- Never assign the same file to two tasks in the same wave
+- Solo mode: waves are dispatched as concurrent subagents; team mode: waves map to parallel groups
+- Backward compat: `parallel:A` = `wave:1`, `parallel:B` = `wave:2`, etc.
 
 ## Plan Approval Protocol
 - PLAN.md must include `## Approval` with `Status:` and `Approved-at:` fields
@@ -184,3 +187,4 @@ Read ONLY when the condition applies to your current task:
 - `spec/rules/_agent-roles.md` — when checking agent boundaries or responsibilities
 - `spec/rules/_nextjs-ordering.md` — when project is Next.js
 - `spec/rules/_skill-budget.md` — when deciding which skills to read (budget limits per agent)
+- `spec/rules/_artifact-limits.md` — advisory line limits for spec documents (prevents context bloat)

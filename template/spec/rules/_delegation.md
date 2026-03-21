@@ -55,6 +55,20 @@ UPSTREAM:
 
 The `UPSTREAM:` section is critical for fresh-context subagents — they have no memory of previous tasks. Include only entries that this task directly depends on (not the full ledger).
 
+## Wave Sync Protocol
+
+When using `wave:N` fields in PLAN.md:
+
+1. **Within a wave**: dispatch all tasks in the same wave simultaneously (parallel subagents or teammates)
+2. **Wave boundary**: after all tasks in wave N complete:
+   - Collect all `[Task Complete]` reports
+   - Update the task ledger with files and exports from each task
+   - Mark all wave N tasks as `[x]` in PLAN.md
+   - Only then start dispatching wave N+1 tasks with updated `UPSTREAM:` context
+3. **Failure in a wave**: if any task in wave N fails, retry within auto-fix budget. Do NOT start wave N+1 until all wave N tasks succeed or are escalated.
+4. **Solo mode**: concurrent Agent tool calls for same-wave tasks
+5. **Team mode**: map waves to teammate coordination — teammates for multi-task domains, subagents for single tasks
+
 ## Resume Protocol
 
 If `/dev` is interrupted (session crash, timeout, context limit), running `/dev` again resumes:

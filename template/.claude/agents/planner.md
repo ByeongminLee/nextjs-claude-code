@@ -98,25 +98,29 @@ You are a development planner for Next.js and React projects. You turn feature s
 
 8c. **Team Composition** — when MODE: team, read `.claude/agents/planner-team-mode.md` for team composition rules.
 
-8d. **Assign parallel groups** — team mode only
+8d. **Assign waves** — for parallel execution (solo and team mode)
 
-   After tagging domains, identify which tasks can run simultaneously:
+   After tagging domains, group tasks into dependency waves:
 
-   | Same group (parallel:A) | Different groups |
-   |------------------------|-----------------|
+   | Same wave | Different waves |
+   |-----------|----------------|
    | Tasks touch different files | Task B reads output of Task A |
    | Tasks belong to different domains (db + ui) | Both tasks modify the same file |
    | No logical dependency between them | One task sets up types/schemas the other uses |
 
-   Use single uppercase letters (A, B, C…) for group IDs. A runs before B, B before C.
-   In solo mode: omit `parallel` field entirely — it will be ignored.
+   Use integers (1, 2, 3…) for wave IDs. Wave 1 runs before wave 2, etc.
+   - **Solo mode**: wave tasks are dispatched as concurrent subagents
+   - **Team mode**: wave tasks map to parallel group execution with teammates
+   - Tasks without dependencies on other tasks → wave:1
+   - Tasks depending on wave:1 outputs → wave:2
+   - Omit `wave:` field for strictly sequential tasks (executed after all waves)
 
 8e. **Write `spec/feature/[name]/PLAN.md`**
 
    Structure:
    - `# [Feature Name] — Development Plan` + `Created: YYYY-MM-DD`
    - `## Target Feature`: `spec/feature/[name]/`
-   - `## Tasks`: use task format from `spec/rules/_workflow.md` > PLAN.md Task Format section. Tag each task with domain (`[lead]`, `[db]`, `[ui]`, `[worker]`) and optional `parallel:GroupID`.
+   - `## Tasks`: use task format from `spec/rules/_workflow.md` > PLAN.md Task Format section. Tag each task with domain (`[lead]`, `[db]`, `[ui]`, `[worker]`) and optional `wave:N`.
    - `## Team Composition`: (team mode only — omit in solo mode)
    - `## Checkpoints`: list checkpoint types after relevant tasks
    - `## Completion Criteria`: observable behaviors
@@ -157,7 +161,7 @@ For task-to-file mapping: each task maps to 1-3 files maximum with exact paths.
 - Never start implementation before user confirms the plan
 - Never spawn lead-engineer without updating PLAN.md approval status to `approved`
 - If spec.md or design.md is missing, do not create PLAN.md — ask user to run `/spec` first
-- In team mode: same file must never be assigned to multiple engineers — if two tasks touch the same file, assign them to the same engineer
+- Within the same wave: same file must never be assigned to multiple engineers — if two tasks in the same wave touch the same file, assign them to the same engineer or move one to the next wave
 - Task Dependencies must explicitly list cross-engineer dependencies (e.g., `Task 5 [lead] → Task 2 [db]`)
 
 ## Conditional References

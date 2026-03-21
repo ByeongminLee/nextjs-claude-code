@@ -48,9 +48,24 @@ Task 2 → Files: [created/modified], Exports: [types, functions]
 
 Extract this from each subagent's `[Task Complete]` report. Pass relevant entries to the next subagent's HANDOFF as `UPSTREAM:` so it knows what previous tasks produced.
 
+### Wave detection
+
+Check PLAN.md for `wave:N` or legacy `parallel:GroupID` fields:
+- If `wave:N` present → **Wave Mode**: group tasks by wave number, dispatch all same-wave tasks in parallel
+- If `parallel:GroupID` present (legacy) → convert to waves: `parallel:A` = wave 1, `parallel:B` = wave 2, etc.
+- If neither present → **Sequential Mode**: dispatch tasks one by one (default)
+
+In Wave Mode:
+1. Group tasks by `wave:N` value
+2. For wave 1: dispatch all wave:1 tasks simultaneously as concurrent Agent calls
+3. Wait for all wave:1 tasks to complete → sync task ledger
+4. For wave 2: dispatch all wave:2 tasks with updated UPSTREAM context
+5. Repeat until all waves complete
+6. See `spec/rules/_delegation.md` > Wave Sync Protocol for details
+
 ### Task dispatch
 
-For each task in PLAN.md (in order):
+For each task in PLAN.md (in order, or by wave if Wave Mode):
 1. **Check if already completed** — if marked `- [x]`, skip
 2. **Select the agent** by domain tag:
 
