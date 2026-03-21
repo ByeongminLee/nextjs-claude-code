@@ -383,7 +383,7 @@ export const SKILLS: SkillDef[] = [
     cli: 'npx skills add vercel-labs/agent-skills --skill i18n-best-practices --agent claude-code --yes --copy',
     description: 'Internationalization patterns — next-intl, react-intl, i18next',
     tier: 'on-demand',
-    condition: ['i18n'],
+    condition: ['next-intl', 'react-intl', 'i18next', 'react-i18next'],
   },
 
   // ── On-demand: Storybook ─────────────────────────────────────────────────────
@@ -393,7 +393,7 @@ export const SKILLS: SkillDef[] = [
     cli: 'npx skills add vercel-labs/agent-skills --skill storybook --agent claude-code --yes --copy',
     description: 'Component documentation and Storybook story patterns',
     tier: 'on-demand',
-    condition: ['storybook'],
+    condition: ['storybook', '@storybook/react', '@storybook/nextjs'],
   },
 
   // ── On-demand: PWA ──────────────────────────────────────────────────────────
@@ -403,7 +403,7 @@ export const SKILLS: SkillDef[] = [
     cli: 'npx skills add vercel-labs/agent-skills --skill pwa-patterns --agent claude-code --yes --copy',
     description: 'PWA service workers, offline support, and caching strategies',
     tier: 'on-demand',
-    condition: ['pwa'],
+    condition: ['next-pwa', '@ducanh2912/next-pwa', 'workbox-webpack-plugin'],
   },
 
   // ── On-demand: OpenAPI ───────────────────────────────────────────────────────
@@ -413,7 +413,7 @@ export const SKILLS: SkillDef[] = [
     cli: 'npx skills add vercel-labs/agent-skills --skill openapi-spec --agent claude-code --yes --copy',
     description: 'OpenAPI 3.x specification writing and API documentation patterns',
     tier: 'on-demand',
-    condition: ['openapi'],
+    condition: ['swagger-jsdoc', 'openapi-types', 'next-swagger-doc'],
   },
 ];
 
