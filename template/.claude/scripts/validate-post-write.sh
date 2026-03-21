@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
-# NCC — Consolidated PostToolUse hook: validation (blocking)
-# Merges: validate-spec.sh + validate-edit.sh
-# Runs after every Write/Edit. Blocks on spec format errors; advisory for code issues.
+# NCC — PostToolUse validation hook (blocking + advisory)
+# Runs after Write/Edit. Blocks spec format errors; advisory for code and plan issues.
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/hook-profile.sh"
@@ -13,306 +12,128 @@ node -e '
 const input = JSON.parse(process.argv[1]);
 const filePath = (input.tool_input && input.tool_input.file_path) || "";
 if (!filePath) process.exit(0);
-
 const fs = require("fs");
 const path = require("path");
+const isFeature = filePath.includes("/spec/feature/") || filePath.startsWith("spec/feature/");
+const resolve = (p) => path.isAbsolute(p) ? p : path.join(process.cwd(), p);
+const warn = (msg) => process.stderr.write(msg);
+const block = (reason) => console.log(JSON.stringify({ decision: "block", reason }));
 
-// ═══════════════════════════════════════════════════════════════════════════════
-// Part 1: Spec document validation (from validate-spec.sh) — BLOCKING
-// ═══════════════════════════════════════════════════════════════════════════════
+// ── Helper: check required sections ─────────────────────────────────────────
+function checkSections(content, required) {
+  return required
+    .filter(alts => !alts.some(s => content.includes(s)))
+    .map(alts => alts.join(" / "));
+}
 
-// --- Validate spec.md format ---
-if ((filePath.includes("/spec/feature/") || filePath.startsWith("spec/feature/")) && filePath.endsWith("/spec.md")) {
+// ═══ Part 1: Spec document validation — BLOCKING ════════════════════════════
+
+if (isFeature && filePath.endsWith("/spec.md")) {
   if (!fs.existsSync(filePath)) process.exit(0);
-  const content = fs.readFileSync(filePath, "utf-8");
-
-  const required = [
-    ["## Purpose",      "## 목적"],
-    ["## Requirements", "## 요구사항"],
-    ["## Behaviors",    "## 핵심 동작"],
-    ["## Out of Scope", "## 범위 외"],
-  ];
-
-  const missing = required
-    .filter((alts) => !alts.some((s) => content.includes(s)))
-    .map((alts) => alts.join(" / "));
-
+  const c = fs.readFileSync(filePath, "utf-8");
+  const missing = checkSections(c, [
+    ["## Purpose", "## 목적"], ["## Requirements", "## 요구사항"],
+    ["## Behaviors", "## 핵심 동작"], ["## Out of Scope", "## 범위 외"],
+  ]);
   if (missing.length > 0) {
-    const fixHint = [
-      "Required sections:",
-      "  ## Purpose",
-      "  ## Requirements  (REQ-001: ... format)",
-      "  ## Behaviors     (When [trigger], [result] format)",
-      "  ## Out of Scope",
-    ].join("\n");
-    const reasons = missing.map((s) => "  - Missing section: " + s).join("\n");
-    console.log(JSON.stringify({
-      decision: "block",
-      reason: "spec.md validation failed:\n" + reasons + "\n\n" + fixHint,
-    }));
+    block("spec.md validation failed:\n" + missing.map(s => "  - Missing: " + s).join("\n") +
+      "\n\nRequired: ## Purpose, ## Requirements (REQ-001:), ## Behaviors, ## Out of Scope");
     process.exit(0);
   }
-
-  // Advisory: check REQ-NNN format
-  const reqMatch = content.split(/^## (?:Requirements|요구사항)/m);
-  if (reqMatch.length > 1) {
-    const reqSection = reqMatch[1].split(/^## /m)[0] || "";
-    const lines = reqSection.split("\n").filter((l) => l.trim() && !l.startsWith("#"));
-    const nonReqLines = lines.filter((l) => !l.trim().match(/^REQ-\d{3}:/));
-    if (nonReqLines.length > 0) {
-      console.log(JSON.stringify({
-        decision: "approve",
-        reason: "[Advisory] Some lines in ## Requirements do not follow REQ-NNN format.",
-      }));
+  // Advisory: REQ format
+  const reqPart = c.split(/^## (?:Requirements|요구사항)/m)[1];
+  if (reqPart) {
+    const lines = reqPart.split(/^## /m)[0].split("\n").filter(l => l.trim() && !l.startsWith("#"));
+    if (lines.some(l => !l.trim().match(/^REQ-\d{3}:/))) {
+      console.log(JSON.stringify({ decision: "approve", reason: "[Advisory] Some Requirements lines do not follow REQ-NNN: format." }));
     }
   }
   process.exit(0);
 }
 
-// --- Validate design.md format ---
-if ((filePath.includes("/spec/feature/") || filePath.startsWith("spec/feature/")) && filePath.endsWith("/design.md")) {
+if (isFeature && filePath.endsWith("/design.md")) {
   if (!fs.existsSync(filePath)) process.exit(0);
-  const content = fs.readFileSync(filePath, "utf-8");
-
-  const required = [
-    ["## Components",          "## 컴포넌트"],
-    ["## State",               "## 상태"],
-    ["## Data Flow",           "## 데이터 흐름"],
-    ["## Technical Decisions", "## 기술 결정"],
-  ];
-
-  const missing = required
-    .filter((alts) => !alts.some((s) => content.includes(s)))
-    .map((alts) => alts.join(" / "));
-
+  const missing = checkSections(fs.readFileSync(filePath, "utf-8"), [
+    ["## Components", "## 컴포넌트"], ["## State", "## 상태"],
+    ["## Data Flow", "## 데이터 흐름"], ["## Technical Decisions", "## 기술 결정"],
+  ]);
   if (missing.length > 0) {
-    const fixHint = [
-      "Required sections:",
-      "  ## Components",
-      "  ## State",
-      "  ## Data Flow",
-      "  ## Technical Decisions",
-    ].join("\n");
-    const reasons = missing.map((s) => "  - Missing section: " + s).join("\n");
-    console.log(JSON.stringify({
-      decision: "block",
-      reason: "design.md validation failed:\n" + reasons + "\n\n" + fixHint,
-    }));
+    block("design.md validation failed:\n" + missing.map(s => "  - Missing: " + s).join("\n") +
+      "\n\nRequired: ## Components, ## State, ## Data Flow, ## Technical Decisions");
   }
   process.exit(0);
 }
 
-// --- Validate history entry format ---
-if ((filePath.includes("/history/") || filePath.startsWith("spec/") && filePath.includes("history/")) && filePath.endsWith(".md")) {
+if (filePath.includes("history/") && filePath.endsWith(".md")) {
   if (!fs.existsSync(filePath)) process.exit(0);
-  const content = fs.readFileSync(filePath, "utf-8");
-
-  const filenamePattern = /\/\d{4}-\d{2}-\d{2}-.+\.md$/;
-  const basename = filePath.split("/").pop();
-  const errors = [];
-
-  if (!filenamePattern.test(filePath)) {
-    errors.push("Filename must match YYYY-MM-DD-[description].md (got: " + basename + ")");
-  }
-
-  const requiredSections = [
-    ["## Reason",        "## 사유"],
-    ["## Changes",       "## 변경사항"],
-    ["## Files Modified","## 수정된 파일"],
-  ];
-
-  const missingSections = requiredSections
-    .filter((alts) => !alts.some((s) => content.includes(s)))
-    .map((alts) => alts.join(" / "));
-
-  if (missingSections.length > 0) {
-    missingSections.forEach((s) => errors.push("Missing section: " + s));
-  }
-
-  if (!content.match(/^# .+/m)) {
-    errors.push("Missing top-level heading (# [Change description])");
-  }
-
-  if (!content.match(/Date:\s*\d{4}-\d{2}-\d{2}/)) {
-    errors.push("Missing or malformed Date field (expected Date: YYYY-MM-DD)");
-  }
-
-  if (errors.length > 0) {
-    const fixHint = [
-      "Required history entry format:",
-      "  # [Change description]",
-      "  Date: YYYY-MM-DD",
-      "  ## Reason",
-      "  ## Changes",
-      "  ## Files Modified",
-    ].join("\n");
-    const reasons = errors.map((e) => "  - " + e).join("\n");
-    console.log(JSON.stringify({
-      decision: "block",
-      reason: "History entry validation failed:\n" + reasons + "\n\n" + fixHint,
-    }));
-  }
+  const c = fs.readFileSync(filePath, "utf-8");
+  const errs = [];
+  if (!/\/\d{4}-\d{2}-\d{2}-.+\.md$/.test(filePath)) errs.push("Filename must be YYYY-MM-DD-desc.md");
+  const ms = checkSections(c, [["## Reason","## 사유"],["## Changes","## 변경사항"],["## Files Modified","## 수정된 파일"]]);
+  ms.forEach(s => errs.push("Missing: " + s));
+  if (!c.match(/^# .+/m)) errs.push("Missing # heading");
+  if (!c.match(/Date:\s*\d{4}-\d{2}-\d{2}/)) errs.push("Missing Date: YYYY-MM-DD");
+  if (errs.length > 0) block("History entry failed:\n" + errs.map(e => "  - " + e).join("\n"));
   process.exit(0);
 }
 
-// ═══════════════════════════════════════════════════════════════════════════════
-// Part 2: Edit result validation (from validate-edit.sh) — ADVISORY
-// ═══════════════════════════════════════════════════════════════════════════════
+// ═══ Part 2: Code validation — ADVISORY ═════════════════════════════════════
 
-const absPath = path.isAbsolute(filePath) ? filePath : path.join(process.cwd(), filePath);
+const absPath = resolve(filePath);
+if (!fs.existsSync(absPath)) { warn("⚠️  File not found: " + absPath + "\n"); process.exit(0); }
+if (fs.statSync(absPath).size === 0) { warn("⚠️  Empty file: " + absPath + "\n"); process.exit(0); }
 
-if (!fs.existsSync(absPath)) {
-  process.stderr.write("⚠️  [validate] File not found after edit: " + absPath + "\n");
-  process.exit(0);
-}
-
-const stat = fs.statSync(absPath);
-if (stat.size === 0) {
-  process.stderr.write("⚠️  [validate] File is empty after edit: " + absPath + "\n");
-  process.exit(0);
-}
-
-// JS/TS syntax check
 if (/\.(js|ts|mjs|cjs)$/.test(absPath)) {
-  const { execSync } = require("child_process");
-  try {
-    execSync("node --check " + JSON.stringify(absPath), { stdio: "pipe" });
-  } catch (e) {
-    const msg = (e.stderr || e.stdout || "").toString().split("\n").slice(0, 3).join("\n");
-    process.stderr.write("⚠️  [validate] Syntax issue: " + absPath + "\n   " + msg + "\n");
-  }
+  try { require("child_process").execSync("node --check " + JSON.stringify(absPath), { stdio: "pipe" }); }
+  catch (e) { warn("⚠️  Syntax: " + absPath.split("/").slice(-3).join("/") + "\n"); }
 }
-
-// API route error handling check (advisory)
 if (/\.(ts|tsx)$/.test(absPath) && (absPath.includes("/api/") || absPath.includes("/actions/"))) {
-  const routeContent = fs.readFileSync(absPath, "utf-8");
-  const hasExportedHandler = /export\s+(async\s+)?function\s+(GET|POST|PUT|PATCH|DELETE|HEAD)\s*\(/m.test(routeContent);
-  if (hasExportedHandler && !routeContent.includes("catch")) {
-    process.stderr.write(
-      "\u26a0\ufe0f  [NCC] API route missing error handling: " + absPath.split("/").slice(-3).join("/") + "\n" +
-      "   \u2192 Wrap handler in try/catch with structured error response.\n" +
-      "   \u2192 See spec/rules/_workflow.md > Code Quality Rules.\n\n"
-    );
+  const rc = fs.readFileSync(absPath, "utf-8");
+  if (/export\s+(async\s+)?function\s+(GET|POST|PUT|PATCH|DELETE|HEAD)\s*\(/m.test(rc) && !rc.includes("catch")) {
+    warn("⚠️  API route missing try/catch: " + absPath.split("/").slice(-3).join("/") + "\n");
   }
 }
-
-// JSON syntax check
 if (/\.json$/.test(absPath)) {
-  try {
-    JSON.parse(fs.readFileSync(absPath, "utf-8"));
-  } catch (e) {
-    process.stderr.write("⚠️  [validate] Invalid JSON: " + absPath + "\n");
+  try { JSON.parse(fs.readFileSync(absPath, "utf-8")); } catch { warn("⚠️  Invalid JSON: " + absPath + "\n"); }
+}
+
+// ═══ Part 3: Spec artifact advisory checks ══════════════════════════════════
+
+// Artifact size limits
+if (filePath.includes("spec/") && filePath.endsWith(".md")) {
+  const limits = { "PROJECT.md":80,"ARCHITECTURE.md":120,"STATE.md":100,"spec.md":150,"design.md":200,"PLAN.md":100,"CONTEXT.md":50,"LOOP_NOTES.md":50 };
+  const bn = filePath.split("/").pop() || "";
+  const lim = limits[bn];
+  if (lim) {
+    const cp = resolve(filePath);
+    if (fs.existsSync(cp)) {
+      const lc = fs.readFileSync(cp, "utf-8").split("\n").length;
+      if (lc > lim) warn("\n⚠️  " + bn + " exceeds " + lim + " lines (" + lc + "). Split per _artifact-limits.md.\n\n");
+    }
   }
 }
 
-// ═══════════════════════════════════════════════════════════════════════════════
-// Part 3: Artifact size limit check — ADVISORY (from _artifact-limits.md)
-// ═══════════════════════════════════════════════════════════════════════════════
-
-(function checkArtifactSize() {
-  if (!filePath.includes("spec/")) return;
-  if (!filePath.endsWith(".md")) return;
-
-  const limits = {
-    "PROJECT.md": 80,
-    "ARCHITECTURE.md": 120,
-    "STATE.md": 100,
-    "spec.md": 150,
-    "design.md": 200,
-    "PLAN.md": 100,
-    "CONTEXT.md": 50,
-    "LOOP_NOTES.md": 50,
-  };
-
-  const basename = filePath.split("/").pop() || "";
-  const limit = limits[basename];
-  if (!limit) return;
-
-  const checkPath = path.isAbsolute(filePath) ? filePath : path.join(process.cwd(), filePath);
-  if (!fs.existsSync(checkPath)) return;
-
-  const content = fs.readFileSync(checkPath, "utf-8");
-  const lineCount = content.split("\n").length;
-
-  if (lineCount > limit) {
-    process.stderr.write(
-      "\n\u26a0\ufe0f  [NCC Artifact Limit] " + basename + " exceeds recommended size: " +
-      lineCount + "/" + limit + " lines\n" +
-      "   \u2192 Consider splitting content. See spec/rules/_artifact-limits.md for overflow strategies.\n\n"
-    );
+// PLAN.md checks (mock tasks + approval format)
+if (filePath.endsWith("PLAN.md") && isFeature) {
+  const pp = resolve(filePath);
+  if (fs.existsSync(pp)) {
+    const plan = fs.readFileSync(pp, "utf-8");
+    // Mock task check
+    const sp = path.join(path.dirname(pp), "spec.md");
+    if (fs.existsSync(sp)) {
+      const spec = fs.readFileSync(sp, "utf-8");
+      if (!/^mock:\s*false/m.test(spec) && (/^api:\s*\[.+\]/m.test(spec) || /^api:\s*\n\s*-/m.test(spec))) {
+        if (!/msw|mock.*handler|mocks\//i.test(plan)) {
+          warn("\n⚠️  PLAN.md missing MSW tasks (mock:true + api). Add Layer 0/2.5.\n\n");
+        }
+      }
+    }
+    // Approval format
+    const aw = [];
+    if (!plan.includes("Status:")) aw.push("Missing Status:");
+    if (plan.includes("Status: approved") && !plan.includes("Approved-at:")) aw.push("Missing Approved-at:");
+    if (!/Max retries:\s*\d+\s*\/\s*Used:\s*\d+/.test(plan)) aw.push("Missing Max retries: N / Used: N");
+    if (aw.length > 0) warn("\n⚠️  PLAN.md: " + aw.join("; ") + "\n\n");
   }
-})();
-
-// ═══════════════════════════════════════════════════════════════════════════════
-// Part 4: PLAN.md mock task presence check — ADVISORY
-// ═══════════════════════════════════════════════════════════════════════════════
-
-(function checkMockTasks() {
-  if (!filePath.endsWith("PLAN.md")) return;
-  if (!filePath.includes("spec/feature/") && !filePath.startsWith("spec/feature/")) return;
-
-  const featureDir = path.dirname(
-    path.isAbsolute(filePath) ? filePath : path.join(process.cwd(), filePath)
-  );
-  const specPath = path.join(featureDir, "spec.md");
-  if (!fs.existsSync(specPath)) return;
-
-  const spec = fs.readFileSync(specPath, "utf-8");
-
-  // Check mock field (default true)
-  if (/^mock:\s*false/m.test(spec)) return;
-
-  // Check api field non-empty (inline or block format)
-  const hasInlineApi = /^api:\s*\[.+\]/m.test(spec);
-  const hasBlockApi = /^api:\s*\n\s*-/m.test(spec);
-  if (!hasInlineApi && !hasBlockApi) return;
-
-  // mock: true (or default) AND api non-empty → check PLAN.md for mock tasks
-  const planPath = path.isAbsolute(filePath) ? filePath : path.join(process.cwd(), filePath);
-  if (!fs.existsSync(planPath)) return;
-
-  const plan = fs.readFileSync(planPath, "utf-8");
-  if (/msw|mock.*handler|mocks\//i.test(plan)) return;
-
-  process.stderr.write(
-    "\n\u26a0\ufe0f  [NCC] PLAN.md missing MSW mock tasks\n" +
-    "   spec.md has mock: true (or default) with API endpoints,\n" +
-    "   but no MSW/mock handler task found in PLAN.md.\n" +
-    "   \u2192 Add Layer 0 (MSW setup) and Layer 2.5 (handler) tasks.\n" +
-    "   \u2192 See spec/rules/_nextjs-ordering.md for task ordering.\n\n"
-  );
-})();
-
-// ═══════════════════════════════════════════════════════════════════════════════
-// Part 5: PLAN.md approval format check — ADVISORY
-// ═══════════════════════════════════════════════════════════════════════════════
-
-(function checkPlanApproval() {
-  if (!filePath.endsWith("PLAN.md")) return;
-  if (!filePath.includes("spec/feature/") && !filePath.startsWith("spec/feature/")) return;
-
-  const planPath = path.isAbsolute(filePath) ? filePath : path.join(process.cwd(), filePath);
-  if (!fs.existsSync(planPath)) return;
-
-  const plan = fs.readFileSync(planPath, "utf-8");
-  const warnings = [];
-
-  if (!plan.includes("Status:")) {
-    warnings.push("Missing Status: field in ## Approval section");
-  }
-  if (plan.includes("Status: approved") && !plan.includes("Approved-at:")) {
-    warnings.push("Missing Approved-at: timestamp (required when Status: approved)");
-  }
-  if (!(/Max retries:\s*\d+\s*\/\s*Used:\s*\d+/.test(plan))) {
-    warnings.push("Missing Max retries: N / Used: N in ## Auto-fix Budget");
-  }
-
-  if (warnings.length > 0) {
-    process.stderr.write(
-      "\n\u26a0\ufe0f  [NCC] PLAN.md format issues:\n" +
-      warnings.map(w => "   - " + w).join("\n") + "\n" +
-      "   \u2192 See spec/rules/_workflow.md > Plan Approval Protocol.\n\n"
-    );
-  }
-})();
+}
 ' "$INPUT_JSON"
