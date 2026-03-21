@@ -69,7 +69,7 @@ try {
   const blockerSection = state.split(/^## Blockers/m)[1];
   if (blockerSection) {
     const blockers = blockerSection.split(/^## /m)[0].trim();
-    if (blockers && blockers !== "- (none)") {
+    if (blockers && blockers !== "- (none)" && blockers !== "(none)") {
       lines.push("");
       lines.push("## Blockers");
       lines.push(blockers);

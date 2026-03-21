@@ -22,7 +22,7 @@ const path = require("path");
 // ═══════════════════════════════════════════════════════════════════════════════
 
 // --- Validate spec.md format ---
-if (filePath.includes("/spec/feature/") && filePath.endsWith("/spec.md")) {
+if ((filePath.includes("/spec/feature/") || filePath.startsWith("spec/feature/")) && filePath.endsWith("/spec.md")) {
   if (!fs.existsSync(filePath)) process.exit(0);
   const content = fs.readFileSync(filePath, "utf-8");
 
@@ -70,7 +70,7 @@ if (filePath.includes("/spec/feature/") && filePath.endsWith("/spec.md")) {
 }
 
 // --- Validate design.md format ---
-if (filePath.includes("/spec/feature/") && filePath.endsWith("/design.md")) {
+if ((filePath.includes("/spec/feature/") || filePath.startsWith("spec/feature/")) && filePath.endsWith("/design.md")) {
   if (!fs.existsSync(filePath)) process.exit(0);
   const content = fs.readFileSync(filePath, "utf-8");
 
@@ -103,7 +103,7 @@ if (filePath.includes("/spec/feature/") && filePath.endsWith("/design.md")) {
 }
 
 // --- Validate history entry format ---
-if (filePath.includes("/history/") && filePath.endsWith(".md")) {
+if ((filePath.includes("/history/") || filePath.startsWith("spec/") && filePath.includes("history/")) && filePath.endsWith(".md")) {
   if (!fs.existsSync(filePath)) process.exit(0);
   const content = fs.readFileSync(filePath, "utf-8");
 
@@ -197,7 +197,7 @@ if (/\.json$/.test(absPath)) {
 // ═══════════════════════════════════════════════════════════════════════════════
 
 (function checkArtifactSize() {
-  if (!filePath.includes("spec/") && !filePath.includes("/spec/")) return;
+  if (!filePath.includes("spec/")) return;
   if (!filePath.endsWith(".md")) return;
 
   const limits = {
