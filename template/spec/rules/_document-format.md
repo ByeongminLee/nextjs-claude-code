@@ -18,7 +18,9 @@ Frontmatter (required):
 ---
 feature: [name]
 deps: [feature-name, ...]   # features this spec depends on; [] if none
-api: [METHOD /path, ...]    # API endpoints; omit if none
+api: [METHOD /path, ...]    # API endpoints; omit if none. Two equivalent formats:
+                             #   Inline: api: [GET /api/products, POST /api/cart]
+                             #   Block:  api:\n    - GET /api/products\n    - POST /api/cart
 testing: required            # none | optional | required
 mock: true                   # true | false
 ---

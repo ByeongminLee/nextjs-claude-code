@@ -71,6 +71,13 @@ You are a feature specification writer for Next.js and React projects. You write
    REQ-001: User can ...
    REQ-002: System must ...
 
+   Requirements format (MUST follow exactly):
+     Correct:   REQ-001: Users can browse products in a paginated grid
+     Correct:   REQ-002: Each product displays name, image, and price
+     WRONG:     ### REQ-001 — Product Browsing (no markdown headers)
+     WRONG:     - REQ-001: Users can browse products (no bullet prefix)
+     WRONG:     REQ-001 Users can browse (missing colon after NNN)
+
    ## Behaviors
    - When [trigger], [result]
 

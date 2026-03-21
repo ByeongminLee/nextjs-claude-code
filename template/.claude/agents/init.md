@@ -178,23 +178,27 @@ Only when invoked via `/init`. Safe to re-run — existing spec files are preser
    - If yes: spawn `git-strategy-detector` agent (haiku) with: `Detect the git branch strategy for this project.`
    - If skip or no remote: continue to next step
 
-11. **Suggest on-demand skills based on detected libraries**
+11. **Install matching on-demand skills**
 
-   After completing analysis, check if there are matching on-demand skills:
-   - Also check if `find-skills` is installed (it is an on-demand skill). If not, suggest: `npx nextjs-claude-code skill-add find-skills`
+   After completing analysis, install library-specific skills:
    - Read `.claude/skills/skill-catalog.json` (list of available on-demand skills)
    - Read `.claude/skills/skills-manifest.json` (already installed skills)
    - Compare detected libraries (step 2) against catalog's `condition` fields
-   - If matching uninstalled skills exist, present them to the user:
-     ```
-     📦 On-demand skills available for your project:
-       - zustand — Zustand state management patterns
-       - shadcn — shadcn/ui component usage patterns
+   - If matching uninstalled skills exist:
+     1. **Try auto-install**: Run `npx nextjs-claude-code skill-suggest` to auto-detect and install matching skills
+     2. If the command is unavailable, present the list to the user:
+        ```
+        📦 On-demand skills available for your project:
+          - zustand — Zustand state management patterns
+          - shadcn — shadcn/ui component usage patterns
 
-     Install with: npx nextjs-claude-code skill-suggest
-     Or individually: npx nextjs-claude-code skill-add <skill-name>
-     ```
+        Install with: npx nextjs-claude-code skill-suggest
+        Or individually: npx nextjs-claude-code skill-add <skill-name>
+        ```
+   - Also check if `find-skills` is installed. If not, suggest: `npx nextjs-claude-code skill-add find-skills`
    - If no matching skills, skip silently
+
+   **Important**: Without library-specific skills, agents lack best practices for your stack. This step should not be skipped.
 
 12. **Present summary to user**
    - List all files written

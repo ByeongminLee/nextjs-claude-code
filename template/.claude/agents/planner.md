@@ -64,13 +64,21 @@ You are a development planner for Next.js and React projects. You turn feature s
 7b. **Check mock requirement**
 
    Read the `mock` field from `spec/feature/[name]/spec.md` frontmatter:
+   - The `api` field is "non-empty" if it contains ANY endpoints, regardless of YAML format:
+     - Inline: `api: [GET /api/products, POST /api/cart]`
+     - Block list: `api:\n  - GET /api/products\n  - POST /api/cart`
+     - Both are equivalent — treat as non-empty
    - If `mock` is NOT explicitly `false` (i.e., `true`, missing, or omitted) AND `api` field is non-empty:
      - Check if `mocks/` directory exists in the project root
-     - If `mocks/` does not exist → include a **mock setup task** (Layer 0) in the task list: initialize MSW infrastructure (`mocks/server.ts`, `mocks/browser.ts`, `mocks/index.ts`, `mocks/handlers/index.ts`)
-     - Include a **mock handler task** (Layer 2.5, between Utilities and API) for this feature: generate MSW handlers and fixtures from the `## API Contracts` section
-     - Note: mock tasks are always tagged `[lead]`
+     - If `mocks/` does NOT exist → **MUST** add a Layer 0 task:
+       `- [ ] [lead] Set up MSW mock infrastructure → mocks/server.ts, mocks/browser.ts, mocks/handlers/index.ts (REQ-mock) model:haiku wave:1`
+     - **MUST** add a Layer 2.5 task for this feature's API contracts:
+       `- [ ] [lead] Create MSW handlers and fixtures for [feature] → mocks/handlers/[feature].ts, mocks/fixtures/[feature].ts (REQ-mock) model:haiku wave:{same as or after API route tasks}`
+     - Mock tasks are always tagged `[lead]`
    - If `mock: false` → skip mock tasks entirely
-   - If `api` field is empty → skip mock tasks regardless of `mock` value
+   - If `api` field is empty or omitted → skip mock tasks regardless of `mock` value
+
+   **Validation after task list creation:** Scan the task list. If `mock` is not `false` and `api` is non-empty, verify that at least one task mentions "MSW", "mock", or "mocks/". If none found, you have a bug — add the missing mock tasks before presenting the plan.
 
 8. **Create task list and classify domains**
 

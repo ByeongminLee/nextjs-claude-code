@@ -229,4 +229,44 @@ if (/\.json$/.test(absPath)) {
     );
   }
 })();
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// Part 4: PLAN.md mock task presence check — ADVISORY
+// ═══════════════════════════════════════════════════════════════════════════════
+
+(function checkMockTasks() {
+  if (!filePath.endsWith("PLAN.md")) return;
+  if (!filePath.includes("spec/feature/") && !filePath.startsWith("spec/feature/")) return;
+
+  const featureDir = path.dirname(
+    path.isAbsolute(filePath) ? filePath : path.join(process.cwd(), filePath)
+  );
+  const specPath = path.join(featureDir, "spec.md");
+  if (!fs.existsSync(specPath)) return;
+
+  const spec = fs.readFileSync(specPath, "utf-8");
+
+  // Check mock field (default true)
+  if (/^mock:\s*false/m.test(spec)) return;
+
+  // Check api field non-empty (inline or block format)
+  const hasInlineApi = /^api:\s*\[.+\]/m.test(spec);
+  const hasBlockApi = /^api:\s*\n\s*-/m.test(spec);
+  if (!hasInlineApi && !hasBlockApi) return;
+
+  // mock: true (or default) AND api non-empty → check PLAN.md for mock tasks
+  const planPath = path.isAbsolute(filePath) ? filePath : path.join(process.cwd(), filePath);
+  if (!fs.existsSync(planPath)) return;
+
+  const plan = fs.readFileSync(planPath, "utf-8");
+  if (/msw|mock.*handler|mocks\//i.test(plan)) return;
+
+  process.stderr.write(
+    "\n\u26a0\ufe0f  [NCC] PLAN.md missing MSW mock tasks\n" +
+    "   spec.md has mock: true (or default) with API endpoints,\n" +
+    "   but no MSW/mock handler task found in PLAN.md.\n" +
+    "   \u2192 Add Layer 0 (MSW setup) and Layer 2.5 (handler) tasks.\n" +
+    "   \u2192 See spec/rules/_nextjs-ordering.md for task ordering.\n\n"
+  );
+})();
 ' "$INPUT_JSON"
