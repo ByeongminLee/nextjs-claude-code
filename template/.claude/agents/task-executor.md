@@ -45,8 +45,9 @@ For `[worker]` tasks → `worker-engineer` is spawned instead.
    - Never swallow errors silently — log or re-throw
    - Extract hardcoded values (timeouts, limits, magic numbers) into named constants
    - If a database schema exists for the target data, query it — never use hardcoded stub values
+   - Never place unconditional `throw` before a `return` — this creates dead code. Error throws must be conditional (e.g., `if (!record) throw new NotFoundError()`)
 
-   **DRY rule**: If the same logic (auth check, param parsing, error formatting) would appear in 2+ route files, extract it to a shared module in `lib/` or `utils/` and import it. Never duplicate utility code across routes.
+   **DRY rule**: If the same logic would appear in 2+ files, extract it to a shared module in `lib/` or `utils/` and import it. This includes: auth checks, error formatting, Zod validation schemas, utility/helper functions, and date/number formatters. Before defining a local helper, check if `src/lib/` already exports an equivalent function.
 
    **Read `error-handling-patterns` skill** for API routes, server actions, or any code that handles external input.
 

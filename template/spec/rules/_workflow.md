@@ -59,6 +59,7 @@ Wave rules: see `_delegation.md` > Wave Sync Protocol. Key: same wave = parallel
 
 API routes/server actions MUST: try/catch with `{ code, message }` errors, Zod input validation, error classification (400/401/404/500), no silent swallowing, no stub data when schema exists, named constants.
 All files MUST: strict TypeScript (no `any`), single responsibility (<30 lines), read quality skills for error/complex logic.
+DRY: If the same logic (Zod schemas, helpers, formatters) appears in 2+ files, extract to `lib/` or `utils/`. Check existing shared modules before creating local helpers.
 
 ## Document Sync on Modification
 
