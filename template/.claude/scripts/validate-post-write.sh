@@ -133,6 +133,8 @@ if (filePath.endsWith("PLAN.md") && isFeature) {
     if (!plan.includes("Status:")) aw.push("Missing Status:");
     if (plan.includes("Status: approved") && !plan.includes("Approved-at:")) aw.push("Missing Approved-at:");
     if (!/Max retries:\s*\d+\s*\/\s*Used:\s*\d+/.test(plan)) aw.push("Missing Max retries: N / Used: N");
+    // Team Composition check (team mode requires this section)
+    if (plan.includes("--team") && !plan.includes("## Team Composition")) aw.push("Team mode but missing ## Team Composition");
     if (aw.length > 0) warn("\n⚠️  PLAN.md: " + aw.join("; ") + "\n\n");
   }
 }

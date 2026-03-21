@@ -55,13 +55,7 @@ Check PLAN.md for `wave:N` or legacy `parallel:GroupID` fields:
 - If `parallel:GroupID` present (legacy) → convert to waves: `parallel:A` = wave 1, `parallel:B` = wave 2, etc.
 - If neither present → **Sequential Mode**: dispatch tasks one by one (default)
 
-In Wave Mode:
-1. Group tasks by `wave:N` value
-2. For wave 1: dispatch all wave:1 tasks simultaneously as concurrent Agent calls
-3. Wait for all wave:1 tasks to complete → sync task ledger
-4. For wave 2: dispatch all wave:2 tasks with updated UPSTREAM context
-5. Repeat until all waves complete
-6. See `spec/rules/_delegation.md` > Wave Sync Protocol for details
+In Wave Mode: group by `wave:N`, dispatch same-wave tasks in parallel, sync ledger between waves. See `spec/rules/_delegation.md` > Wave Sync Protocol.
 
 ### Task dispatch
 

@@ -46,6 +46,8 @@ For `[worker]` tasks → `worker-engineer` is spawned instead.
    - Extract hardcoded values (timeouts, limits, magic numbers) into named constants
    - If a database schema exists for the target data, query it — never use hardcoded stub values
 
+   **DRY rule**: If the same logic (auth check, param parsing, error formatting) would appear in 2+ route files, extract it to a shared module in `lib/` or `utils/` and import it. Never duplicate utility code across routes.
+
    **Read `error-handling-patterns` skill** for API routes, server actions, or any code that handles external input.
 
 2. **Run type check**: `npx tsc --noEmit`

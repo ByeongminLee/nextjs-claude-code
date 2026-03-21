@@ -529,6 +529,26 @@ export async function installSkills(
   }
 
   progress.succeed(`Core skills installed (${installed}/${coreSkills.length})`);
+
+  // Auto-install matching on-demand skills (non-interactive)
+  // Only install skills that have explicit condition matching — skip unconditional on-demand skills
+  const onDemandMatches = getOnDemandSkills().filter((s) => {
+    if (manifest.some((m) => m.name === s.name)) return false;
+    if (!s.condition || s.condition.length === 0) return false; // skip unconditional
+    return shouldInstall(s, framework, libraries);
+  });
+
+  if (onDemandMatches.length > 0 && !dryRun) {
+    let odInstalled = 0;
+    for (const skill of onDemandMatches) {
+      progress.update(`Installing on-demand skills... (${odInstalled}/${onDemandMatches.length}) ${skill.name}`);
+      const ok = await installSingleSkill(targetDir, skill.name);
+      if (ok) odInstalled++;
+    }
+    if (odInstalled > 0) {
+      progress.succeed(`On-demand skills installed (${odInstalled}/${onDemandMatches.length})`);
+    }
+  }
 }
 
 // ─── On-demand 스킬 1개 설치 (npx → archive fallback) ──────────────────────────

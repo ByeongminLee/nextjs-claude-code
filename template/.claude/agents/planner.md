@@ -104,11 +104,20 @@ You are a development planner for Next.js and React projects. You turn feature s
    Tasks that qualify are re-tagged from their original domain to `[worker]`.
    Example: a `[lead]` task "Create formatDate utility" → re-tagged to `[worker]`.
 
-8c. **Team Composition** — when MODE: team, read `.claude/agents/planner-team-mode.md` for team composition rules.
-   **MUST** include `## Team Composition` section in PLAN.md when team mode is active. Without this section, lead-engineer cannot activate team mode and will fall back to solo execution. The section must list:
-   - Which engineers handle which task numbers
-   - Task dependencies across engineers
-   - Example: `db-engineer: Tasks [1, 2, 3] | ui-engineer: Tasks [5, 6, 7] | task-executor: Tasks [4, 8]`
+8c. **Team Composition** — when MODE: team, **MUST** add `## Team Composition` to PLAN.md:
+   ```
+   ## Team Composition
+   Mode: team
+   Engineers:
+     - lead-engineer (sonnet) — tasks: [N, ...]
+     - db-engineer (sonnet) — tasks: [N, ...]
+     - ui-engineer (sonnet) — tasks: [N, ...]
+   Workers (subagent):
+     - worker-engineer (haiku) — tasks: [N, ...]
+   Task Dependencies:
+     - Task N [tag] → Task M [tag]
+   ```
+   Without this section, lead-engineer falls back to solo mode. In solo mode: do NOT add this section.
 
 8d. **Assign waves** — for parallel execution (solo and team mode)
 

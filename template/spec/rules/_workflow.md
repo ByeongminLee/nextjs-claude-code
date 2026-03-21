@@ -30,11 +30,7 @@ Max 2 rounds. Rounds do NOT count toward auto-fix budget. After 2 fails → esca
 
 ## Checkpoints
 
-| Type | Trigger | Action |
-|------|---------|--------|
-| `checkpoint:decision` | Direction unclear, type change | Present options, wait |
-| `checkpoint:human-verify` | UI complete | Browser verification, wait |
-| `checkpoint:auth-gate` | Payment/auth manual step | Always stop |
+Three types: `checkpoint:decision` (direction unclear → wait), `checkpoint:human-verify` (UI done → browser check), `checkpoint:auth-gate` (payment/auth → always stop). Details in `lead-engineer-completion.md`.
 
 ## Auto-fix Budget
 
@@ -53,7 +49,7 @@ Orchestrator maintains in-memory task ledger. Never writes code directly. Passes
 - [ ] [domain] Task description → target (REQ-NNN) model:haiku|sonnet [wave:N]
 ```
 
-Wave rules: same wave = parallel, numeric order, sync ledger between waves, never same file in same wave. `parallel:A` = `wave:1` (backward compat).
+Wave rules: see `_delegation.md` > Wave Sync Protocol. Key: same wave = parallel, never same file in same wave.
 
 ## Plan Approval
 
