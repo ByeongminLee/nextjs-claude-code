@@ -3,6 +3,10 @@
 # Merges: validate-spec.sh + validate-edit.sh
 # Runs after every Write/Edit. Blocks on spec format errors; advisory for code issues.
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/hook-profile.sh"
+ncc_profile_allows "validate-post-write" || exit 0
+
 INPUT_JSON=$(cat)
 
 node -e '
@@ -187,4 +191,42 @@ if (/\.json$/.test(absPath)) {
     process.stderr.write("⚠️  [validate] Invalid JSON: " + absPath + "\n");
   }
 }
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// Part 3: Artifact size limit check — ADVISORY (from _artifact-limits.md)
+// ═══════════════════════════════════════════════════════════════════════════════
+
+(function checkArtifactSize() {
+  if (!filePath.includes("spec/") && !filePath.includes("/spec/")) return;
+  if (!filePath.endsWith(".md")) return;
+
+  const limits = {
+    "PROJECT.md": 80,
+    "ARCHITECTURE.md": 120,
+    "STATE.md": 100,
+    "spec.md": 150,
+    "design.md": 200,
+    "PLAN.md": 100,
+    "CONTEXT.md": 50,
+    "LOOP_NOTES.md": 50,
+  };
+
+  const basename = filePath.split("/").pop() || "";
+  const limit = limits[basename];
+  if (!limit) return;
+
+  const checkPath = path.isAbsolute(filePath) ? filePath : path.join(process.cwd(), filePath);
+  if (!fs.existsSync(checkPath)) return;
+
+  const content = fs.readFileSync(checkPath, "utf-8");
+  const lineCount = content.split("\n").length;
+
+  if (lineCount > limit) {
+    process.stderr.write(
+      "\n\u26a0\ufe0f  [NCC Artifact Limit] " + basename + " exceeds recommended size: " +
+      lineCount + "/" + limit + " lines\n" +
+      "   \u2192 Consider splitting content. See spec/rules/_artifact-limits.md for overflow strategies.\n\n"
+    );
+  }
+})();
 ' "$INPUT_JSON"

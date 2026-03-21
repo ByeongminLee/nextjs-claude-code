@@ -1,0 +1,51 @@
+[
+  {
+    "pattern": "getStaticProps",
+    "context": "app/",
+    "message": "getStaticProps is not available in App Router. Use generateStaticParams or Server Component fetch.",
+    "replacement": "generateStaticParams / fetch in Server Component"
+  },
+  {
+    "pattern": "getServerSideProps",
+    "context": "app/",
+    "message": "getServerSideProps is not available in App Router. Use Server Components with direct data fetching.",
+    "replacement": "Server Component fetch / async component"
+  },
+  {
+    "pattern": "from 'next/legacy/image'",
+    "message": "next/legacy/image is deprecated since Next.js 13. Use next/image.",
+    "replacement": "import Image from 'next/image'"
+  },
+  {
+    "pattern": "from \"next/legacy/image\"",
+    "message": "next/legacy/image is deprecated since Next.js 13. Use next/image.",
+    "replacement": "import Image from 'next/image'"
+  },
+  {
+    "pattern": "from '@next/font",
+    "message": "@next/font is deprecated since Next.js 13.2. Use next/font.",
+    "replacement": "import { Inter } from 'next/font/google'"
+  },
+  {
+    "pattern": "from \"@next/font",
+    "message": "@next/font is deprecated since Next.js 13.2. Use next/font.",
+    "replacement": "import { Inter } from 'next/font/google'"
+  },
+  {
+    "pattern": "next/document",
+    "context": "app/",
+    "message": "next/document is not used in App Router. Use layout.tsx metadata API instead.",
+    "replacement": "export const metadata / export function generateMetadata"
+  },
+  {
+    "pattern": "next/head",
+    "context": "app/",
+    "message": "next/head is not used in App Router. Use the Metadata API instead.",
+    "replacement": "export const metadata / export function generateMetadata"
+  },
+  {
+    "pattern": "experimental_ppr",
+    "message": "PPR is stable in Next.js 15+. Remove the experimental flag.",
+    "replacement": "ppr: true (without experimental prefix)"
+  }
+]

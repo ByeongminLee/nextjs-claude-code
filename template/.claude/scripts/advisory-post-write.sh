@@ -3,6 +3,10 @@
 # Merges: reflect-spec.sh + suggest-skills.sh + security-suggest.sh
 # All checks are advisory — never blocks.
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/hook-profile.sh"
+ncc_profile_allows "advisory-post-write" || exit 0
+
 INPUT_JSON=$(cat)
 
 node -e '
@@ -108,14 +112,34 @@ const dir = process.cwd();
   }
 
   const suggestions = catalog.filter((s) => matchedSkills.has(s.name) && !installed.has(s.name));
-  if (suggestions.length > 0) {
-    const names = suggestions.map((s) => s.name).join(", ");
-    console.log(JSON.stringify({
-      decision: "report",
-      reason: "New dependencies detected! Matching skills available: " + names +
-        "\\nInstall with: npx nextjs-claude-code skill-suggest"
-    }));
-  }
+  if (suggestions.length === 0) return;
+
+  // Dedup: skip already-suggested skills in this session
+  const cacheDir = path.join(dir, ".claude", ".cache");
+  const cachePath = path.join(cacheDir, "skill-suggestions");
+  let alreadySuggested = new Set();
+  try {
+    if (fs.existsSync(cachePath)) {
+      alreadySuggested = new Set(fs.readFileSync(cachePath, "utf-8").trim().split("\n").filter(Boolean));
+    }
+  } catch (_) {}
+
+  const newSuggestions = suggestions.filter((s) => !alreadySuggested.has(s.name));
+  if (newSuggestions.length === 0) return;
+
+  // Write to cache
+  try {
+    if (!fs.existsSync(cacheDir)) fs.mkdirSync(cacheDir, { recursive: true });
+    const toAppend = newSuggestions.map((s) => s.name).join("\n") + "\n";
+    fs.appendFileSync(cachePath, toAppend);
+  } catch (_) {}
+
+  const names = newSuggestions.map((s) => s.name).join(", ");
+  console.log(JSON.stringify({
+    decision: "report",
+    reason: "New dependencies detected! Matching skills available: " + names +
+      "\\nInstall with: npx nextjs-claude-code skill-suggest"
+  }));
 })();
 
 // ═══════════════════════════════════════════════════════════════════════════════
