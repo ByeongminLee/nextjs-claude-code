@@ -9,13 +9,17 @@ export const en = {
     title: 'Features',
     items: [
       { bold: 'Spec-Driven', text: 'Feature specs with REQ-NNN traceability, compliance reporting' },
-      { bold: 'Curated skills', text: 'from skills.sh (community skill registry for Claude Code) — includes React, Next.js, UI/UX, testing, and library-specific best practices' },
-      { bold: 'Architecture guides', text: 'Flat, Feature-Based, FSD, Monorepo (chosen by team size)' },
+      { bold: 'TDD by default', text: 'Test-Driven Development with MSW API mocking out of the box' },
+      { bold: 'Curated skills', text: 'from skills.sh — bundled core skills auto-installed, on-demand skills matched from package.json' },
+      { bold: 'Architecture guides', text: 'Flat, Feature-Based, FSD, Monorepo (auto-detected from project structure)' },
       { bold: 'Library-aware agents', text: 'agents read your selected stack and follow its patterns' },
       { bold: 'Next.js native', text: 'App Router, Server Components, Server Actions, Pages Router' },
       { bold: 'React support', text: 'Vite and other React setups' },
       { bold: 'Monorepo ready', text: 'Turborepo workspace-aware installation' },
-      { bold: 'Claude Code native', text: 'slash commands, multi-agent coordination, PostToolUse hooks' },
+      { bold: 'Claude Code native', text: 'slash commands, multi-agent coordination, lifecycle hooks (SessionStart, PreToolUse, PostToolUse, Stop)' },
+      { bold: 'Hook profiles', text: 'NCC_HOOK_PROFILE controls hook intensity: minimal, standard (default), strict' },
+      { bold: 'Wave execution', text: 'tasks grouped into dependency waves for parallel dispatch' },
+      { bold: 'Path-specific rules', text: '.claude/rules/ with paths frontmatter — coding patterns load only for matching files' },
     ],
   },
 
@@ -70,6 +74,7 @@ export const en = {
         commands: [
           { cmd: '/review [name]', desc: 'Spec compliance + code quality review' },
           { cmd: '/loop [name]', desc: 'Repeat review → fix → re-review until all REQs pass (max 5)' },
+          { cmd: '/qa', desc: 'Playwright E2E tests, visual regression, accessibility audits' },
           { cmd: '/test [name]', desc: 'Run tests based on TEST_STRATEGY.md' },
           { cmd: '/log [name]', desc: 'Audit logging practices' },
           { cmd: '/security [name]', desc: 'Security audit (OWASP Top 10)' },
@@ -107,9 +112,16 @@ export const en = {
       subtitle: 'Core Agents',
       items: [
         { name: 'spec-writer', role: 'Write spec.md + design.md' },
-        { name: 'planner', role: 'Create CONTEXT.md + PLAN.md' },
-        { name: 'lead-engineer', role: 'Implement features (solo or team leader)' },
+        { name: 'planner', role: 'Create CONTEXT.md + PLAN.md, domain analysis + task tagging' },
+        { name: 'lead-engineer', role: 'Orchestrate implementation via fresh-context subagents. Wave-based parallel dispatch.' },
         { name: 'verifier', role: '4-level verification' },
+      ],
+    },
+    subagents: {
+      subtitle: 'Fresh-Context Subagents (/dev)',
+      items: [
+        { name: 'task-executor', role: 'Implements [lead] tasks (types, utils, hooks, API routes)' },
+        { name: 'task-spec-reviewer', role: 'Per-task spec compliance + code quality review' },
       ],
     },
     team: {
@@ -129,6 +141,7 @@ export const en = {
       { bold: 'Auto-fix Budget', text: 'Maximum 3 retries per mode — error analysis → alternative approach → minimal change → escalation' },
       { bold: 'Verification Levels', text: '4 levels from file existence to browser verification' },
       { bold: 'Resume Protocol', text: 'Interrupted /dev sessions resume from where they left off' },
+      { bold: 'Hook Profiles', text: 'minimal (security only), standard (default), strict (+ deprecation guard, comment checker, todo enforcer)' },
       { bold: 'Spec Validation', text: 'PostToolUse hooks block malformed spec writes and remind spec updates' },
     ],
   },

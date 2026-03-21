@@ -284,6 +284,80 @@ export const SKILLS: SkillDef[] = [
     condition: ['jest'],
   },
 
+  // ── On-demand: Vercel Plugin (vercel/vercel-plugin) ─────────────────────────
+  {
+    name: 'nextjs-vercel',
+    url: 'https://skills.sh/vercel/vercel-plugin/nextjs',
+    cli: 'npx skills add vercel/vercel-plugin --skill nextjs --agent claude-code --yes --copy',
+    description: 'Next.js 16 App Router, Server Components, Server Actions, Cache Components, rendering strategies (Vercel official, 986 lines)',
+    tier: 'on-demand',
+    framework: ['nextjs-app'],
+  },
+  {
+    name: 'react-best-practices-vercel',
+    url: 'https://skills.sh/vercel/vercel-plugin/react-best-practices',
+    cli: 'npx skills add vercel/vercel-plugin --skill react-best-practices --agent claude-code --yes --copy',
+    description: 'TSX/JSX quality review — component structure, hooks, a11y, performance, TypeScript (Vercel official)',
+    tier: 'on-demand',
+    framework: ['nextjs-app', 'nextjs-pages', 'react'],
+  },
+  {
+    name: 'turbopack',
+    url: 'https://skills.sh/vercel/vercel-plugin/turbopack',
+    cli: 'npx skills add vercel/vercel-plugin --skill turbopack --agent claude-code --yes --copy',
+    description: 'Turbopack — Next.js Rust bundler, HMR, file system caching',
+    tier: 'on-demand',
+    framework: ['nextjs-app', 'nextjs-pages'],
+  },
+  {
+    name: 'ai-sdk',
+    url: 'https://skills.sh/vercel/vercel-plugin/ai-sdk',
+    cli: 'npx skills add vercel/vercel-plugin --skill ai-sdk --agent claude-code --yes --copy',
+    description: 'AI SDK v6 — text/object generation, streaming, tool calling, agents, MCP',
+    tier: 'on-demand',
+    condition: ['ai', '@ai-sdk'],
+  },
+  {
+    name: 'auth-vercel',
+    url: 'https://skills.sh/vercel/vercel-plugin/auth',
+    cli: 'npx skills add vercel/vercel-plugin --skill auth --agent claude-code --yes --copy',
+    description: 'Authentication patterns — Clerk, Descope, Auth0 for Next.js (Vercel official)',
+    tier: 'on-demand',
+    condition: ['clerk', '@clerk/nextjs', '@auth0/nextjs-auth0', 'next-auth'],
+  },
+  {
+    name: 'vercel-storage',
+    url: 'https://skills.sh/vercel/vercel-plugin/vercel-storage',
+    cli: 'npx skills add vercel/vercel-plugin --skill vercel-storage --agent claude-code --yes --copy',
+    description: 'Vercel Storage — Blob, Edge Config, Neon Postgres, Upstash Redis',
+    tier: 'on-demand',
+    condition: ['@vercel/blob', '@vercel/postgres', '@vercel/kv', '@vercel/edge-config'],
+  },
+  {
+    name: 'routing-middleware',
+    url: 'https://skills.sh/vercel/vercel-plugin/routing-middleware',
+    cli: 'npx skills add vercel/vercel-plugin --skill routing-middleware --agent claude-code --yes --copy',
+    description: 'Next.js middleware — rewrites, redirects, personalization, geolocation',
+    tier: 'on-demand',
+    framework: ['nextjs-app', 'nextjs-pages'],
+  },
+  {
+    name: 'vercel-functions',
+    url: 'https://skills.sh/vercel/vercel-plugin/vercel-functions',
+    cli: 'npx skills add vercel/vercel-plugin --skill vercel-functions --agent claude-code --yes --copy',
+    description: 'Vercel Functions — Serverless, Edge, Fluid Compute, streaming',
+    tier: 'on-demand',
+    framework: ['nextjs-app', 'nextjs-pages'],
+  },
+  {
+    name: 'observability-vercel',
+    url: 'https://skills.sh/vercel/vercel-plugin/observability',
+    cli: 'npx skills add vercel/vercel-plugin --skill observability --agent claude-code --yes --copy',
+    description: 'Vercel observability — Analytics, Speed Insights, logs, OpenTelemetry',
+    tier: 'on-demand',
+    condition: ['@vercel/analytics', '@vercel/speed-insights'],
+  },
+
   // ── On-demand: Accessibility & Performance ──────────────────────────────────
   {
     name: 'accessibility',
@@ -309,7 +383,7 @@ export const SKILLS: SkillDef[] = [
     cli: 'npx skills add vercel-labs/agent-skills --skill i18n-best-practices --agent claude-code --yes --copy',
     description: 'Internationalization patterns — next-intl, react-intl, i18next',
     tier: 'on-demand',
-    condition: ['i18n'],
+    condition: ['next-intl', 'react-intl', 'i18next', 'react-i18next'],
   },
 
   // ── On-demand: Storybook ─────────────────────────────────────────────────────
@@ -319,7 +393,7 @@ export const SKILLS: SkillDef[] = [
     cli: 'npx skills add vercel-labs/agent-skills --skill storybook --agent claude-code --yes --copy',
     description: 'Component documentation and Storybook story patterns',
     tier: 'on-demand',
-    condition: ['storybook'],
+    condition: ['storybook', '@storybook/react', '@storybook/nextjs'],
   },
 
   // ── On-demand: PWA ──────────────────────────────────────────────────────────
@@ -329,7 +403,7 @@ export const SKILLS: SkillDef[] = [
     cli: 'npx skills add vercel-labs/agent-skills --skill pwa-patterns --agent claude-code --yes --copy',
     description: 'PWA service workers, offline support, and caching strategies',
     tier: 'on-demand',
-    condition: ['pwa'],
+    condition: ['next-pwa', '@ducanh2912/next-pwa', 'workbox-webpack-plugin'],
   },
 
   // ── On-demand: OpenAPI ───────────────────────────────────────────────────────
@@ -339,7 +413,7 @@ export const SKILLS: SkillDef[] = [
     cli: 'npx skills add vercel-labs/agent-skills --skill openapi-spec --agent claude-code --yes --copy',
     description: 'OpenAPI 3.x specification writing and API documentation patterns',
     tier: 'on-demand',
-    condition: ['openapi'],
+    condition: ['swagger-jsdoc', 'openapi-types', 'next-swagger-doc'],
   },
 ];
 
@@ -455,6 +529,26 @@ export async function installSkills(
   }
 
   progress.succeed(`Core skills installed (${installed}/${coreSkills.length})`);
+
+  // Auto-install matching on-demand skills (non-interactive)
+  // Only install skills that have explicit condition matching — skip unconditional on-demand skills
+  const onDemandMatches = getOnDemandSkills().filter((s) => {
+    if (manifest.some((m) => m.name === s.name)) return false;
+    if (!s.condition || s.condition.length === 0) return false; // skip unconditional
+    return shouldInstall(s, framework, libraries);
+  });
+
+  if (onDemandMatches.length > 0 && !dryRun) {
+    let odInstalled = 0;
+    for (const skill of onDemandMatches) {
+      progress.update(`Installing on-demand skills... (${odInstalled}/${onDemandMatches.length}) ${skill.name}`);
+      const ok = await installSingleSkill(targetDir, skill.name);
+      if (ok) odInstalled++;
+    }
+    if (odInstalled > 0) {
+      progress.succeed(`On-demand skills installed (${odInstalled}/${onDemandMatches.length})`);
+    }
+  }
 }
 
 // ─── On-demand 스킬 1개 설치 (npx → archive fallback) ──────────────────────────

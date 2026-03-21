@@ -19,7 +19,32 @@
   ],
   "agents": "./template/.claude/agents",
   "skills": "./template/.claude/skills",
+  "env": {
+    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1",
+    "NCC_HOOK_PROFILE": "standard"
+  },
   "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/template/.claude/scripts/repo-profiler.sh\"",
+            "statusMessage": "Profiling project..."
+          }
+        ]
+      },
+      {
+        "matcher": "compact",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/template/.claude/scripts/compact-recovery.sh\"",
+            "statusMessage": "Recovering context..."
+          }
+        ]
+      }
+    ],
     "PreToolUse": [
       {
         "matcher": "Bash",
@@ -28,6 +53,16 @@
             "type": "command",
             "command": "bash \"${CLAUDE_PLUGIN_ROOT}/template/.claude/scripts/security-guard.sh\"",
             "statusMessage": "Checking command safety..."
+          }
+        ]
+      },
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/template/.claude/scripts/deprecation-guard.sh\"",
+            "statusMessage": "Checking for deprecated patterns..."
           }
         ]
       }
@@ -45,6 +80,22 @@
             "type": "command",
             "command": "bash \"${CLAUDE_PLUGIN_ROOT}/template/.claude/scripts/advisory-post-write.sh\"",
             "statusMessage": "Running advisory checks..."
+          },
+          {
+            "type": "command",
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/template/.claude/scripts/comment-checker.sh\"",
+            "statusMessage": "Checking comment density..."
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/template/.claude/scripts/todo-enforcer.sh\"",
+            "statusMessage": "Checking for incomplete items..."
           }
         ]
       }

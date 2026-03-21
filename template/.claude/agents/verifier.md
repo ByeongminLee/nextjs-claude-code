@@ -50,14 +50,14 @@ Check if test files exist for the feature:
 - Integration: `__tests__/[feature]/[file].test.ts`
 - E2E: `e2e/[feature].spec.ts` (Playwright)
 
-**When `testing: required`** — this check is **blocking**:
+**When `testing: required` or field missing (default: required)** — this check is **blocking**:
 ```
 ✗ Level 2b failed — test files required but not found for feature [name]
   Missing: [expected test file paths]
-  spec.md declares testing: required
+  spec.md testing: required (default)
 ```
 
-**When `testing: optional` or `testing: none` (or field missing)** — this check is **non-blocking**:
+**When `testing: optional` or `testing: none`** — this check is **non-blocking**:
 ```
 ⚠ Advisory — test files not found for feature [name]
   Suggested: e2e/[feature].spec.ts for critical user flows
@@ -66,7 +66,9 @@ Check if test files exist for the feature:
 
 ### Level 2c — Mock Infrastructure (conditional)
 
-Read the `mock` field from `spec/feature/[name]/spec.md` frontmatter. Only run this check when `mock: true`.
+Read the `mock` field from `spec/feature/[name]/spec.md` frontmatter and the `api` field.
+
+Run this check when `mock` is NOT explicitly `false` AND `api` field is non-empty (default: mock is enabled).
 
 Check:
 - `mocks/handlers/[feature-name].ts` exists
@@ -74,14 +76,14 @@ Check:
 - `mocks/handlers/index.ts` imports and spreads the feature's handlers
 - `mocks/index.ts` exists (MSW initializer)
 
-**When `mock: true`** — this check is **blocking**:
+**When mock is active (not `false`, api non-empty)** — this check is **blocking**:
 ```
 ✗ Level 2c failed — mock infrastructure incomplete for feature [name]
   Missing: [specific files or imports]
-  spec.md declares mock: true
+  mock: true (default), api endpoints defined
 ```
 
-**When `mock: false` or field missing** — skip this check entirely.
+**When `mock: false` OR `api` is empty** — skip this check entirely.
 
 ### Level 3 — Wired (Next.js specific)
 Verify integration across the system:
@@ -111,10 +113,11 @@ Verify integration across the system:
 
 ### Level 4 — Functional (Human)
 
-**When required:** Always required when called from `/dev` (lead-engineer handoff).
+**When required:** When called from `/dev` AND `design.md` has `figma` field with a URL (not `"N/A"`).
+**When advisory:** When called from `/dev` AND `design.md` has `figma: "N/A"` (backend-only feature) — skip Level 4, report success after Level 1-3.
 **When optional:** When called from `/loop` (loop agent decides based on user preference).
 
-If Level 1–3 all pass:
+If Level 1–3 all pass and Level 4 is required:
 
 Read `spec/feature/[name]/design.md` for the `figma` field. If a Figma URL exists and Figma MCP is available, include a design comparison step.
 

@@ -1,138 +1,85 @@
 # FeatureSpec Workflow Rules (Core)
 
-> **Immutable.** Do not modify after `/init`. Project-specific coding rules belong in non-prefixed files in this directory.
+> **Immutable.** Project-specific rules belong in non-prefixed files.
 
 ## Folder Structure
 
 ```
 spec/
-  PROJECT.md             <- project purpose, tech stack, testing setup
-  ARCHITECTURE.md        <- feature map, cross-feature dependencies
-  STATE.md               <- all features and their current phases (multi-feature)
-  DEBUG.md               <- debug log (created by /debug)
-  learnings/             <- recurring patterns extracted from /loop and /debug sessions
-  rules/
-    _workflow.md          <- THIS FILE (core workflow rules, immutable)
-    _document-format.md   <- spec.md, design.md, history format
-    _model-routing.md     <- model selection criteria
-    _delegation.md        <- HANDOFF format, agent spawning rules
-    _verification.md      <- 4-level verification protocol
-    _loop-protocol.md     <- /loop rules and cross-iteration context
-    _agent-roles.md       <- agent role boundaries and responsibilities
-    _nextjs-ordering.md   <- Next.js task dependency ordering
-    code-style.md         <- project coding rules (mutable)
-    testing.md            <- project testing rules (mutable)
-  feature/
-    [name]/
-      spec.md             <- what to build
-      design.md           <- how to build it
-      PLAN.md             <- task list, checkpoints, auto-fix budget
-      CONTEXT.md          <- locked decisions, constraints
-      LOOP_NOTES.md       <- cross-iteration context for /loop
-      PRODUCT_REVIEW.md   <- product review result (created by /office-hours)
-      history/            <- change history archive
+  PROJECT.md, ARCHITECTURE.md, STATE.md, DEBUG.md, learnings/
+  rules/_workflow.md, _document-format.md, _model-routing.md, _delegation.md,
+        _verification.md, _loop-protocol.md, _agent-roles.md, _skill-budget.md,
+        _nextjs-ordering.md, _artifact-limits.md, code-style.md, testing.md
+  feature/[name]/ spec.md, design.md, PLAN.md, CONTEXT.md, LOOP_NOTES.md, history/
 ```
 
-## STATE.md Format
+## STATE.md
 
-STATE.md tracks multiple features independently. Each feature has its own phase.
-
-```markdown
-# State
-Updated: YYYY-MM-DD
-
-## Features
-
-### [feature-name] [phase]
-Started: YYYY-MM-DD
-
-## Completed
-- [feature-name] (YYYY-MM-DD)
-
-## Blockers
-- [feature-name]: [blocker description]
-```
-
-Valid phases: `idle`, `planning`, `executing`, `verifying`, `looping`
-
-Rules:
+Phases: `idle` → `planning` → `executing` → `verifying` → `looping` → completed
 - Each feature's phase is independent
-- When a feature completes, move it from `## Features` to `## Completed` with date
-- Keep STATE.md under 100 lines — archive old completed entries
+- Keep under 100 lines — archive completed entries
 
-## Available Skills
+## Commands
 
-| Skill | Purpose |
-|---|---|
-| `/init` | First-time setup: analyze codebase, populate spec docs |
-| `/spec` | Define or update a feature spec |
-| `/office-hours [name]` | Product review before development (business value, scope, metrics) |
-| `/dev` | Plan, implement, verify a feature. `--team` for parallel team mode |
-| `/review` | Check spec compliance + code quality |
-| `/status` | Show project status |
-| `/debug` | Systematic bug fixing |
-| `/rule` | Add or update a project coding rule |
-| `/loop` | Loop until all REQs in spec.md are satisfied |
+`/init` `/brainstorm` `/spec` `/office-hours` `/dev` `/dev --team` `/review` `/loop` `/debug` `/status` `/rule`
 
-## Checkpoint Conditions
+## Per-Task Review
 
-| Type | Condition | Action |
-|---|---|---|
-| `checkpoint:decision` | Implementation direction unclear, type structure change | Present options, wait |
-| `checkpoint:human-verify` | UI implementation complete | Request browser verification, wait |
-| `checkpoint:auth-gate` | Payment or auth manual steps required | Always stop, never simulate |
+During `/dev`, each task (except `[worker]`) gets a `task-spec-reviewer` (haiku) review.
+Max 2 rounds. Rounds do NOT count toward auto-fix budget. After 2 fails → escalate.
+
+## Checkpoints
+
+Three types: `checkpoint:decision` (direction unclear → wait), `checkpoint:human-verify` (UI done → browser check), `checkpoint:auth-gate` (payment/auth → always stop). Details in `lead-engineer-completion.md`.
 
 ## Auto-fix Budget
 
-Maximum retries: **3**
-- `/dev`: shared counter across session. Persists via PLAN.md `Used: N`.
-- `/loop`: resets per iteration. Each iteration gets budget of 3.
-- `/debug`: 3 attempts per bug. Tracked in DEBUG.md.
-- Cleanup (console.log removal, unused imports, commented-out code) does NOT count toward budget in any flow.
+Max retries: **3** per `/dev` session (persists via PLAN.md `Used: N`). `/loop`: resets per iteration. Cleanup doesn't count. After 3 → escalate.
 
-After 3 failed attempts: stop and escalate to user.
+## Fresh Context Execution
 
-## Language
-- Default language for spec documents is **English**
-- If user writes in another language, match that language
-- Section headers: **English or Korean** (recognized by `validate-post-write.sh`)
+Lead-engineer dispatches each task to a fresh-context subagent:
+`[lead]`→task-executor(sonnet), `[db]`→db-engineer(sonnet), `[ui]`→ui-engineer(sonnet), `[worker]`→worker-engineer(haiku)
 
-## Context Management
-- Mark each task `[x]` in PLAN.md immediately upon completion
-- Keep STATE.md under 100 lines — archive old entries to feature history
-
-## Excluded Paths
-Do not read: `node_modules/`, `.next/`, `dist/`, `.turbo/`, `.cache/`, lock files
+Orchestrator maintains in-memory task ledger. Never writes code directly. Passes `UPSTREAM:` context to dependent tasks.
 
 ## PLAN.md Task Format
 
 ```
-- [ ] [domain] Task description → target file(s) (REQ-NNN) model:haiku|sonnet [parallel:GroupID]
+- [ ] [domain] Task description → target (REQ-NNN) model:haiku|sonnet [wave:N]
 ```
 
-**`parallel` field rules** (team mode only):
-- Tasks sharing the same `parallel:GroupID` (e.g., `parallel:A`) can execute simultaneously
-- Groups execute in alphabetical order: all `parallel:A` tasks before any `parallel:B` tasks
-- Omit the field for sequential execution (default, compatible with solo mode)
-- Never assign the same file to two tasks in the same parallel group
+Wave rules: see `_delegation.md` > Wave Sync Protocol. Key: same wave = parallel, never same file in same wave.
 
-## Plan Approval Protocol
-- PLAN.md must include `## Approval` with `Status:` and `Approved-at:` fields
-- Planner sets `Status: pending`; updates to `approved` only after user confirmation
-- Lead-engineer must verify `Status: approved` before starting
+## Plan Approval
+
+`## Approval` with `Status:` + `Approved-at:` fields. Lead-engineer verifies `Status: approved` before starting.
+
+## Code Quality (all agents)
+
+API routes/server actions MUST: try/catch with `{ code, message }` errors, Zod input validation, error classification (400/401/404/500), no silent swallowing, no stub data when schema exists, named constants.
+All files MUST: strict TypeScript (no `any`), single responsibility (<30 lines), read quality skills for error/complex logic.
+DRY: If the same logic (Zod schemas, helpers, formatters) appears in 2+ files, extract to `lib/` or `utils/`. Check existing shared modules before creating local helpers.
+
+## Document Sync on Modification
+
+When spec.md is modified (not initial creation):
+- **CONTEXT.md**: Update stale "Locked Decisions" — they override spec for downstream agents
+- **design.md**: Update Data Flow, Technical Decisions if architecture/auth/API changes
+- **Dependents**: Check ARCHITECTURE.md for reverse deps, flag breaking changes
+- **History**: Create `history/YYYY-MM-DD-[description].md` for every modification
 
 ## Prohibited Actions
-- Do not modify immutable `_` prefixed rule files
-- Do not modify spec.md or design.md during `/dev` without user approval
-- Do not skip `checkpoint:auth-gate` under any circumstances
+
+- Do not modify `_` prefixed rule files
+- Do not modify spec.md/design.md during `/dev` without user approval
+- Do not skip `checkpoint:auth-gate`
 - Do not commit directly to main/master
 
+## Excluded Paths
+
+`node_modules/`, `.next/`, `dist/`, `.turbo/`, `.cache/`, lock files
+
 ## Extended References
-Read ONLY when the condition applies to your current task:
-- `spec/rules/_document-format.md` — when writing spec.md, design.md, or history entries
-- `spec/rules/_model-routing.md` — when deciding which model to assign to an agent
-- `spec/rules/_delegation.md` — when spawning sub-agents or resuming interrupted sessions
-- `spec/rules/_verification.md` — when running or understanding verification levels
-- `spec/rules/_loop-protocol.md` — when running /loop
-- `spec/rules/_agent-roles.md` — when checking agent boundaries or responsibilities
-- `spec/rules/_nextjs-ordering.md` — when project is Next.js
+
+Read ONLY when applicable: `_document-format.md`, `_model-routing.md`, `_delegation.md`, `_verification.md`, `_loop-protocol.md`, `_agent-roles.md`, `_nextjs-ordering.md`, `_skill-budget.md`, `_artifact-limits.md`

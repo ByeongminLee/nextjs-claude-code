@@ -2,6 +2,10 @@
 # PreToolUse hook: blocks dangerous commands before Bash tool execution
 # exit 2 → blocks the tool call and shows the message
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/hook-profile.sh"
+ncc_profile_allows "security-guard" || exit 0
+
 INPUT_JSON=$(cat)
 if command -v jq &>/dev/null; then
   TOOL_NAME=$(echo "$INPUT_JSON" | jq -r '.tool_name // ""' 2>/dev/null)
@@ -50,7 +54,7 @@ SECRET_PATTERNS=(
 )
 
 for pattern in "${SECRET_PATTERNS[@]}"; do
-  if echo "$COMMAND" | grep -qiE "$pattern"; then
+  if echo "$COMMAND" | grep -qiE -- "$pattern"; then
     echo "🚫 [security-guard] Hardcoded secret detected in command"
     echo "   Use environment variables (.env) or a secrets manager instead."
     exit 2

@@ -1,7 +1,6 @@
 ---
 name: cohesion
 description: Use when 한 기능 수정 시 여러 디렉토리를 건드리거나, 같은 숫자/상수가 여러 파일에 흩어져 있거나, import 경로가 `../../..`처럼 길어질 때
-disable-model-invocation: true
 ---
 
 # 응집도

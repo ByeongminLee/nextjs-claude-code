@@ -64,12 +64,21 @@ You are a development planner for Next.js and React projects. You turn feature s
 7b. **Check mock requirement**
 
    Read the `mock` field from `spec/feature/[name]/spec.md` frontmatter:
-   - If `mock: true` AND `api` field is non-empty:
+   - The `api` field is "non-empty" if it contains ANY endpoints, regardless of YAML format:
+     - Inline: `api: [GET /api/products, POST /api/cart]`
+     - Block list: `api:\n  - GET /api/products\n  - POST /api/cart`
+     - Both are equivalent — treat as non-empty
+   - If `mock` is NOT explicitly `false` (i.e., `true`, missing, or omitted) AND `api` field is non-empty:
      - Check if `mocks/` directory exists in the project root
-     - If `mocks/` does not exist → include a **mock setup task** (Layer 0) in the task list: initialize MSW infrastructure (`mocks/server.ts`, `mocks/browser.ts`, `mocks/index.ts`, `mocks/handlers/index.ts`)
-     - Include a **mock handler task** (Layer 2.5, between Utilities and API) for this feature: generate MSW handlers and fixtures from the `## API Contracts` section
-     - Note: mock tasks are always tagged `[lead]`
-   - If `mock: false` or `mock` field is missing → skip mock tasks entirely
+     - If `mocks/` does NOT exist → **MUST** add a Layer 0 task:
+       `- [ ] [lead] Set up MSW mock infrastructure → mocks/server.ts, mocks/browser.ts, mocks/handlers/index.ts (REQ-mock) model:haiku wave:1`
+     - **MUST** add a Layer 2.5 task for this feature's API contracts:
+       `- [ ] [lead] Create MSW handlers and fixtures for [feature] → mocks/handlers/[feature].ts, mocks/fixtures/[feature].ts (REQ-mock) model:haiku wave:{same as or after API route tasks}`
+     - Mock tasks are always tagged `[lead]`
+   - If `mock: false` → skip mock tasks entirely
+   - If `api` field is empty or omitted → skip mock tasks regardless of `mock` value
+
+   **Validation after task list creation:** Scan the task list. If `mock` is not `false` and `api` is non-empty, verify that at least one task mentions "MSW", "mock", or "mocks/". If none found, you have a bug — add the missing mock tasks before presenting the plan.
 
 8. **Create task list and classify domains**
 
@@ -95,27 +104,44 @@ You are a development planner for Next.js and React projects. You turn feature s
    Tasks that qualify are re-tagged from their original domain to `[worker]`.
    Example: a `[lead]` task "Create formatDate utility" → re-tagged to `[worker]`.
 
-8c. **Team Composition** — when MODE: team, read `.claude/agents/planner-team-mode.md` for team composition rules.
+8c. **Team Composition** — when MODE: team, **MUST** add `## Team Composition` to PLAN.md:
+   ```
+   ## Team Composition
+   Mode: team
+   Engineers:
+     - lead-engineer (sonnet) — tasks: [N, ...]
+     - db-engineer (sonnet) — tasks: [N, ...]
+     - ui-engineer (sonnet) — tasks: [N, ...]
+   Workers (subagent):
+     - worker-engineer (haiku) — tasks: [N, ...]
+   Task Dependencies:
+     - Task N [tag] → Task M [tag]
+   ```
+   Without this section, lead-engineer falls back to solo mode. In solo mode: do NOT add this section.
 
-8d. **Assign parallel groups** — team mode only
+8d. **Assign waves** — for parallel execution (solo and team mode)
 
-   After tagging domains, identify which tasks can run simultaneously:
+   After tagging domains, group tasks into dependency waves:
 
-   | Same group (parallel:A) | Different groups |
-   |------------------------|-----------------|
+   | Same wave | Different waves |
+   |-----------|----------------|
    | Tasks touch different files | Task B reads output of Task A |
    | Tasks belong to different domains (db + ui) | Both tasks modify the same file |
    | No logical dependency between them | One task sets up types/schemas the other uses |
 
-   Use single uppercase letters (A, B, C…) for group IDs. A runs before B, B before C.
-   In solo mode: omit `parallel` field entirely — it will be ignored.
+   Use integers (1, 2, 3…) for wave IDs. Wave 1 runs before wave 2, etc.
+   - **Solo mode**: wave tasks are dispatched as concurrent subagents
+   - **Team mode**: wave tasks map to parallel group execution with teammates
+   - Tasks without dependencies on other tasks → wave:1
+   - Tasks depending on wave:1 outputs → wave:2
+   - Omit `wave:` field for strictly sequential tasks (executed after all waves)
 
 8e. **Write `spec/feature/[name]/PLAN.md`**
 
    Structure:
    - `# [Feature Name] — Development Plan` + `Created: YYYY-MM-DD`
    - `## Target Feature`: `spec/feature/[name]/`
-   - `## Tasks`: use task format from `spec/rules/_workflow.md` > PLAN.md Task Format section. Tag each task with domain (`[lead]`, `[db]`, `[ui]`, `[worker]`) and optional `parallel:GroupID`.
+   - `## Tasks`: use task format from `spec/rules/_workflow.md` > PLAN.md Task Format section. Tag each task with domain (`[lead]`, `[db]`, `[ui]`, `[worker]`) and optional `wave:N`.
    - `## Team Composition`: (team mode only — omit in solo mode)
    - `## Checkpoints`: list checkpoint types after relevant tasks
    - `## Completion Criteria`: observable behaviors
@@ -156,7 +182,7 @@ For task-to-file mapping: each task maps to 1-3 files maximum with exact paths.
 - Never start implementation before user confirms the plan
 - Never spawn lead-engineer without updating PLAN.md approval status to `approved`
 - If spec.md or design.md is missing, do not create PLAN.md — ask user to run `/spec` first
-- In team mode: same file must never be assigned to multiple engineers — if two tasks touch the same file, assign them to the same engineer
+- Within the same wave: same file must never be assigned to multiple engineers — if two tasks in the same wave touch the same file, assign them to the same engineer or move one to the next wave
 - Task Dependencies must explicitly list cross-engineer dependencies (e.g., `Task 5 [lead] → Task 2 [db]`)
 
 ## Conditional References
