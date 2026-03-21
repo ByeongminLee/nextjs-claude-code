@@ -4,7 +4,12 @@
     "agent-browser": {
       "source": "vercel-labs/agent-browser",
       "sourceType": "github",
-      "computedHash": "9dcf7342a0a051445137a279855f6ed9b1fb342e46291b799c344ac20e34d409"
+      "computedHash": "35478d4b0a33b3f98e22b7b4f3fe2d2919ebe72a6ca24b3a7175a9b17cc2788d"
+    },
+    "ai-sdk": {
+      "source": "vercel/vercel-plugin",
+      "sourceType": "github",
+      "computedHash": "6364378138ffe6aa1142621e44fc77eb5b2b05c51adcc90490999b11a454272a"
     },
     "analytics-tracking": {
       "source": "coreyhaines31/marketingskills",
@@ -15,6 +20,11 @@
       "source": "apollographql/skills",
       "sourceType": "github",
       "computedHash": "ae82ac8ee2b1de548a83ebee3c470391aa11ba2948ccd79448b9c9101384016e"
+    },
+    "auth": {
+      "source": "vercel/vercel-plugin",
+      "sourceType": "github",
+      "computedHash": "dfca893379432c0216976e19cfd0888c00f8dc83ca6a24ebf9c30212789cb27e"
     },
     "better-auth-best-practices": {
       "source": "better-auth/skills",
@@ -29,7 +39,7 @@
     "clean-code": {
       "source": "sickn33/antigravity-awesome-skills",
       "sourceType": "github",
-      "computedHash": "af77b8995f255140f1643de753007baf87b734e8b87175489524aadc3559c42a"
+      "computedHash": "14ba8e7d8477723eca6d48a79a1924337f4a1f5f1c7ab9b0a7acc073268ecd5a"
     },
     "cohesion": {
       "source": "toss/frontend-fundamentals",
@@ -106,10 +116,20 @@
       "sourceType": "github",
       "computedHash": "a94b83ddcd2ff1c30722577f693b1bfe32f2e1a83abdd6c08c2d6cc6753b53c8"
     },
+    "nextjs": {
+      "source": "vercel/vercel-plugin",
+      "sourceType": "github",
+      "computedHash": "c50aa77f7aa7196a0b1e6a436d064319b20316fbad8d9f18769b470bfae0340b"
+    },
     "nextjs-app-router-fundamentals": {
       "source": "wsimmonds/claude-nextjs-skills",
       "sourceType": "github",
       "computedHash": "2d73efbbc227187a78d547d80e7e778d179048d592530dc9f69c8307eee6ae76"
+    },
+    "observability": {
+      "source": "vercel/vercel-plugin",
+      "sourceType": "github",
+      "computedHash": "2efca4b596c0d6e6428e28093f7d63f8a5872be9d30ba2e900fc6db3c7003223"
     },
     "playwright-best-practices": {
       "source": "currents-dev/playwright-best-practices-skill",
@@ -121,6 +141,11 @@
       "sourceType": "github",
       "computedHash": "46eeb9ad76c2adfe1e5ddd336ecd4a064f737f79a68fefa1260e37fab255b366"
     },
+    "react-best-practices": {
+      "source": "vercel/vercel-plugin",
+      "sourceType": "github",
+      "computedHash": "4666ceb6576da8baefe2fea38b31a1c83cb185ee1bc429d3f6f6afa76b724c27"
+    },
     "react-hook-form-zod": {
       "source": "ovachiever/droid-tings",
       "sourceType": "github",
@@ -131,6 +156,11 @@
       "sourceType": "github",
       "computedHash": "23adeac7a9041f7a026bb46bb58f0ac56872b02531838c418acac71944a9df2f"
     },
+    "routing-middleware": {
+      "source": "vercel/vercel-plugin",
+      "sourceType": "github",
+      "computedHash": "b786757e9522e4c98ad41874d98261528a694bfb697fd72130ed592445e7aa14"
+    },
     "seo-audit": {
       "source": "coreyhaines31/marketingskills",
       "sourceType": "github",
@@ -139,7 +169,7 @@
     "shadcn": {
       "source": "shadcn/ui",
       "sourceType": "github",
-      "computedHash": "1ec42c9b918b315d8e5c6c856b78c3c4725fc93dea30b9b7e9975c69848fcce6"
+      "computedHash": "507f011a70e8b3ae242bdc0bb5b39fd91a1d4049a0f3c281991ccf84973d591c"
     },
     "tailwind-design-system": {
       "source": "wshobson/agents",
@@ -151,10 +181,15 @@
       "sourceType": "github",
       "computedHash": "21d2e8b7468a81d772b6527ad8ca178cc2f3f08af777bb9061333013ee88a0c9"
     },
+    "turbopack": {
+      "source": "vercel/vercel-plugin",
+      "sourceType": "github",
+      "computedHash": "f5369c5efd09055273f89c9ab390dd83f752474ae6a282b0de8dd02e310f51a7"
+    },
     "turborepo": {
       "source": "vercel/turborepo",
       "sourceType": "github",
-      "computedHash": "fa46b4bc06589ff6acdd0a5837ab280302908f6c817be2caa8cbae1989feb434"
+      "computedHash": "ba8750c8b17b431b42fd9178cc753fa56049fbed9e0d1871cb2410f1da07a54d"
     },
     "ui-ux-pro-max": {
       "source": "nextlevelbuilder/ui-ux-pro-max-skill",
@@ -166,10 +201,20 @@
       "sourceType": "github",
       "computedHash": "f98931159fa9c7fed043bcd18a891a46dcf89ababa38df13a4c5b7b30dc0ce07"
     },
+    "vercel-functions": {
+      "source": "vercel/vercel-plugin",
+      "sourceType": "github",
+      "computedHash": "52bc874b60f17d674931e76d8b770da89e69794d726c0ffe6679e5a11fcb2c4b"
+    },
     "vercel-react-best-practices": {
       "source": "vercel-labs/agent-skills",
       "sourceType": "github",
       "computedHash": "c858d2d9023e73edb4e5504868cb0e36313e58fd56af12ef888b43c5634a3c17"
+    },
+    "vercel-storage": {
+      "source": "vercel/vercel-plugin",
+      "sourceType": "github",
+      "computedHash": "9b03f4a4c22be325e50add138172479b4c30f275a9126c14cdbc333acc144f2d"
     },
     "web-design-guidelines": {
       "source": "vercel-labs/agent-skills",
