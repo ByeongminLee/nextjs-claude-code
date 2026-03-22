@@ -5,6 +5,13 @@ argument-hint: "[feature-name] | --setup | --audit | --diff | --fix"
 context: fork
 ---
 
+## Strategy check
+
+Before routing, check if `spec/SECURITY_STRATEGY.md` exists:
+- If NOT exists AND mode is a feature name (not `--setup`, `--audit`, `--diff`, or `--fix`):
+  → Output: "No SECURITY_STRATEGY.md found. Run `/security --setup` to configure your security strategy, or `/security --audit` for a project-wide audit." → **STOP**
+- `--setup`, `--audit`, `--diff`, and `--fix` modes proceed without strategy file.
+
 ## Routing
 
 Parse `$ARGUMENTS` to determine mode:

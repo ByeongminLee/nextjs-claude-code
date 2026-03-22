@@ -15,13 +15,15 @@ spec/
 
 ## STATE.md
 
-Phases: `idle` → `planning` → `executing` → `verifying` → `looping` → completed
+Phases: `idle` | `existing` → `planning` → `executing` → `verifying` → `looping` → completed
+- `idle`: no work started; fresh implementation
+- `existing`: code detected during /init; run /spec before /dev
 - Each feature's phase is independent
 - Keep under 100 lines — archive completed entries
 
 ## Commands
 
-`/init` `/brainstorm` `/spec` `/office-hours` `/dev` `/dev --team` `/review` `/loop` `/debug` `/status` `/rule`
+`/init` `/create` `/brainstorm` `/spec` `/office-hours` `/dev` `/dev --team` `/review` `/loop` `/debug` `/status` `/rule`
 
 ## Per-Task Review
 

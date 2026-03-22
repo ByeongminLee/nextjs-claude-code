@@ -5,6 +5,12 @@ argument-hint: "[feature-name] [description + optional Figma URL]"
 context: fork
 ---
 
+## Prerequisite check
+
+Before routing to any agent, verify `/init` has been run:
+- Check if `spec/PROJECT.md` exists
+- If NOT exists → output: "Project not initialized. Run `/init` first to analyze your codebase and set up the spec directory." → **STOP**
+
 ## Model selection
 
 Assess task size per `spec/rules/_model-routing.md`:

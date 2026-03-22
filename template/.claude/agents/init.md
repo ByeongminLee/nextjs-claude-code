@@ -13,6 +13,15 @@ Only when invoked via `/init`. Safe to re-run — existing spec files are preser
 
 ## Work sequence
 
+-1. **Check prerequisites**
+
+   Verify `package.json` exists in project root (Glob).
+   - If NOT exists → output: "No package.json found. Create a project first:\n\n  npx create-next-app@latest\n\nThen re-run /init." → **STOP**
+   - If monorepo detected (`turbo.json` or `pnpm-workspace.yaml` exists, or `package.json` contains `"workspaces"`):
+     - List `apps/*/package.json` directories
+     - Ask user: "Monorepo detected. Which app should I analyze? [list] (or 'root' for monorepo-level analysis)"
+     - Adjust working context to selected app directory for all subsequent steps
+
 0. **Scaffold spec/ directory if missing**
 
    Before analysis, check if the spec directory structure exists. If any of these files are missing, create them:
@@ -78,6 +87,9 @@ Only when invoked via `/init`. Safe to re-run — existing spec files are preser
    - `app/` or `src/app/` directory exists → App Router
    - `pages/` or `src/pages/` directory exists → Pages Router
    - Both exist → App Router (primary)
+   - Neither `app/` nor `pages/` exists:
+     - Ask: "No app/ or pages/ directory detected. Which router will you use? (app / pages / not set up yet)"
+     - "not set up yet" → default App Router, note `[assumed: App Router]` in PROJECT.md
 
    Read `next.config.*`, `vite.config.*` if present for additional context.
 
@@ -145,7 +157,19 @@ Only when invoked via `/init`. Safe to re-run — existing spec files are preser
 
 8. **Draft feature specs** — for each discovered feature, create `spec/feature/[name]/spec.md` marked `> DRAFT`. Conservative: only confirmed behaviors.
 
-9. **Update `spec/STATE.md`** — add features as `[idle]`
+9. **Update `spec/STATE.md`** — classify features by origin:
+   - Feature with implementation files (route `page.tsx`/`route.ts`, or 2+ source files in feature dir) → mark as `[existing]`:
+     ```
+     ### [feature-name] [existing]
+     Started: YYYY-MM-DD
+     Source: detected from [file paths]
+     ```
+   - Feature inferred from config only (no implementation files found) → mark as `[idle]`
+
+   **Detection heuristic**: A feature is `[existing]` if at least ONE of:
+   - A route file (`page.tsx`, `route.ts`) exists at the feature's detected path
+   - A feature directory contains 2+ source files (`.ts`, `.tsx`)
+   - Component files matching the feature name exist in `src/` or `app/`
 
 10. **Git strategy (optional)** — if no `GIT_STRATEGY.md` and remote exists, ask user → spawn `git-strategy-detector` (haiku)
 

@@ -5,6 +5,13 @@ argument-hint: "[feature-name] [--browser | --unit | --setup]"
 context: fork
 ---
 
+## Strategy check
+
+Before routing, check if `spec/TEST_STRATEGY.md` exists:
+- If NOT exists AND mode is NOT `--setup`:
+  → Output: "No TEST_STRATEGY.md found. Run `/init` (auto-creates) or `/test --setup` to configure your test strategy." → **STOP**
+- `--setup` mode proceeds without strategy file.
+
 ## Routing
 
 Parse `$ARGUMENTS` to determine mode:
