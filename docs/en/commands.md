@@ -10,7 +10,6 @@
 |---------|-------------|
 | `/create "description"` | Ideation-to-validation pipeline. Forcing questions → alternative approaches → C-level review (CEO/CTO/CPO/CMO) → validated concept. Optionally converts to `/spec` input. [Details →](create-workflow.md) |
 | `/brainstorm "description"` | Quick design exploration. Socratic questioning → 2-3 approaches with trade-offs → spec-ready summary. |
-| `/office-hours [name]` | Product review gate for existing specs. Evaluates user value, business impact, scope, success metrics, priority. |
 
 ## Core Workflow
 

@@ -23,7 +23,7 @@ Phases: `idle` | `existing` → `planning` → `executing` → `verifying` → `
 
 ## Commands
 
-`/init` `/create` `/brainstorm` `/spec` `/office-hours` `/dev` `/dev --team` `/review` `/loop` `/debug` `/status` `/rule`
+`/init` `/create` `/brainstorm` `/spec` `/dev` `/dev --team` `/review` `/loop` `/debug` `/status` `/rule`
 
 ## Per-Task Review
 

@@ -40,7 +40,6 @@ Before modifying code:
 | \`/debug "desc"\` | Systematic bug fixing |
 | \`/status\` | Project status |
 | \`/create "desc"\` | Ideation → C-level review → validation |
-| \`/office-hours [name]\` | Product review before development |
 | \`/commit\` | Auto-generate commit message |
 | \`/pr\` | Create PR with spec-based body |
 | \`/ncc-upgrade\` | Upgrade NCC to latest version |

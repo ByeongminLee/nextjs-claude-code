@@ -25,7 +25,6 @@ Getting Started:
 Ideation:
   /create "description"          — Ideation pipeline (forcing questions + C-level review)
   /brainstorm "description"      — Quick design exploration with approaches
-  /office-hours [name]           — Product review for existing specs
 
 Core Workflow:
   /spec [name] "description"  — Define a feature spec

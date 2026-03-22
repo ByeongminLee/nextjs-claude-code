@@ -13,8 +13,6 @@
 | **No plan at all** — starting from scratch | `/create "my idea"` |
 | **Major new feature** — need validation before investing | `/create "add payments"` |
 | **Already have a spec** — quick design exploration | `/brainstorm "feature"` |
-| **Spec exists** — product review gate before /dev | `/office-hours feature-name` |
-
 `/create` is the **earliest stage** — before `/spec`, before `/dev`. Once you have a validated concept, convert it to a spec and build.
 
 ---
