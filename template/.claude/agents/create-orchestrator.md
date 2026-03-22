@@ -67,10 +67,27 @@ Wait for user to choose or modify.
 
 After user selects an approach:
 
-1. **Create directory**: `spec/create/[name]/`
-2. **Write VISION.md** (max 80 lines) with sections: Problem, Demand, Target User, Value Proposition, Chosen Approach, Success Criteria, Constraints.
+1. **Ensure C-level skills are installed** before spawning reviewers:
 
-3. **Round 1 — Parallel team review** (5 agents simultaneously):
+   Check if these skills exist in `.claude/skills/`. For each missing skill, install it:
+   - `investor-materials` — needed by CEO
+   - `investor-outreach` — needed by CEO
+   - `pm-product-strategy` — needed by CPO
+   - `brainstorming` — needed by CPO, CDO
+   - `marketing-psychology` — needed by CMO
+   - `copywriting` — needed by CMO
+
+   Install method (try in order):
+   1. `npx skills add [owner/repo] --skill [name] --agent claude-code --yes --copy` (from skills.sh)
+   2. If npx fails: copy from `skills-archive/[name]/` to `.claude/skills/[name]/` (bundled fallback)
+
+   The CLI commands and archive paths are listed in `src/skills-installer.ts` under "On-demand: /create C-Level Agent Skills".
+   Skip any skill that already exists in `.claude/skills/`.
+
+2. **Create directory**: `spec/create/[name]/`
+3. **Write VISION.md** (max 80 lines) with sections: Problem, Demand, Target User, Value Proposition, Chosen Approach, Success Criteria, Constraints.
+
+4. **Round 1 — Parallel team review** (5 agents simultaneously):
 
    Use the Agent tool to spawn all 5 C-level agents **in parallel** (single message, multiple tool calls):
 
@@ -88,9 +105,9 @@ After user selects an approach:
 
    Each agent reads its own skills independently (token-optimized — CEO reads nothing, CTO reads architectures, CMO reads marketing-psychology, etc.).
 
-4. **Collect Round 1 results** — gather all 5 assessments.
+5. **Collect Round 1 results** — gather all 5 assessments.
 
-5. **Round 2 — Debate** (conditional, max 1 round):
+6. **Round 2 — Debate** (conditional, max 1 round):
 
    Trigger debate ONLY if:
    - Any agent issued a **BLOCK**, OR
@@ -109,7 +126,7 @@ After user selects an approach:
    Max 2-3 agents per debate round. Each debate response is max 5 lines.
    If no BLOCK or contradiction → skip Round 2 entirely.
 
-6. **Write C-REVIEW.md** (max 100 lines) with: CEO/CTO/CPO/CMO/CDO Assessment sections (each with Verdict + evaluation + risks), optional Debate Summary, and Summary (Approvals N/5, Concerns, Blockers).
+7. **Write C-REVIEW.md** (max 100 lines) with: CEO/CTO/CPO/CMO/CDO Assessment sections (each with Verdict + evaluation + risks), optional Debate Summary, and Summary (Approvals N/5, Concerns, Blockers).
 
 ## Phase 5: Decision & Spec Conversion
 
@@ -141,8 +158,9 @@ After user selects an approach:
    - **If yes**: Update DECISION.md `Status: converted`, then output:
      ```
      Ready for spec. Run:
-     /spec [name] "[one-line problem + approach + key constraints]"
+     /spec [name] "[problem] — [approach], [2-3 key technical decisions], [constraints from C-review]"
      ```
+     The description MUST include: core problem, chosen approach, top 2-3 architectural decisions (e.g., data models, API surface, concurrency strategy), and any C-level flagged constraints (compliance, encryption, etc.). This is the only context spec-writer receives — make it specific.
    - **If no**: Update DECISION.md `Status: not-converted`, output:
      "Documents saved to spec/create/[name]/. Reference them anytime."
 
