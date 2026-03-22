@@ -186,6 +186,16 @@ const contents = [en, ko];
 
         <hr class="border-gray-100 mb-12" />
 
+        {/* References */}
+        {c.references && (
+          <section class="mb-12">
+            <h2 class="text-xl font-semibold text-gray-900 mb-4">{c.references.title}</h2>
+            <p class="text-gray-600 text-sm leading-relaxed [&_a]:underline [&_a]:underline-offset-2 [&_a]:text-gray-700 hover:[&_a]:text-gray-900" set:html={c.references.text} />
+          </section>
+        )}
+
+        <hr class="border-gray-100 mb-12" />
+
         {/* Contributing + License */}
         <footer class="text-gray-500 text-sm space-y-2">
           <p>

@@ -102,6 +102,13 @@ export const en = {
           { cmd: '/rule "..."', desc: 'Add or update coding rules' },
         ],
       },
+      {
+        subtitle: 'Upgrade',
+        commands: [
+          { cmd: '/ncc-upgrade', desc: 'Upgrade NCC from within Claude Code (plugin or npx)' },
+          { cmd: 'npx nextjs-claude-code upgrade', desc: 'Upgrade from terminal (npx only)' },
+        ],
+      },
     ],
   },
 
@@ -144,6 +151,11 @@ export const en = {
       { bold: 'Hook Profiles', text: 'minimal (security only), standard (default), strict (+ deprecation guard, comment checker, todo enforcer)' },
       { bold: 'Spec Validation', text: 'PostToolUse hooks block malformed spec writes and remind spec updates' },
     ],
+  },
+
+  references: {
+    title: 'References',
+    text: "NCC was built by studying what works best across the Claude Code ecosystem and incorporating those proven patterns into a cohesive workflow. Wave execution, context engineering, agent orchestration, token optimization, verification loops, and spec-driven planning were all refined with insights from <a href=\"https://github.com/gsd-build/get-shit-done\">GSD</a>, <a href=\"https://github.com/garrytan/gstack\">gstack</a>, <a href=\"https://github.com/affaan-m/everything-claude-code\">Everything Claude Code</a>, <a href=\"https://github.com/code-yeongyu/oh-my-openagent\">Oh My OpenAgent</a>, <a href=\"https://github.com/obra/superpowers\">Superpowers</a>, <a href=\"https://github.com/vercel/vercel-plugin\">Vercel Plugin</a>, <a href=\"https://github.com/github/spec-kit\">Spec Kit</a>, and <a href=\"https://github.com/Fission-AI/OpenSpec\">OpenSpec</a>.",
   },
 
   contributing: {

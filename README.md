@@ -173,6 +173,21 @@ Independent commands — use any of them whenever you need.
 | `npx nextjs-claude-code skill-update` | Update all installed skills to latest |
 | `npx nextjs-claude-code skill-suggest` | Suggest skills based on package.json dependencies |
 
+### Upgrade
+
+| Command | Description |
+|---------|-------------|
+| `/ncc-upgrade` | Upgrade NCC from within Claude Code. Auto-detects plugin vs npx installation. |
+| `npx nextjs-claude-code upgrade` | Upgrade NCC from the terminal (npx installations only). |
+
+**Updated:** agents, hooks, scripts, rules, skills, CLAUDE.md NCC block, settings.json (merged).
+**Preserved:** `spec/feature/`, `spec/STATE.md`, CLAUDE.md user content, `skills-lock.json`.
+
+- **Plugin mode** (`CLAUDE_PLUGIN_ROOT` set): pulls latest from git remote, updates on-demand skills.
+- **npx mode** (files copied into project): downloads latest package from npm, re-installs system files, updates skills.
+
+After upgrade, the latest version's changelog is displayed in the terminal.
+
 ---
 
 ## Agent Roles
@@ -321,6 +336,12 @@ Control hook intensity via `NCC_HOOK_PROFILE` environment variable in `.claude/s
 | Hook errors on every file write | Set `NCC_HOOK_PROFILE=minimal` in `.claude/settings.json` env to reduce hooks |
 | Deprecation guard blocking valid code | Set `NCC_HOOK_PROFILE=standard` to disable strict hooks, or edit `deprecation-rules.json` |
 | Spec changed after planning | Re-run `/dev [name]` — it detects spec staleness and suggests re-planning |
+
+---
+
+## References
+
+NCC was built by studying what works best across the Claude Code ecosystem and incorporating those proven patterns into a cohesive workflow. Wave execution, context engineering, agent orchestration, token optimization, verification loops, and spec-driven planning were all refined with insights from [GSD](https://github.com/gsd-build/get-shit-done), [gstack](https://github.com/garrytan/gstack), [Everything Claude Code](https://github.com/affaan-m/everything-claude-code), [Oh My OpenAgent](https://github.com/code-yeongyu/oh-my-openagent), [Superpowers](https://github.com/obra/superpowers), [Vercel Plugin](https://github.com/vercel/vercel-plugin), [Spec Kit](https://github.com/github/spec-kit), and [OpenSpec](https://github.com/Fission-AI/OpenSpec).
 
 ---
 

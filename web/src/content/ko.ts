@@ -102,6 +102,13 @@ export const ko = {
           { cmd: '/rule "..."', desc: '코딩 규칙 추가 또는 수정' },
         ],
       },
+      {
+        subtitle: '업그레이드',
+        commands: [
+          { cmd: '/ncc-upgrade', desc: 'Claude Code 내에서 NCC 업그레이드 (플러그인/npx 자동 감지)' },
+          { cmd: 'npx nextjs-claude-code upgrade', desc: '터미널에서 NCC 업그레이드 (npx 전용)' },
+        ],
+      },
     ],
   },
 
@@ -144,6 +151,11 @@ export const ko = {
       { bold: 'Hook Profiles', text: 'minimal (보안만), standard (기본), strict (+ deprecation guard, comment checker, todo enforcer)' },
       { bold: '스펙 검증', text: 'PostToolUse 훅이 잘못된 스펙 작성을 차단하고 스펙 업데이트를 리마인드' },
     ],
+  },
+
+  references: {
+    title: 'References',
+    text: "NCC는 Claude Code 생태계에서 검증된 최선의 패턴을 연구하고, 이를 하나의 일관된 워크플로우로 통합하여 만들어졌습니다. Wave 실행, 컨텍스트 엔지니어링, 에이전트 오케스트레이션, 토큰 최적화, 검증 루프, 스펙 기반 계획 등 핵심 기능은 <a href=\"https://github.com/gsd-build/get-shit-done\">GSD</a>, <a href=\"https://github.com/garrytan/gstack\">gstack</a>, <a href=\"https://github.com/affaan-m/everything-claude-code\">Everything Claude Code</a>, <a href=\"https://github.com/code-yeongyu/oh-my-openagent\">Oh My OpenAgent</a>, <a href=\"https://github.com/obra/superpowers\">Superpowers</a>, <a href=\"https://github.com/vercel/vercel-plugin\">Vercel Plugin</a>, <a href=\"https://github.com/github/spec-kit\">Spec Kit</a>, <a href=\"https://github.com/Fission-AI/OpenSpec\">OpenSpec</a>의 인사이트를 반영하여 개선되었습니다.",
   },
 
   contributing: {
