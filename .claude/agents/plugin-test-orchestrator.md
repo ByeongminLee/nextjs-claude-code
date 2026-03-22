@@ -108,6 +108,48 @@ Use 20-category scoring (base 15 + 5 install-test categories):
 - Category 19: Debug & Loop (DEBUG.md hypothesis-driven, LOOP_NOTES.md iteration tracking)
 - Category 20: Installation Method Fidelity (npx: local files + CLAUDE.md marker + manifest; marketplace: namespaced skills + CLAUDE_PLUGIN_ROOT hooks + no local .claude/agents/)
 
+## /create Pipeline Test (--create)
+
+Two test projects verifying the full create→spec→dev pipeline:
+
+**create-new** (greenfield):
+1. Scaffold minimal Next.js project (package.json + app/layout.tsx + app/page.tsx)
+2. Install NCC via dev method
+3. Run /init pattern → verify PROJECT.md, STATE.md created
+4. Run /create pattern with "AI-powered recipe recommendation app":
+   - Execute create-orchestrator 5-phase pipeline
+   - Write VISION.md, C-REVIEW.md, DECISION.md to spec/create/recipe-app/
+   - Verify all 5 C-level assessments present
+5. Run spec conversion → /spec recipe-app → verify spec/feature/recipe-app/spec.md created
+6. Run /dev pattern → verify PLAN.md created with (create)/(modify) prefixes
+7. Token isolation: verify spec-writer did NOT read spec/create/
+
+**create-existing** (healthcare with existing specs):
+1. Copy healthcare project, install NCC
+2. Count existing features in spec/feature/
+3. Run /create pattern with "patient notification system"
+4. Verify spec/create/notification-system/ created (VISION.md, C-REVIEW.md, DECISION.md)
+5. Verify spec/feature/ count unchanged (create didn't touch it)
+6. Run /spec notification-system → verify spec/feature/notification-system/ created
+7. Verify STATE.md existing features unchanged
+8. Token isolation: verify planner did NOT read spec/create/
+
+Executor HANDOFF for --create:
+```
+[HANDOFF]
+TO: plugin-test-executor (sonnet)
+TASK: {create-new|create-existing} at __plugin-tests__/{name}/
+INSTALL_METHOD: dev
+NCC_SOURCE: {path}
+MODE: solo
+FEATURES: {feature from /create conversion}
+CREATE_TEST: true
+CREATE_IDEA: "{idea description}"
+[/HANDOFF]
+```
+
+Reviewer uses 5-category /create scoring (from SKILL.md).
+
 ## Executor HANDOFF
 
 ```
