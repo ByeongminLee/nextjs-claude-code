@@ -100,6 +100,42 @@ export const SKILLS: SkillDef[] = [
     description: 'Marketing psychology and mental models for UX conversion optimization',
     tier: 'on-demand',
   },
+  // ── On-demand: /create C-Level Agent Skills ────────────────────────────────
+  {
+    name: 'copywriting',
+    url: 'https://skills.sh/coreyhaines31/marketingskills/copywriting',
+    cli: 'npx skills add coreyhaines31/marketingskills --skill copywriting --agent claude-code --yes --copy',
+    description: 'Conversion-focused marketing copy — headlines, CTAs, page structure',
+    tier: 'on-demand',
+  },
+  {
+    name: 'pm-product-strategy',
+    url: 'https://skills.sh/phuryn/pm-skills/product-strategy',
+    cli: 'npx skills add phuryn/pm-skills --skill product-strategy --agent claude-code --yes --copy',
+    description: 'Product strategy — vision, competitive analysis, market sizing, SWOT, personas',
+    tier: 'on-demand',
+  },
+  {
+    name: 'brainstorming',
+    url: 'https://skills.sh/obra/superpowers/brainstorming',
+    cli: 'npx skills add obra/superpowers --skill brainstorming --agent claude-code --yes --copy',
+    description: 'Structured brainstorming — explore approaches, validate design before implementation',
+    tier: 'on-demand',
+  },
+  {
+    name: 'investor-materials',
+    url: 'https://skills.sh/affaan-m/everything-claude-code/investor-materials',
+    cli: 'npx skills add affaan-m/everything-claude-code --skill investor-materials --agent claude-code --yes --copy',
+    description: 'Pitch decks, investor memos, financial models, and fundraising materials',
+    tier: 'on-demand',
+  },
+  {
+    name: 'investor-outreach',
+    url: 'https://skills.sh/affaan-m/everything-claude-code/investor-outreach',
+    cli: 'npx skills add affaan-m/everything-claude-code --skill investor-outreach --agent claude-code --yes --copy',
+    description: 'Cold emails, warm intros, follow-ups, and investor communications',
+    tier: 'on-demand',
+  },
   // ── On-demand: Skill Discovery ──────────────────────────────────────────────
   {
     name: 'find-skills',
