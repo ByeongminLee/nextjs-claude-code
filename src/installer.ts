@@ -42,6 +42,8 @@ Before modifying code:
 | \`/office-hours [name]\` | Product review before development |
 | \`/commit\` | Auto-generate commit message |
 | \`/pr\` | Create PR with spec-based body |
+| \`/ncc-upgrade\` | Upgrade NCC to latest version |
+| \`/ncc-help\` | NCC usage help and version info |
 
 ### Navigation
 - Agents: \`.claude/agents/\` — lead-engineer, db-engineer, ui-engineer, worker-engineer, planner, verifier
