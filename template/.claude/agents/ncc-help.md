@@ -36,6 +36,7 @@ Ops:
   /security [name]             — Security audit (OWASP Top 10)
   /qa                          — Playwright E2E + visual + a11y
   /cicd                        — CI/CD pipeline setup
+  /issue-reporter "desc"       — Report NCC bug or feature request
 
 Upgrade & Help:
   /ncc-upgrade                 — Upgrade NCC to latest version

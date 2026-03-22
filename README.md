@@ -155,6 +155,12 @@ Independent commands — use any of them whenever you need.
 |---------|-------------|
 | `/cicd` | (experimental) Set up CI/CD pipeline. Uses find-skills for platform-specific skill discovery. Generates spec/CICD.md. |
 
+### Issue Reporting
+
+| Command | Description |
+|---------|-------------|
+| `/issue-reporter "..."` | Report a bug or feature request to the NCC GitHub repo. Sanitizes all project-specific and personal information before submission. Requires user confirmation. |
+
 ### Dev Utilities
 
 | Command | Description |
@@ -238,6 +244,7 @@ After upgrade, the latest version's changelog is displayed in the terminal.
 | `status` | Project status summary | No | No (read-only) |
 | `debugger` | Bug fixing | Yes | Yes (DEBUG.md) |
 | `rule-writer` | Manage coding rules | No | Yes (spec/rules/) |
+| `issue-reporter` | Report NCC bugs/feature requests to GitHub (sanitizes all project data) | No | No |
 
 ---
 

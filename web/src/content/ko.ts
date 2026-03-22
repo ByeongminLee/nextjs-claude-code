@@ -94,6 +94,12 @@ export const ko = {
         ],
       },
       {
+        subtitle: '이슈 리포팅',
+        commands: [
+          { cmd: '/issue-reporter "..."', desc: 'NCC 버그/기능 요청을 GitHub에 제출 (프로젝트 데이터 자동 제거, 사용자 확인 필요)' },
+        ],
+      },
+      {
         subtitle: '개발 유틸리티',
         commands: [
           { cmd: '/init', desc: '기존 코드베이스 분석 + spec 문서 초안 생성' },

@@ -94,6 +94,12 @@ export const en = {
         ],
       },
       {
+        subtitle: 'Issue Reporting',
+        commands: [
+          { cmd: '/issue-reporter "..."', desc: 'Report NCC bug or feature request to GitHub (sanitizes project data, requires confirmation)' },
+        ],
+      },
+      {
         subtitle: 'Dev Utilities',
         commands: [
           { cmd: '/init', desc: 'Analyze existing codebase and populate spec documents' },
