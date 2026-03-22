@@ -5,6 +5,7 @@ import { log, banner } from './logger';
 import { install } from './installer';
 import { updateSkills, installSingleSkill, listAvailableSkills, suggestAndInstallSkills } from './skills-installer';
 import { runDoctor } from './doctor';
+import { upgrade } from './upgrader';
 import { UserAnswers } from './types';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -60,6 +61,13 @@ export async function run(): Promise<void> {
   if (command === 'doctor') {
     banner(pkg.version);
     await runDoctor(process.cwd());
+    return;
+  }
+
+  // ── upgrade: NCC 전체 업그레이드 ─────────────────────────────────────────
+  if (command === 'upgrade') {
+    banner(pkg.version);
+    await upgrade(process.cwd());
     return;
   }
 
@@ -122,6 +130,7 @@ export async function run(): Promise<void> {
   console.log(pc.dim(`    ${pc.cyan('npx nextjs-claude-code skill-suggest')}  — auto-detect & install matching skills`));
   console.log(pc.dim(`    ${pc.cyan('npx nextjs-claude-code skill-add <n>')}  — install a specific skill`));
   console.log(pc.dim(`    ${pc.cyan('npx nextjs-claude-code skill-update')}   — update installed skills`));
+  console.log(pc.dim(`    ${pc.cyan('npx nextjs-claude-code upgrade')}        — upgrade NCC to latest version`));
   console.log(pc.dim(`    ${pc.cyan('npx nextjs-claude-code doctor')}         — diagnose installation health`));
   console.log(pc.dim('  Docs: https://github.com/ByeongminLee/nextjs-claude-code'));
   console.log();
