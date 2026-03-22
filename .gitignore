@@ -3,3 +3,4 @@ dist/
 *.js.map
 *.d.ts
 __plugin-tests__/
+__token-audit__/
