@@ -17,6 +17,16 @@ Output this help overview directly — do NOT read any files:
 NCC — nextjs-claude-code
 Spec-Driven AI Development workflow for Next.js & React
 
+Getting Started:
+  New project:      npx create-next-app@latest → npx nextjs-claude-code → /init
+  Existing project:  cd your-project → npx nextjs-claude-code → /init
+  After /init:      Review DRAFT specs with /spec, then build with /dev
+
+Ideation:
+  /create "description"          — Ideation pipeline (forcing questions + C-level review)
+  /brainstorm "description"      — Quick design exploration with approaches
+  /office-hours [name]           — Product review for existing specs
+
 Core Workflow:
   /spec [name] "description"  — Define a feature spec
   /dev [name]                  — Implement a feature (solo mode)
