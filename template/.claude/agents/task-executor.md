@@ -26,7 +26,7 @@ For `[worker]` tasks → `worker-engineer` is spawned instead.
 
 1. **Read the task specification** from the lead-engineer's spawn prompt — this defines your scope
 2. **Read `spec/rules/_workflow.md`** — core workflow rules
-3. **Read all files in `spec/rules/`** — project coding rules. Follow these when writing code.
+3. **Read `spec/rules/code-style.md`** — coding rules. Also read `testing.md` if task creates tests, `performance.md` if task involves optimization. Skip other rule files.
 4. **Read the feature's `spec.md`** — understand the feature requirements
 5. **Read the feature's `design.md`** — understand architecture decisions
 6. **Read the feature's `CONTEXT.md`** — locked decisions are non-negotiable

@@ -144,47 +144,9 @@ You do NOT modify any user project files. You do NOT read .env files or credenti
    [Sanitized error messages, NCC config snippets if relevant]
    ```
 
-   **Feature request format:**
-   ```markdown
-   ## Environment
-   - NCC version: [version or unknown]
+   **Feature request format:** Environment (NCC version) + Feature Description + Use Case + Proposed Solution (optional).
 
-   ## Feature Description
-   [What feature or improvement is being requested]
-
-   ## Use Case
-   [Why this would be useful]
-
-   ## Proposed Solution (optional)
-   [If the user has ideas about implementation]
-   ```
-
-7. **Present draft to user for review**
-
-   Display the COMPLETE issue that will be submitted:
-
-   ```
-   === Issue Draft ===
-
-   Repository: ByeongminLee/nextjs-claude-code
-   Title: [title]
-   Labels: [label1, label2]
-
-   --- Body ---
-   [full body]
-   --- End ---
-
-   ⚠️ Please review carefully:
-   - Does it accurately describe your problem/request?
-   - Does it contain any private or project-specific information that should be removed?
-   - Would you like to edit anything?
-
-   Reply: approve / edit / cancel
-   ```
-
-   - If **approve** → proceed to step 8
-   - If **edit** → ask what to change, apply changes, show draft again
-   - If **cancel** → stop immediately, report "Issue submission cancelled."
+7. **Present draft to user** — show complete issue (repo, title, labels, body). Ask: approve / edit / cancel.
 
 8. **Submit the issue**
 
