@@ -34,7 +34,7 @@ Before modifying code:
 | \`/init\` | First-time setup |
 | \`/spec [name] "desc"\` | Define a feature spec |
 | \`/dev [name]\` | Implement a feature (solo mode) |
-| \`/dev [name] --team\` | Implement with parallel engineer team (db/ui/worker) |
+| \`/dev [name] --team\` | Implement with parallel engineer team (db/ui/lead) |
 | \`/review [name]\` | Check spec compliance |
 | \`/loop [name]\` | Force-complete until all REQs pass |
 | \`/debug "desc"\` | Systematic bug fixing |
@@ -46,7 +46,7 @@ Before modifying code:
 | \`/ncc-help\` | NCC usage help and version info |
 
 ### Navigation
-- Agents: \`.claude/agents/\` — lead-engineer, db-engineer, ui-engineer, worker-engineer, planner, verifier
+- Agents: \`.claude/agents/\` — lead-engineer, task-executor, db-engineer, ui-engineer, planner, verifier
 - Skills: \`.claude/skills/\` — on-demand reference, loaded by skill name
 - Rules: \`spec/rules/\` — project coding rules (read before writing code)
 ${FS_MARKER_END}
@@ -114,6 +114,11 @@ async function installClaude(
   await mergeSettingsJson(
     path.join(TEMPLATE_DIR, '.claude', 'settings.json'),
     path.join(targetDir, '.claude', 'settings.json'),
+    dryRun,
+  );
+  await mergeMcpJson(
+    path.join(TEMPLATE_DIR, '.mcp.json'),
+    path.join(targetDir, '.mcp.json'),
     dryRun,
   );
   await injectBlock(
@@ -234,6 +239,39 @@ async function mergeSettingsJson(
     // Remove empty arrays
     if (existing.hooks[hookType].length === 0) {
       delete existing.hooks[hookType];
+    }
+  }
+
+  if (!dryRun) {
+    fs.writeFileSync(destPath, JSON.stringify(existing, null, 2) + '\n', 'utf-8');
+  }
+}
+
+async function mergeMcpJson(
+  templatePath: string,
+  destPath: string,
+  dryRun: boolean,
+): Promise<void> {
+  if (!fs.existsSync(templatePath)) return;
+  const templateContent = JSON.parse(fs.readFileSync(templatePath, 'utf-8'));
+
+  if (!fs.existsSync(destPath)) {
+    if (!dryRun) {
+      fs.mkdirSync(path.dirname(destPath), { recursive: true });
+      fs.writeFileSync(destPath, JSON.stringify(templateContent, null, 2) + '\n', 'utf-8');
+    }
+    return;
+  }
+
+  const existing = JSON.parse(fs.readFileSync(destPath, 'utf-8'));
+
+  // Merge mcpServers — only add servers that don't already exist
+  if (templateContent.mcpServers) {
+    if (!existing.mcpServers) existing.mcpServers = {};
+    for (const [name, config] of Object.entries(templateContent.mcpServers)) {
+      if (!(name in existing.mcpServers)) {
+        existing.mcpServers[name] = config;
+      }
     }
   }
 
