@@ -72,7 +72,7 @@ TDD is the default development approach. If `spec/TEST_STRATEGY.md` exists with 
    TO: verifier ({model from PLAN.md})
    TASK: Verify feature "[feature-name]" implementation
    DONE-WHEN:
-     - Level 1-3 all pass
+     - Level 1-3b all pass
      - Level 4 checkpoint:human-verify presented
    MUST-NOT:
      - Modify any file
