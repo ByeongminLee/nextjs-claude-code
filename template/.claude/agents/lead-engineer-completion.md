@@ -85,3 +85,14 @@ TDD is the default development approach. If `spec/TEST_STRATEGY.md` exists with 
 7. After verification passes: move feature to `## Completed` in STATE.md with date
 8. Write history entry `spec/feature/[name]/history/YYYY-MM-DD-[description].md`
 9. Reset CONTEXT.md to: `# Context\n\nNo active context.`
+10. **Spawn learning-extractor** — fire-and-forget:
+    ```
+    [HANDOFF]
+    TO: learning-extractor (haiku)
+    TASK: Extract patterns from dev session for "[feature-name]"
+    READS:
+      - spec/feature/[feature-name]/PLAN.md
+      - spec/feature/[feature-name]/CONTEXT.md
+    [/HANDOFF]
+    ```
+    Do not wait for output.
