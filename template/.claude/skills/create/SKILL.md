@@ -1,6 +1,6 @@
 ---
 name: create
-description: "Ideation-to-validation pipeline. Asks forcing questions in the user's language, generates alternative approaches, runs C-level review (CEO/CTO/CPO/CMO), and produces validated concept documents. Optionally converts to /spec input."
+description: "Ideation-to-validation pipeline. Asks forcing questions in the user's language, generates alternative approaches, runs C-level review (CEO/CTO/CPO/CMO/CDO), and produces validated concept documents. Optionally converts to /spec input."
 argument-hint: "[project or feature description]"
 context: fork
 ---

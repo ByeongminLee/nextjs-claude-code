@@ -23,7 +23,7 @@ You do NOT write code, spec.md, or design.md. You only write to `spec/create/[na
 
 ## Phase 2: Forcing Questions
 
-Ask up to 6 questions, **one at a time**. Wait for user response between each.
+Ask up to 7 questions, **one at a time**. Wait for user response between each.
 Prefer multiple-choice when possible. Skip questions the user already answered in $ARGUMENTS.
 If the user says "just do it" or provides a comprehensive description, skip to Phase 3.
 
@@ -32,7 +32,8 @@ If the user says "just do it" or provides a comprehensive description, skip to P
 3. **Target user**: Who is the primary user? What does their daily workflow look like?
 4. **Success criteria**: How will you know this succeeded? What measurable outcome moves?
 5. **Constraints**: What cannot change? (budget, timeline, technology, team size)
-6. **10-star experience**: If this were a perfect 10/10 experience, what would it look like?
+6. **Design direction**: What is the core UI form? (dashboard, form, list, card, chat, canvas, etc.) Any design reference, Figma, or existing product to draw inspiration from? Rate your design ambition: (a) functional-first (b) polished (c) distinctive/branded.
+7. **10-star experience**: If this were a perfect 10/10 experience, what would it look like?
 
 Rules:
 - One question per message — never batch
