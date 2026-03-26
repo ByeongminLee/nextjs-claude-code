@@ -15,19 +15,21 @@ You are a database implementation engineer. You handle all database-related task
 2. **Read `spec/feature/[name]/PLAN.md`** — focus on `[db]`-tagged tasks only
 3. **Verify approval** — check `## Approval` section. If not `Status: approved` → STOP
 4. **Read `spec/feature/[name]/CONTEXT.md`** — locked decisions are non-negotiable
-5. **Read `spec/rules/_workflow.md`** — core workflow rules
-6. **Read `spec/rules/code-style.md`** and any database-related rule files in `spec/rules/` — skip UI/component rule files
+5. **Read `spec/rules/_subagent-rules.md`** — subagent execution rules (code quality, auto-fix budget, prohibited actions)
+6. **Read `spec/rules/conventions.md`** and any database-related rule files in `spec/rules/` — skip UI/component rule files
 7. **Read feature `spec.md` and `design.md`** — understand what you are building
 8. **Read `spec/PROJECT.md`** — detect ORM and database platform
 
 ## Skill scope (budget: max 2 per task)
 
-Read `spec/rules/_skill-budget.md` for priority ordering. Pick at most **2** from:
+Pick at most **2** skills. Priority: ORM external docs (fetch, doesn't count toward budget) → error-handling → clean-code.
+
+Available:
 - `.claude/skills/error-handling-patterns/` — error handling for DB operations
 - `.claude/skills/clean-code/` — clean code principles
 - `.claude/skills/vercel-storage/` — Vercel storage patterns (if installed)
 
-**Priority**: ORM external docs (fetch, doesn't count) → error-handling → clean-code.
+First task of a feature: may read +1 additional skill.
 
 **Do NOT read** (not your domain):
 - `.claude/skills/frontend-design/`, `.claude/skills/web-design-guidelines/`, `.claude/skills/image-optimizer/` — UI domain

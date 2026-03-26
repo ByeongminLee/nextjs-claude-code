@@ -91,6 +91,8 @@ If `/dev` is interrupted (session crash, timeout, context limit), running `/dev`
 When resuming `executing` phase, the current task (first `- [ ]`) may have been partially completed before the crash:
 
 1. Check if the task's target files already exist
-2. If they exist, inspect for stub indicators (TODO, empty functions, placeholder values)
-3. If incomplete, rewrite the file from scratch (overwrite partial code)
-4. Do NOT count partial attempts toward auto-fix budget — crashes are not agent failures
+2. If they exist, inspect for stub indicators (TODO, empty functions, placeholder values) and type/lint breakage in touched files
+3. If incomplete, prefer minimal patch repair first. Do not overwrite from scratch unless repair is unsafe or impossible.
+4. If overwrite is unavoidable, preserve intent by copying key logic/comments into CONTEXT.md before rewrite
+5. Re-run task DONE-WHEN checks before marking complete
+6. Do NOT count partial attempts toward auto-fix budget — crashes are not agent failures

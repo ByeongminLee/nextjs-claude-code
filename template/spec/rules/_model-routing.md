@@ -31,7 +31,6 @@ Default model for all agents is **sonnet**. Opus is never used.
 | `lead-engineer` | ≤3 simple tasks AND no checkpoints |
 | `db-engineer` | ≤2 DB tasks, all single-file |
 | `ui-engineer` | ≤2 UI tasks, all single-file |
-| `worker-engineer` | Always haiku (fixed) |
 | `verifier` | Always haiku |
 | `code-quality-reviewer` | Always haiku |
 | `reviewer` | ≤5 REQs AND <5 files |

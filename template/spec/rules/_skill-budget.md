@@ -15,7 +15,6 @@ Each skill directory can be 5-50KB. Reading all available skills wastes context 
 | `task-executor` | **3** | 1. Task-specific (from UPSTREAM hints) → 2. Domain match → 3. General (clean-code, error-handling) |
 | `db-engineer` | **2** | 1. ORM-specific docs (external fetch) → 2. error-handling-patterns |
 | `ui-engineer` | **3** | 1. Component library (shadcn, ui-reference) → 2. Design (frontend-design, web-design-guidelines) → 3. Composition patterns |
-| `worker-engineer` | **0** | Worker tasks are simple enough to not need skills |
 | `code-quality-reviewer` | **3** | 1. readability → 2. cohesion → 3. coupling + predictability (count as 1 pair) |
 | `verifier` | **0** | Verification uses spec.md criteria, not skills |
 | `lead-engineer` | **1** | Only architectures/ if needed for coordination |
@@ -44,6 +43,6 @@ Priority 3: General quality skills (clean-code, readability)
 ### Exceptions
 
 - **First task of a feature**: May read +1 additional skill to understand overall patterns
-- **Review agents** (task-spec-reviewer, reviewer): Budget does not apply — reviewers need comprehensive coverage
+- **Review agents** (reviewer, code-quality-reviewer): Budget does not apply — reviewers need comprehensive coverage
 - **`/loop` iterations**: Budget applies normally per iteration
 - **External doc fetch** (e.g., Drizzle llms.txt, Prisma llms.txt): Does NOT count toward skill budget — these are reference lookups, not skill reads

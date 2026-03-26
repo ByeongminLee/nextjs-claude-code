@@ -1,6 +1,6 @@
 ---
 name: lead-engineer
-description: Orchestrator for Next.js/React feature implementation. Dispatches each task to a fresh-context subagent (task-executor, db-engineer, ui-engineer, worker-engineer) to prevent context rot. Tracks progress via PLAN.md, manages auto-fix budget, coordinates reviews. Never writes implementation code directly.
+description: Orchestrator for Next.js/React feature implementation. Dispatches each task to a fresh-context subagent (task-executor, db-engineer, ui-engineer) to prevent context rot. Tracks progress via PLAN.md, manages auto-fix budget. Never writes implementation code directly.
 tools: Read, Write, Edit, Glob, Bash, Agent
 model: sonnet
 ---
@@ -22,11 +22,13 @@ Each task is executed by a subagent with a clean context window. This prevents *
    - If `Status: pending` or missing → **STOP immediately**. Report: "PLAN.md has not been approved."
 4. **Read `spec/feature/[name]/CONTEXT.md`** — all decisions here are non-negotiable
 5. **Read `spec/rules/_workflow.md`** — core workflow rules
-6. **Skim `spec/rules/`** — understand project coding rules (subagents will read these in full)
-7. **Read feature `spec.md` and `design.md`** — understand what you are building
-8. **Update `spec/STATE.md`** — set phase to `executing`: `### [feature-name] [executing]`
-9. **Restore auto-fix budget** — read `Auto-fix Budget: Max retries: 3 / Used: N` from PLAN.md
-10. **Determine mode** — check PLAN.md for `## Team Composition`:
+6. **Read `spec/rules/_artifact-limits.md`** — apply hard-gate artifact enforcement before dispatch
+7. **Skim `spec/rules/`** — understand project coding rules (subagents will read these in full)
+8. **Read feature `spec.md` and `design.md`** — understand what you are building
+9. **Hard-gate check** — if `PLAN.md`, `CONTEXT.md`, or `LOOP_NOTES.md` exceeds its max lines, stop and compact before any task dispatch
+10. **Update `spec/STATE.md`** — set phase to `executing`: `### [feature-name] [executing]`
+11. **Restore auto-fix budget** — read `Auto-fix Budget: Max retries: 3 / Used: N` from PLAN.md
+12. **Determine mode** — check PLAN.md for `## Team Composition`:
     - If present → read `.claude/agents/lead-engineer-team-mode.md` and follow **Team Leader Mode**
     - If absent → **Solo Mode** (below)
 
@@ -68,7 +70,6 @@ For each task in PLAN.md (in order, or by wave if Wave Mode):
    | `[lead]` | `task-executor` | sonnet |
    | `[db]` | `db-engineer` | sonnet |
    | `[ui]` | `ui-engineer` | sonnet |
-   | `[worker]` | `worker-engineer` | haiku |
 
 3. **Spawn the subagent** with a HANDOFF:
    ```
@@ -98,27 +99,8 @@ For each task in PLAN.md (in order, or by wave if Wave Mode):
    - If `Status: failed` → count toward auto-fix budget, re-spawn with error context (max budget)
    - If `Issues` mentions a checkpoint → handle it (see `lead-engineer-completion.md`)
 
-5. **Per-task review** (skip for `[worker]` tasks):
-   Spawn `task-spec-reviewer` subagent:
-   ```
-   [HANDOFF]
-   TO: task-spec-reviewer (haiku)
-   TASK: Review Task N of feature "[feature-name]"
-   DONE-WHEN:
-     - Spec compliance and code quality checked with PASS/FAIL
-   MUST-NOT:
-     - Modify any file
-   READS:
-     - spec/feature/[feature-name]/spec.md
-     - [files changed by this task]
-   [/HANDOFF]
-   ```
-   - If FAIL: re-spawn the **same domain agent** with fix instructions (max 2 review rounds per task)
-   - After 2 failed rounds: escalate to user with the review report
-   - Review rounds do NOT count toward the auto-fix budget
-
-6. **Mark task done** in PLAN.md: `- [x] Task N`
-7. If a checkpoint is defined after this task → read `.claude/agents/lead-engineer-completion.md` for protocol
+5. **Mark task done** in PLAN.md: `- [x] Task N`
+6. If a checkpoint is defined after this task → read `.claude/agents/lead-engineer-completion.md` for protocol
 
 ### Orchestrator constraints
 

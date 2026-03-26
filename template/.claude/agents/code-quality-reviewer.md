@@ -23,7 +23,7 @@ You do NOT modify code. You only read and report.
    - Read each relevant file
 
 4. **Read project rules**
-   - Read `spec/rules/code-style.md`, `spec/rules/testing.md`, `spec/rules/performance.md`
+   - Read `spec/rules/conventions.md`, `spec/rules/testing.md`
 
 5. **Read quality metric skills** (when relevant to findings)
    - `.claude/skills/cohesion/` — when evaluating file/module organization

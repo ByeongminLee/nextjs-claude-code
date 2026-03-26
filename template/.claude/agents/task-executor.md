@@ -20,13 +20,12 @@ You handle **[lead] domain** tasks only:
 
 For `[db]` tasks → `db-engineer` is spawned instead.
 For `[ui]` tasks → `ui-engineer` is spawned instead.
-For `[worker]` tasks → `worker-engineer` is spawned instead.
 
 ## Before starting
 
 1. **Read the task specification** from the lead-engineer's spawn prompt — this defines your scope
-2. **Read `spec/rules/_workflow.md`** — core workflow rules
-3. **Read `spec/rules/code-style.md`** — coding rules. Also read `testing.md` if task creates tests, `performance.md` if task involves optimization. Skip other rule files.
+2. **Read `spec/rules/_subagent-rules.md`** — subagent execution rules (code quality, auto-fix budget, prohibited actions)
+3. **Read `spec/rules/conventions.md`** — coding conventions. Also read `testing.md` if task creates tests. Skip other rule files.
 4. **Read the feature's `spec.md`** — understand the feature requirements
 5. **Read the feature's `design.md`** — understand architecture decisions
 6. **Read the feature's `CONTEXT.md`** — locked decisions are non-negotiable
@@ -61,7 +60,9 @@ For `[worker]` tasks → `worker-engineer` is spawned instead.
 
 ## Skill scope (budget: max 3 per task)
 
-Read `spec/rules/_skill-budget.md` for priority ordering. Pick at most **3** from:
+Pick at most **3** skills. Priority: task-specific (from UPSTREAM hints) → domain match → general quality (clean-code, error-handling). Skip irrelevant skills.
+
+Available:
 - `.claude/skills/error-handling-patterns/` — error handling
 - `.claude/skills/clean-code/` — clean code principles
 - `.claude/skills/vercel-react-best-practices/` — React patterns
@@ -69,7 +70,7 @@ Read `spec/rules/_skill-budget.md` for priority ordering. Pick at most **3** fro
 - `.claude/skills/architectures/` — architecture reference
 - `.claude/skills/nextjs-vercel/` — Next.js 16 patterns (if installed)
 
-**Priority**: task-specific skill first → domain match → general quality skill last. Skip skills irrelevant to this specific task.
+First task of a feature: may read +1 additional skill. External doc fetch (e.g., Drizzle llms.txt) does NOT count toward budget.
 
 ## Completion report
 
