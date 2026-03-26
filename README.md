@@ -28,12 +28,22 @@ The core workflow. Define what to build, then build it — with every change tra
 
 ### Don't have a plan yet? → `/create`
 
-Turn a raw idea into a validated product concept. Six forcing questions sharpen your thinking into a real product — then a virtual C-suite (CEO, CTO, CPO, CMO, CDO) **debates your idea as a team**, catching blind spots before you write a single spec. [Details →](docs/en/create-workflow.md)
+Turn a raw idea into a validated product concept. Seven forcing questions sharpen your thinking into a real product — then a virtual C-suite (CEO, CTO, CPO, CMO, CDO) **debates your idea as a team**, catching blind spots before you write a single spec. [Details →](docs/en/create-workflow.md)
 
 ```bash
 /create "AI recipe app that suggests meals from fridge photos"
-# → 6 forcing questions → 3 approaches → C-suite team debate
+# → 7 forcing questions → 3 approaches → C-suite team debate
 # → VISION.md + C-REVIEW.md + DECISION.md → convert to /spec
+```
+
+### Have a legacy project? → `/reforge`
+
+Transform an existing codebase into spec-driven development. Analyzes legacy code, accepts change specifications, generates feature specs — blending existing logic with requested modifications.
+
+```bash
+/reforge ./_legacy/old-project "Switch to App Router, add Tailwind"
+# → analysis → change spec → delta → spec generation → validation
+# → spec.md + design.md per feature → /dev [feature]
 ```
 
 ### Ops — Review, Test, Ship
@@ -80,8 +90,9 @@ Features are never completed in a single iteration. You ship a basic checkout, a
 - **TDD by default**: MSW API mocking, tests first
 - **Curated skills** from [skills.sh](https://skills.sh) — core bundled, on-demand per library
 - **Architecture guides** — Flat, Feature-Based, FSD, Monorepo (auto-detected)
-- **C-level ideation** — CEO/CTO/CPO/CMO review pipeline via `/create`
-- **Next.js + React native** — App Router, Server Components, Pages Router, Vite
+- **C-level ideation** — CEO/CTO/CPO/CMO/CDO review pipeline via `/create`
+- **Legacy reforge** — `/reforge` transforms existing projects into spec-driven development
+- **Next.js + React** — App Router, Server Components, Pages Router, Vite
 - **Wave execution** — dependency-grouped parallel dispatch
 - **Multi-agent team** — db/ui/worker engineers in `--team` mode
 - **Hook profiles** — `minimal` / `standard` / `strict` intensity control
@@ -95,8 +106,12 @@ Features are never completed in a single iteration. You ship a basic checkout, a
 User                    Claude Agents              Files
 ────                    ─────────────              ─────
 /create "idea"     ──→  create-orchestrator ──→    spec/create/[name]/VISION.md
-                         c-level-reviewer          spec/create/[name]/C-REVIEW.md
+                         c-ceo/cto/cpo/cmo/cdo     spec/create/[name]/C-REVIEW.md
                                                    spec/create/[name]/DECISION.md
+
+/reforge [path]    ──→  reforge-orchestrator──→    spec/reforge/[name]/ANALYSIS.md
+  "changes"              codebase-analyzer          spec/reforge/[name]/DELTA.md
+                         reforge-spec-gen    ──→    spec/feature/[name]/spec.md + design.md
 
 /spec [name] "..." ──→  spec-writer        ──→    spec/feature/[name]/spec.md
                                                    spec/feature/[name]/design.md
@@ -121,7 +136,7 @@ User                    Claude Agents              Files
 | Verification | 4 levels: files exist → no stubs → wired correctly → actually works |
 | Resume protocol | `/dev` resumes from where it left off (phase-aware) |
 | Hook profiles | `minimal` (security only) → `standard` → `strict` (all guards) |
-| Token isolation | `/create` docs in `spec/create/` — never loaded by `/spec` or `/dev` |
+| Token isolation | `/create` docs in `spec/create/`, `/reforge` docs in `spec/reforge/` — never loaded by `/spec` or `/dev` |
 
 ---
 

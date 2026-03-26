@@ -25,7 +25,14 @@
 | `c-cmo` | 시장 포지셔닝, 메시징, 성장 잠재력 | marketing-psychology, copywriting | No |
 | `c-cdo` | 디자인, 정보 아키텍처, AI slop 감지 | frontend-design, brainstorming | No |
 | `brainstormer` | 소크라테스식 디자인 탐색, 2-3가지 접근법 | — | No |
-| `product-reviewer` | 제품 게이트 리뷰 (5개 차원) | — | Yes (PRODUCT_REVIEW.md) |
+
+## Reforge Agents (/reforge)
+
+| Agent | 역할 | 코드 수정 | 문서 수정 |
+|-------|------|:---:|:---:|
+| `reforge-orchestrator` | 5단계 레거시→스펙 파이프라인 오케스트레이션 | No | Yes (spec/reforge/, spec/feature/) |
+| `codebase-analyzer` | 레거시 코드베이스 심층 분석 (읽기 전용) | No | Yes (spec/reforge/[name]/) |
+| `reforge-spec-generator` | 분석 기반 spec.md + design.md 생성 | No | Yes (spec/feature/) |
 
 ## Fresh-Context 서브에이전트 (/dev)
 

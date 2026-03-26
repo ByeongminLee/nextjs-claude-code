@@ -22,11 +22,11 @@
 ```
 Phase 1: Context       Read project state (if existing project)
     ↓
-Phase 2: Questions      6 forcing questions (one at a time, your language)
+Phase 2: Questions      Up to 7 forcing questions (one at a time, your language)
     ↓
 Phase 3: Approaches     2-3 alternatives with trade-offs → you choose
     ↓
-Phase 4: C-Level Review CEO → CTO → CPO → CMO sequential review
+Phase 4: C-Level Review CEO/CTO/CPO/CMO/CDO parallel review
     ↓
 Phase 5: Decision       VISION + REVIEW + DECISION docs → optional spec conversion
 ```
@@ -39,14 +39,15 @@ Phase 5: Decision       VISION + REVIEW + DECISION docs → optional spec conver
 
 ### Phase 2: Forcing Questions
 
-Six questions that expose demand reality and constraints. Asked **one at a time** in your language:
+Up to seven questions that expose demand reality and constraints. Asked **one at a time** in your language:
 
 1. **Demand reality** — Who has this problem? How do they solve it now?
 2. **Premise challenge** — What happens if we do nothing?
 3. **Target user** — Who specifically? What's their workflow?
 4. **Success criteria** — What metric moves if this works?
 5. **Constraints** — What can't change?
-6. **10-star experience** — What does perfection look like?
+6. **Design direction** — What is the core UI form? Any design reference or Figma?
+7. **10-star experience** — What does perfection look like?
 
 Skip any question you've already answered. Say "just do it" to fast-track.
 

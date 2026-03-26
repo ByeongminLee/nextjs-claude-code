@@ -25,7 +25,14 @@
 | `c-cmo` | Market positioning, messaging, growth potential | marketing-psychology, copywriting | No |
 | `c-cdo` | Design, information architecture, AI slop detection | frontend-design, brainstorming | No |
 | `brainstormer` | Socratic design exploration, 2-3 approaches | — | No |
-| `product-reviewer` | Product gate review (5 dimensions) | — | Yes (PRODUCT_REVIEW.md) |
+
+## Reforge Agents (/reforge)
+
+| Agent | Role | Modifies code | Modifies spec |
+|-------|------|:---:|:---:|
+| `reforge-orchestrator` | 5-phase legacy-to-spec pipeline orchestration | No | Yes (spec/reforge/, spec/feature/) |
+| `codebase-analyzer` | Deep legacy codebase analysis (read-only) | No | Yes (spec/reforge/[name]/) |
+| `reforge-spec-generator` | Generate spec.md + design.md from analysis | No | Yes (spec/feature/) |
 
 ## Fresh-Context Subagents (/dev)
 

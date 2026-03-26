@@ -70,6 +70,14 @@ export const en = {
     title: 'Commands',
     sections: [
       {
+        subtitle: 'Ideation & Design',
+        commands: [
+          { cmd: '/create "..."', desc: 'Ideation-to-validation pipeline with C-suite review' },
+          { cmd: '/brainstorm "..."', desc: 'Quick design exploration with trade-offs' },
+          { cmd: '/reforge "[path]" "..."', desc: 'Transform legacy project into spec-driven development' },
+        ],
+      },
+      {
         subtitle: 'Review & Quality',
         commands: [
           { cmd: '/review [name]', desc: 'Spec compliance + code quality review' },
@@ -143,6 +151,14 @@ export const en = {
         { name: 'db-engineer', role: 'Schema, migrations, ORM, queries' },
         { name: 'ui-engineer', role: 'Components, styling, animations' },
         { name: 'worker-engineer', role: 'Simple utils, types, config' },
+      ],
+    },
+    reforge: {
+      subtitle: 'Reforge Agents (/reforge)',
+      items: [
+        { name: 'reforge-orchestrator', role: '5-phase legacy-to-spec pipeline' },
+        { name: 'codebase-analyzer', role: 'Deep legacy codebase analysis' },
+        { name: 'reforge-spec-generator', role: 'Generate specs from legacy analysis' },
       ],
     },
   },

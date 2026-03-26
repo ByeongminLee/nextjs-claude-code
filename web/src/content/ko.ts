@@ -35,7 +35,7 @@ export const ko = {
     title: '설치',
     human: '직접 설치',
     humanLink: 'https://github.com/ByeongminLee/nextjs-claude-code/blob/main/docs/installation.ko.md',
-    claude: 'For Claude Code — 가이드를 가져와서 따라 실행:',
+    claude: 'Claude Code용 — 가이드를 가져와서 따라 실행:',
     command: 'curl -s https://raw.githubusercontent.com/ByeongminLee/nextjs-claude-code/main/docs/installation.ko.md',
   },
 
@@ -69,6 +69,14 @@ export const ko = {
   ops: {
     title: '명령어',
     sections: [
+      {
+        subtitle: '아이디에이션 & 디자인',
+        commands: [
+          { cmd: '/create "..."', desc: '아이디에이션→검증 파이프라인 (C-suite 리뷰)' },
+          { cmd: '/brainstorm "..."', desc: '빠른 디자인 탐색 + 트레이드오프' },
+          { cmd: '/reforge "[경로]" "..."', desc: '레거시 프로젝트를 spec-driven 개발로 전환' },
+        ],
+      },
       {
         subtitle: '리뷰 & 품질',
         commands: [
@@ -143,6 +151,14 @@ export const ko = {
         { name: 'db-engineer', role: '스키마, 마이그레이션, ORM, 쿼리' },
         { name: 'ui-engineer', role: '컴포넌트, 스타일링, 애니메이션' },
         { name: 'worker-engineer', role: '단순 유틸, 타입 정의, 설정' },
+      ],
+    },
+    reforge: {
+      subtitle: 'Reforge Agents (/reforge)',
+      items: [
+        { name: 'reforge-orchestrator', role: '5단계 레거시→스펙 파이프라인' },
+        { name: 'codebase-analyzer', role: '레거시 코드베이스 심층 분석' },
+        { name: 'reforge-spec-generator', role: '분석 기반 스펙 생성' },
       ],
     },
   },

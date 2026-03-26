@@ -28,12 +28,22 @@
 
 ### 아이디어가 없다면? → `/create`
 
-원시 아이디어를 검증된 제품 컨셉으로. 6개의 핵심 질문이 사고를 날카롭게 만듭니다 — 그리고 가상의 C-suite(CEO, CTO, CPO, CMO, CDO)가 **팀으로 토론**하며 spec을 쓰기 전에 맹점을 잡아냅니다. [상세 →](create-workflow.md)
+원시 아이디어를 검증된 제품 컨셉으로. 7개의 핵심 질문이 사고를 날카롭게 만듭니다 — 그리고 가상의 C-suite(CEO, CTO, CPO, CMO, CDO)가 **팀으로 토론**하며 spec을 쓰기 전에 맹점을 잡아냅니다. [상세 →](create-workflow.md)
 
 ```bash
 /create "냉장고 사진으로 레시피를 추천하는 AI 앱"
-# → 6개 핵심 질문 → 3가지 접근법 → C-suite 팀 토론
+# → 7개 핵심 질문 → 3가지 접근법 → C-suite 팀 토론
 # → VISION.md + C-REVIEW.md + DECISION.md → /spec으로 변환
+```
+
+### 레거시 프로젝트가 있다면? → `/reforge`
+
+기존 코드베이스를 spec-driven 개발로 전환합니다. 레거시 코드를 분석하고, 변경 명세를 받아, 기존 로직과 요청된 수정을 결합한 feature spec을 생성합니다.
+
+```bash
+/reforge ./_legacy/old-project "App Router로 전환, Tailwind 추가"
+# → 분석 → 변경 명세 → 델타 → 스펙 생성 → 검증
+# → feature별 spec.md + design.md → /dev [feature]
 ```
 
 ### 운영 — 리뷰, 테스트, 배포
@@ -80,8 +90,9 @@ npx nextjs-claude-code@latest     # SDD 워크플로우 설치
 - **TDD 기본**: MSW API 목킹, 테스트 우선
 - **큐레이션 스킬** — [skills.sh](https://skills.sh)에서 core 번들 + 라이브러리별 on-demand
 - **아키텍처 가이드** — Flat, Feature-Based, FSD, Monorepo (자동 감지)
-- **C-레벨 아이디에이션** — `/create`로 CEO/CTO/CPO/CMO 리뷰 파이프라인
-- **Next.js + React 네이티브** — App Router, Server Components, Pages Router, Vite
+- **C-레벨 아이디에이션** — `/create`로 CEO/CTO/CPO/CMO/CDO 리뷰 파이프라인
+- **레거시 Reforge** — `/reforge`로 기존 프로젝트를 spec-driven 개발로 전환
+- **Next.js + React** — App Router, Server Components, Pages Router, Vite
 - **Wave 실행** — 의존성 기반 병렬 디스패치
 - **멀티 에이전트 팀** — `--team` 모드로 db/ui/worker 엔지니어
 - **Hook profiles** — `minimal` / `standard` / `strict` 강도 조절
@@ -95,8 +106,12 @@ npx nextjs-claude-code@latest     # SDD 워크플로우 설치
 사용자                    Claude Agents              파일
 ────                      ─────────────              ─────
 /create "아이디어"   ──→  create-orchestrator ──→    spec/create/[이름]/VISION.md
-                         c-level-reviewer          spec/create/[이름]/C-REVIEW.md
+                         c-ceo/cto/cpo/cmo/cdo     spec/create/[이름]/C-REVIEW.md
                                                    spec/create/[이름]/DECISION.md
+
+/reforge [경로]     ──→  reforge-orchestrator──→    spec/reforge/[이름]/ANALYSIS.md
+  "변경사항"              codebase-analyzer          spec/reforge/[이름]/DELTA.md
+                         reforge-spec-gen    ──→    spec/feature/[이름]/spec.md + design.md
 
 /spec [이름] "..."  ──→  spec-writer        ──→    spec/feature/[이름]/spec.md
                                                    spec/feature/[이름]/design.md
@@ -121,7 +136,7 @@ npx nextjs-claude-code@latest     # SDD 워크플로우 설치
 | 검증 | 4단계: 파일 존재 → stub 없음 → 연결 확인 → 실제 동작 |
 | Resume protocol | `/dev` 재실행 시 중단점부터 재개 (phase 인식) |
 | Hook profiles | `minimal` (보안만) → `standard` → `strict` (전체 가드) |
-| 토큰 격리 | `/create` 문서는 `spec/create/`에 저장 — `/spec`이나 `/dev`에서 로드 안 됨 |
+| 토큰 격리 | `/create` 문서는 `spec/create/`, `/reforge` 문서는 `spec/reforge/`에 저장 — `/spec`이나 `/dev`에서 로드 안 됨 |
 
 ---
 
