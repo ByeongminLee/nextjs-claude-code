@@ -63,7 +63,7 @@ Each includes: effort, risk, pros, cons, and "fits when" condition.
 
 ### Phase 4: C-Suite Team Review
 
-Five specialists evaluate your concept **in parallel**, then debate disagreements:
+Adaptive review to reduce token cost while preserving decision quality:
 
 | Role | Focus | Skills |
 |------|-------|--------|
@@ -73,7 +73,8 @@ Five specialists evaluate your concept **in parallel**, then debate disagreement
 | **CMO** | Positioning, competition, messaging, growth | marketing-psychology, copywriting |
 | **CDO** | Design, information architecture, accessibility | frontend-design, brainstorming |
 
-**Round 1**: All 5 review independently (parallel). Each returns **APPROVE**, **CONCERN**, or **BLOCK**.
+**Round 1 (core panel)**: CEO, CTO, CPO review in parallel. Each returns **APPROVE**, **CONCERN**, or **BLOCK**.
+**Round 1.5 (specialists, conditional)**: CMO and CDO are called only when go-to-market or design quality is a primary uncertainty.
 **Round 2** (conditional): If any BLOCK or contradicting opinions → relevant agents debate with opposing views shared.
 
 ### Phase 5: Decision & Spec Conversion

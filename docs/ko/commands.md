@@ -25,9 +25,9 @@
 
 | 명령어 | 설명 |
 |--------|------|
-| `/review [이름]` | 스펙 준수 + 코드 품질 리뷰. 전략 파일 존재 시 tester, log-auditor, security-reviewer 조건부 실행. |
-| `/qa` | Playwright E2E 테스트, 시각 회귀, 접근성 감사. `--visual` 스크린샷. `--a11y` axe-core. |
-| `/test [이름]` | TEST_STRATEGY.md 기반 테스트. `--browser` 시각 테스트. `--setup` 설정. |
+| `/review [이름]` | 감사 명령. 스펙 준수 + 코드 품질 검사. 전략 파일 존재 시 유닛/통합 테스트, 로깅, 보안 감사 조건부 실행. |
+| `/qa` | AI 브라우저 QA. spec REQ를 읽고 Playwright MCP로 실제 브라우저 테스트. `--quick` 스모크 테스트. `--visual` 스크린샷. `--a11y` axe-core. |
+| `/test [이름]` | 유닛/통합 테스트. TEST_STRATEGY.md 기반. `--setup` 설정. 브라우저 테스트는 `/qa` 사용. |
 | `/log [이름]` | 로깅 관행 감사. `--audit` 프로젝트 전체. `--setup` 설정. |
 | `/security [이름]` | 보안 감사 (OWASP Top 10). `--audit` 전체. `--diff` 변경분만. `--setup` 설정. |
 

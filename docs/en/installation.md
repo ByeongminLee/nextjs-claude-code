@@ -41,12 +41,13 @@ Skills are namespaced as `/nextjs-claude-code:spec`, `/nextjs-claude-code:dev`, 
 ```
 .claude/
   agents/          Specialized agents (init, spec-writer, planner, lead-engineer,
-                   db-engineer, ui-engineer, worker-engineer, verifier,
-                   reviewer, code-quality-reviewer, loop, status, debugger,
-                   rule-writer)
+                   db-engineer, ui-engineer, verifier, reviewer,
+                   code-quality-reviewer, loop, status, debugger, rule-writer)
   skills/          Reference skills from skills.sh + skills-manifest.json
   scripts/         validate-post-write.sh, advisory-post-write.sh, security-guard.sh (hooks)
   settings.json    Hook configuration (merged, preserves existing hooks)
+
+.mcp.json            Playwright MCP server config (merged, preserves existing servers)
 
 spec/
   PROJECT.md       Project context (framework, arch, libraries, testing setup)

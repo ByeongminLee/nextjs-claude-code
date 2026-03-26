@@ -12,7 +12,7 @@
 | `spec-writer` | Write spec.md + design.md (+ TEST.md if TDD) | No | Yes |
 | `planner` | Create CONTEXT.md + PLAN.md, domain analysis + task tagging | No | Yes |
 | `lead-engineer` | Orchestrate implementation via fresh-context subagents. Wave-based parallel dispatch. | No (orchestrator) | Partial |
-| `verifier` | 4-level verification | No | No |
+| `verifier` | 5-level verification (incl. browser check) | No | No |
 
 ## Ideation Agents (/create)
 
@@ -39,7 +39,7 @@
 | Agent | Role | Model | Modifies code |
 |-------|------|:---:|:---:|
 | `task-executor` | Implements [lead] tasks (types, utils, hooks, API) | sonnet | Yes |
-| `task-spec-reviewer` | Per-task spec compliance + code quality review | haiku | No |
+| `browser-tester` | AI-driven browser testing via Playwright MCP (spec-driven, visual, a11y) | sonnet | No |
 | `performance-optimizer` | Core Web Vitals diagnostics | sonnet | No |
 
 ## Team Engineers (/dev --team)
@@ -48,7 +48,6 @@
 |-------|------|:---:|:---:|
 | `db-engineer` | Schema, migrations, ORM, queries, RLS | sonnet | Yes (DB only) |
 | `ui-engineer` | Components, styling, animations, responsive | sonnet | Yes (UI only) |
-| `worker-engineer` | Simple utils, types, config (max 200 lines) | haiku | Yes (assigned file) |
 
 > **Note:** Team mode requires `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` in `.claude/settings.json`.
 

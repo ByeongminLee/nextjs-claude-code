@@ -22,7 +22,7 @@
 ```bash
 /spec auth "이메일 + OAuth 로그인"   # spec-writer → spec.md + design.md
 /dev auth                           # planner → lead-engineer → verifier → 완료
-/dev auth --team                    # 병렬 팀 (db/ui/worker 엔지니어)
+/dev auth --team                    # 병렬 팀 (db/ui 엔지니어)
 /loop auth                          # 리뷰 → 수정 → 재검증 → 모든 REQ 통과까지
 ```
 
@@ -133,7 +133,7 @@ npx nextjs-claude-code@latest     # SDD 워크플로우 설치
 |------|------|
 | Checkpoints | `decision` (방향 선택), `human-verify` (UI 확인), `auth-gate` (결제/인증) |
 | Auto-fix budget | 모드별 3회 재시도 후 에스컬레이션 |
-| 검증 | 4단계: 파일 존재 → stub 없음 → 연결 확인 → 실제 동작 |
+| 검증 | 5단계: 파일 존재 → stub 없음 → 테스트/목 존재 → 연결 확인 → 브라우저 테스트 → 사용자 확인 |
 | Resume protocol | `/dev` 재실행 시 중단점부터 재개 (phase 인식) |
 | Hook profiles | `minimal` (보안만) → `standard` → `strict` (전체 가드) |
 | 토큰 격리 | `/create` 문서는 `spec/create/`, `/reforge` 문서는 `spec/reforge/`에 저장 — `/spec`이나 `/dev`에서 로드 안 됨 |

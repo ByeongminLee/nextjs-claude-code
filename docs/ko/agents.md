@@ -12,7 +12,7 @@
 | `spec-writer` | spec.md + design.md 작성 (TDD 시 TEST.md 포함) | No | Yes |
 | `planner` | CONTEXT.md + PLAN.md 생성, 도메인 분석 + 태스크 태깅 | No | Yes |
 | `lead-engineer` | fresh-context 서브에이전트로 구현 오케스트레이션. Wave 병렬 디스패치. | No (오케스트레이터) | 부분 |
-| `verifier` | 4단계 검증 | No | No |
+| `verifier` | 5단계 검증 (브라우저 체크 포함) | No | No |
 
 ## 아이디에이션 Agents (/create)
 
@@ -39,7 +39,7 @@
 | Agent | 역할 | 모델 | 코드 수정 |
 |-------|------|:---:|:---:|
 | `task-executor` | [lead] 태스크 구현 (타입, 유틸, 훅, API) | sonnet | Yes |
-| `task-spec-reviewer` | 태스크별 스펙 준수 + 코드 품질 리뷰 | haiku | No |
+| `browser-tester` | Playwright MCP 기반 AI 브라우저 테스트 (spec-driven, visual, a11y) | sonnet | No |
 | `performance-optimizer` | Core Web Vitals 진단 | sonnet | No |
 
 ## Team Engineers (/dev --team)
@@ -48,7 +48,6 @@
 |-------|------|:---:|:---:|
 | `db-engineer` | 스키마, 마이그레이션, ORM, 쿼리, RLS | sonnet | Yes (DB만) |
 | `ui-engineer` | 컴포넌트, 스타일링, 애니메이션, 반응형 | sonnet | Yes (UI만) |
-| `worker-engineer` | 단순 유틸, 타입, 설정 (최대 200줄) | haiku | Yes (할당 파일) |
 
 > **참고:** 팀 모드는 `.claude/settings.json`에 `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` 필요.
 

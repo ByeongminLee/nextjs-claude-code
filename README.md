@@ -22,7 +22,7 @@ The core workflow. Define what to build, then build it — with every change tra
 ```bash
 /spec auth "user login with email and OAuth"   # spec-writer → spec.md + design.md
 /dev auth                                       # planner → lead-engineer → verifier → done
-/dev auth --team                                # parallel team (db/ui/worker engineers)
+/dev auth --team                                # parallel team (db/ui engineers)
 /loop auth                                      # review → fix → re-verify until all REQs pass
 ```
 
@@ -133,7 +133,7 @@ User                    Claude Agents              Files
 |---------|-------------|
 | Checkpoints | `decision` (direction choice), `human-verify` (UI check), `auth-gate` (payment/auth) |
 | Auto-fix budget | 3 retries per mode, then escalation |
-| Verification | 4 levels: files exist → no stubs → wired correctly → actually works |
+| Verification | 5 levels: files exist → no stubs → tests/mocks exist → wired correctly → browser test → human verify |
 | Resume protocol | `/dev` resumes from where it left off (phase-aware) |
 | Hook profiles | `minimal` (security only) → `standard` → `strict` (all guards) |
 | Token isolation | `/create` docs in `spec/create/`, `/reforge` docs in `spec/reforge/` — never loaded by `/spec` or `/dev` |

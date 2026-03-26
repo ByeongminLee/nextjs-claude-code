@@ -25,9 +25,9 @@
 
 | Command | Description |
 |---------|-------------|
-| `/review [name]` | Spec compliance + code quality review. Conditionally runs tester, log-auditor, security-reviewer if strategy files exist. |
-| `/qa` | Playwright E2E tests, visual regression, accessibility audits. `--visual` for screenshots. `--a11y` for axe-core. |
-| `/test [name]` | Run tests per TEST_STRATEGY.md. `--browser` for visual tests. `--setup` to configure. |
+| `/review [name]` | Audit command. Always checks spec compliance + code quality. Optionally runs unit/integration test audit, logging audit, and security audit when strategy files exist. |
+| `/qa` | AI-driven browser QA. Default reads spec REQs and tests in real browser via Playwright MCP. `--quick` for smoke test. `--visual` for screenshots. `--a11y` for axe-core. |
+| `/test [name]` | Developer test command. Runs unit/integration tests per TEST_STRATEGY.md. `--setup` to configure strategy. Use `/qa` for browser or visual testing. |
 | `/log [name]` | Audit logging practices. `--audit` for project-wide. `--setup` to configure. |
 | `/security [name]` | Security audit (OWASP Top 10). `--audit` project-wide. `--diff` changed files. `--setup` to configure. |
 

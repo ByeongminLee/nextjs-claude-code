@@ -63,7 +63,7 @@ export const en = {
     description: 'The core SDD loop — define what to build, then build it.',
     commands: `/spec [name] "describe the feature"   →  spec-writer clarifies → writes spec.md + design.md
 /dev  [name]                           →  planner → lead-engineer → verifier → done
-/dev  [name] --team                    →  planner → lead-engineer (+ db/ui/worker team) → verifier → done`,
+/dev  [name] --team                    →  planner → lead-engineer (+ db/ui team) → verifier → done`,
   },
 
   ops: {
@@ -135,14 +135,14 @@ export const en = {
         { name: 'spec-writer', role: 'Write spec.md + design.md' },
         { name: 'planner', role: 'Create CONTEXT.md + PLAN.md, domain analysis + task tagging' },
         { name: 'lead-engineer', role: 'Orchestrate implementation via fresh-context subagents. Wave-based parallel dispatch.' },
-        { name: 'verifier', role: '4-level verification' },
+        { name: 'verifier', role: '5-level verification (incl. browser check)' },
       ],
     },
     subagents: {
       subtitle: 'Fresh-Context Subagents (/dev)',
       items: [
         { name: 'task-executor', role: 'Implements [lead] tasks (types, utils, hooks, API routes)' },
-        { name: 'task-spec-reviewer', role: 'Per-task spec compliance + code quality review' },
+        { name: 'browser-tester', role: 'AI-driven browser testing via Playwright MCP' },
       ],
     },
     team: {
@@ -150,7 +150,6 @@ export const en = {
       items: [
         { name: 'db-engineer', role: 'Schema, migrations, ORM, queries' },
         { name: 'ui-engineer', role: 'Components, styling, animations' },
-        { name: 'worker-engineer', role: 'Simple utils, types, config' },
       ],
     },
     reforge: {
@@ -168,7 +167,7 @@ export const en = {
     items: [
       { bold: 'Checkpoints', text: 'lead-engineer pauses for user confirmation at decision points, UI milestones, and auth/payment gates' },
       { bold: 'Auto-fix Budget', text: 'Maximum 3 retries per mode — error analysis → alternative approach → minimal change → escalation' },
-      { bold: 'Verification Levels', text: '4 levels from file existence to browser verification' },
+      { bold: 'Verification Levels', text: '5 levels from file existence to browser verification' },
       { bold: 'Resume Protocol', text: 'Interrupted /dev sessions resume from where they left off' },
       { bold: 'Hook Profiles', text: 'minimal (security only), standard (default), strict (+ deprecation guard, comment checker, todo enforcer)' },
       { bold: 'Spec Validation', text: 'PostToolUse hooks block malformed spec writes and remind spec updates' },

@@ -63,7 +63,7 @@ export const ko = {
     description: '핵심 SDD 루프 — 무엇을 만들지 정의하고, 만듭니다.',
     commands: `/spec [이름] "기능 설명"   →  spec-writer가 질문 → spec.md + design.md 작성
 /dev  [이름]               →  planner → lead-engineer → verifier → 완료
-/dev  [이름] --team        →  planner → lead-engineer (+ db/ui/worker 팀) → verifier → 완료`,
+/dev  [이름] --team        →  planner → lead-engineer (+ db/ui 팀) → verifier → 완료`,
   },
 
   ops: {
@@ -135,14 +135,14 @@ export const ko = {
         { name: 'spec-writer', role: 'spec.md + design.md 작성' },
         { name: 'planner', role: 'CONTEXT.md + PLAN.md 생성, 도메인 분석 + 태스크 태깅' },
         { name: 'lead-engineer', role: 'fresh-context subagent로 구현 오케스트레이션. Wave 기반 병렬 디스패치.' },
-        { name: 'verifier', role: '4단계 검증' },
+        { name: 'verifier', role: '5단계 검증 (브라우저 체크 포함)' },
       ],
     },
     subagents: {
       subtitle: 'Fresh-Context Subagents (/dev)',
       items: [
         { name: 'task-executor', role: '[lead] 태스크 구현 (타입, 유틸, 훅, API 라우트)' },
-        { name: 'task-spec-reviewer', role: '태스크별 스펙 준수 + 코드 품질 리뷰' },
+        { name: 'browser-tester', role: 'Playwright MCP 기반 AI 브라우저 테스트' },
       ],
     },
     team: {
@@ -150,7 +150,6 @@ export const ko = {
       items: [
         { name: 'db-engineer', role: '스키마, 마이그레이션, ORM, 쿼리' },
         { name: 'ui-engineer', role: '컴포넌트, 스타일링, 애니메이션' },
-        { name: 'worker-engineer', role: '단순 유틸, 타입 정의, 설정' },
       ],
     },
     reforge: {
@@ -168,7 +167,7 @@ export const ko = {
     items: [
       { bold: 'Checkpoints', text: 'lead-engineer가 의사결정, UI 완료, 인증/결제 시 사용자 확인을 받고 진행' },
       { bold: 'Auto-fix Budget', text: '모드별 최대 3회 재시도 — 에러 분석 → 다른 접근법 → 최소 변경 → 에스컬레이션' },
-      { bold: 'Verification Levels', text: '파일 존재부터 브라우저 검증까지 4단계' },
+      { bold: 'Verification Levels', text: '파일 존재부터 브라우저 검증까지 5단계' },
       { bold: 'Resume Protocol', text: '중단된 /dev 세션을 중단 지점부터 재개' },
       { bold: 'Hook Profiles', text: 'minimal (보안만), standard (기본), strict (+ deprecation guard, comment checker, todo enforcer)' },
       { bold: '스펙 검증', text: 'PostToolUse 훅이 잘못된 스펙 작성을 차단하고 스펙 업데이트를 리마인드' },
