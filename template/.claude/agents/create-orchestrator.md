@@ -88,11 +88,23 @@ After user selects an approach:
 2. **Create directory**: `spec/create/[name]/`
 3. **Write VISION.md** (max 80 lines) with sections: Problem, Demand, Target User, Value Proposition, Chosen Approach, Success Criteria, Constraints.
 
-4. **Round 1 — Parallel team review** (5 agents simultaneously):
+4. **Prepare compact review input** (token optimization):
 
-   Use the Agent tool to spawn all 5 C-level agents **in parallel** (single message, multiple tool calls):
+   Create `spec/create/[name]/REVIEW_INPUT.md` (max 30 lines) from VISION.md with only:
+   - Problem and target user (2-3 lines)
+   - Chosen approach summary (2-3 lines)
+   - Top 3 success criteria
+   - Top 3 constraints
+   - Open risks requiring C-level judgment
 
-   For each of `c-ceo`, `c-cto`, `c-cpo`, `c-cmo`, `c-cdo`:
+5. **Round 1 — Core panel review** (3 agents in parallel):
+
+   Use the Agent tool to spawn the core panel **in parallel**:
+   - `c-ceo`
+   - `c-cto`
+   - `c-cpo`
+
+   For each core panel agent:
    ```
    [HANDOFF]
    TO: [agent-name] (sonnet)
@@ -100,15 +112,21 @@ After user selects an approach:
    LANGUAGE: [detected user language]
    DONE-WHEN: Assessment with verdict returned
    MUST-NOT: Modify files, write code
-   READS: spec/create/[name]/VISION.md, spec/PROJECT.md (if exists)
+   READS: spec/create/[name]/REVIEW_INPUT.md
    [/HANDOFF]
    ```
 
-   Each agent reads its own skills independently (token-optimized — CEO reads nothing, CTO reads architectures, CMO reads marketing-psychology, etc.).
+6. **Collect Round 1 results** — gather the 3 core assessments.
 
-5. **Collect Round 1 results** — gather all 5 assessments.
+7. **Round 1.5 — Specialist reviewers** (conditional, up to 2 agents):
 
-6. **Round 2 — Debate** (conditional, max 1 round):
+   Spawn specialist reviewers only when needed:
+   - `c-cmo` if go-to-market, pricing, or distribution is a primary uncertainty
+   - `c-cdo` if UI quality, IA, or design differentiation is a primary uncertainty
+
+   If neither condition applies, skip both to save tokens.
+
+8. **Round 2 — Debate** (conditional, max 1 round):
 
    Trigger debate ONLY if:
    - Any agent issued a **BLOCK**, OR
@@ -127,7 +145,7 @@ After user selects an approach:
    Max 2-3 agents per debate round. Each debate response is max 5 lines.
    If no BLOCK or contradiction → skip Round 2 entirely.
 
-7. **Write C-REVIEW.md** (max 100 lines) with: CEO/CTO/CPO/CMO/CDO Assessment sections (each with Verdict + evaluation + risks), optional Debate Summary, and Summary (Approvals N/5, Concerns, Blockers).
+9. **Write C-REVIEW.md** (max 100 lines) with: core panel assessments (CEO/CTO/CPO), specialist assessments if executed (CMO/CDO), optional Debate Summary, and Summary (Approvals, Concerns, Blockers).
 
 ## Phase 5: Decision & Spec Conversion
 

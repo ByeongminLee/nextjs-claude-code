@@ -52,6 +52,21 @@ When resuming (phase is not `idle`), MODE is determined by the existing PLAN.md:
 
 The `--team` flag is only needed for fresh starts. Resume auto-detects from PLAN.md.
 
+## Approval gate contract
+
+Planning must not transition to execution without explicit user approval.
+
+Accepted approval replies:
+- `approve`
+- `approved`
+- `yes`
+- `proceed`
+
+Rules:
+- If response is not an accepted approval reply, keep PLAN.md as `Status: pending`.
+- Do not spawn `lead-engineer` while status is pending.
+- If user requests changes, route back to planner and keep phase `planning`.
+
 ### Model selection
 
 The planner writes a `## Model Assignment` section in the feature's PLAN.md with the recommended model for each agent.
@@ -125,7 +140,7 @@ If `## Model Assignment` is missing for lead-engineer, default to sonnet.
     TO: planner (sonnet)
     TASK: Present pending PLAN.md for feature "[feature-name]" to user for approval
     DONE-WHEN:
-      - User approves plan
+      - User explicitly approves plan using one of: approve/approved/yes/proceed
       - PLAN.md Status updated to approved
       - Lead-engineer spawned
     MUST-NOT:
