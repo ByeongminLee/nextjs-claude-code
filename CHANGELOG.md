@@ -4,6 +4,25 @@ All notable changes to NCC (nextjs-claude-code) are documented here.
 
 Format based on [Keep a Changelog](https://keepachangelog.com/).
 
+## [1.2.0] - 2026-03-26
+
+### Added
+- `/reforge` command: legacy-to-spec transformation pipeline (5 phases)
+- Reforge agents: `reforge-orchestrator`, `codebase-analyzer`, `reforge-spec-generator`
+- `> REFORGED` tag support in `/dev` flow (warns before developing auto-generated specs)
+- `/create` design direction question (Phase 2, question 6)
+- Auto-trigger `learning-extractor` after `/dev` completion (fire-and-forget)
+
+### Changed
+- Token optimization: reforge-orchestrator compressed (redundant constraints removed)
+- Remove unused `Edit` tool from reforge-spec-generator
+
+### Fixed
+- `/dev` now recognizes both `> DRAFT` and `> REFORGED` auto-generated spec tags
+- codebase-analyzer permission scope corrected to include overflow directory
+- README: "Six forcing questions" → "Seven", missing CDO in C-level list, non-existent `c-level-reviewer` agent reference, "React native" → "React"
+- web/ko: English text in Korean interface translated
+
 ## [1.1.0] - 2026-03-21
 
 ### Added
