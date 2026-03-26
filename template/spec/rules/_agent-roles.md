@@ -23,6 +23,12 @@
 | `debugger` | **Yes** | Yes (DEBUG.md, STATE.md) | — |
 | `rule-writer` | No | Yes (spec/rules/) | — |
 | `loop` | **Yes** (via lead-engineer) | Partial (STATE.md, PLAN.md, LOOP_NOTES.md, history) | — |
+| `create-orchestrator` | No | Yes (spec/create/) | — |
+| `c-ceo`, `c-cto`, `c-cpo`, `c-cmo`, `c-cdo` | No | No | **Yes** |
+| `brainstormer` | No | No | **Yes** |
+| `reforge-orchestrator` | No | Yes (spec/reforge/, spec/feature/) | — |
+| `codebase-analyzer` | No | Yes (spec/reforge/[name]/) | Legacy folder (read-only) |
+| `reforge-spec-generator` | No | Yes (spec/feature/) | — |
 
 - `/review` runs `reviewer` then `code-quality-reviewer` sequentially
 - Read-only agents never modify any file
@@ -31,6 +37,7 @@
 
 | Domain | Primary Agent | Trigger |
 |--------|--------------|---------|
+| Ideation review | `c-ceo`, `c-cto`, `c-cpo`, `c-cmo`, `c-cdo` | `/create` (Phase 4) |
 | Test execution | `tester` | `/test`, `/review` (if TEST_STRATEGY.md exists) |
 | Test generation | `tester` | post-dev or TDD mode |
 | Security audit | `security-reviewer` | `/security`, `/review` (if SECURITY_STRATEGY.md exists) |
@@ -38,6 +45,8 @@
 | Code quality | `code-quality-reviewer` | `/review` |
 | Spec compliance | `reviewer` | `/review`, `/loop` |
 | Per-task review (spec + quality) | `task-spec-reviewer` | `/dev` (after each task) |
+| Legacy analysis | `codebase-analyzer` | `/reforge` (Phase 1) |
+| Reforge spec generation | `reforge-spec-generator` | `/reforge` (Phase 4) |
 
 ## Team Mode (`/dev --team`)
 

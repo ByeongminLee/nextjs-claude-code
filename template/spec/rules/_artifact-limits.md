@@ -12,6 +12,14 @@
 | PLAN.md | 100 | Collapse completed tasks, keep `[x]` one-liners |
 | CONTEXT.md | 50 | Keep only non-negotiable decisions |
 | LOOP_NOTES.md | 50 | Keep only current iteration context |
+| VISION.md (create) | 80 | Keep concise — Problem, Demand, Approach sections |
+| C-REVIEW.md (create) | 100 | One section per C-level + summary |
+| DECISION.md (create) | 60 | Approach + key decisions only |
+| ANALYSIS.md (reforge) | 150 | Split per-feature to spec/reforge/[name]/analysis/ |
+| CHANGES.md (reforge) | 80 | Keep transformations concise |
+| DELTA.md (reforge) | 120 | Collapse completed features |
+| DECISION.md (reforge) | 60 | Summary only |
+| SOURCE.md (reforge) | 10 | Path + status only |
 
 Rules:
 - These limits are **advisory** — exceeding triggers a warning, never blocks

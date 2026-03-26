@@ -10,7 +10,9 @@ spec/
   rules/_workflow.md, _document-format.md, _model-routing.md, _delegation.md,
         _verification.md, _loop-protocol.md, _agent-roles.md, _skill-budget.md,
         _nextjs-ordering.md, _artifact-limits.md, code-style.md, testing.md
+  create/[name]/ VISION.md, C-REVIEW.md, DECISION.md
   feature/[name]/ spec.md, design.md, PLAN.md, CONTEXT.md, LOOP_NOTES.md, history/
+  reforge/[name]/ SOURCE.md, ANALYSIS.md, CHANGES.md, DELTA.md, DECISION.md
 ```
 
 ## STATE.md
@@ -18,12 +20,14 @@ spec/
 Phases: `idle` | `existing` → `planning` → `executing` → `verifying` → `looping` → completed
 - `idle`: no work started; fresh implementation
 - `existing`: code detected during /init; run /spec before /dev
+- `reforging`: session-level state tracked as a separate entry in STATE.md (not a feature phase). Used by /reforge to track the transformation pipeline. Individual features transition directly to `idle` when specs are generated.
+  Format: `### [reforge-name] [reforging]` with `Started:`, `Source:`, `Phase: N/5`
 - Each feature's phase is independent
 - Keep under 100 lines — archive completed entries
 
 ## Commands
 
-`/init` `/create` `/brainstorm` `/spec` `/dev` `/dev --team` `/review` `/loop` `/debug` `/status` `/rule`
+`/init` `/create` `/brainstorm` `/spec` `/dev` `/dev --team` `/reforge` `/review` `/loop` `/debug` `/status` `/rule`
 
 ## Per-Task Review
 

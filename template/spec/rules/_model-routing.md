@@ -13,6 +13,8 @@ Default model for all agents is **sonnet**. Opus is never used.
 | `/review`, `/spec`, `/debug` | **skill** | Assesses task size before spawning |
 | `/status`, `/rule` | **fixed** | Always haiku (frontmatter) |
 | `/init` | **fixed** | Always sonnet (frontmatter) |
+| `/create` | **fixed** | Always sonnet (frontmatter) |
+| `/reforge` | **fixed** | Always sonnet (deep analysis required) |
 
 ## Size criteria
 
@@ -38,5 +40,11 @@ Default model for all agents is **sonnet**. Opus is never used.
 | `rule-writer` | Always haiku (fixed) |
 | `loop` | Never — orchestrates multiple agents |
 | `init` | Never — full codebase analysis |
+| `create-orchestrator` | Never — orchestrates C-level pipeline |
+| `c-ceo`, `c-cto`, `c-cpo`, `c-cmo`, `c-cdo` | Never — deep domain evaluation |
+| `brainstormer` | Never — design exploration requires depth |
+| `reforge-orchestrator` | Never — deep reasoning pipeline |
+| `codebase-analyzer` | Never — deep code analysis |
+| `reforge-spec-generator` | Never — spec synthesis from analysis |
 
 If unsure, default to sonnet — correctness over cost savings.
