@@ -7,26 +7,27 @@
 ```
 spec/
   PROJECT.md, ARCHITECTURE.md, STATE.md, DEBUG.md, learnings/
-  rules/_workflow.md, _document-format.md, _model-routing.md, _delegation.md,
-        _verification.md, _loop-protocol.md, _agent-roles.md, _skill-budget.md,
-        _nextjs-ordering.md, _artifact-limits.md, code-style.md, testing.md
+  rules/_workflow.md, _subagent-rules.md, _document-format.md, _model-routing.md,
+        _delegation.md, _verification.md, _loop-protocol.md, _agent-roles.md,
+        _skill-budget.md, _nextjs-ordering.md, _artifact-limits.md, conventions.md, testing.md
+  create/[name]/ VISION.md, C-REVIEW.md, DECISION.md
   feature/[name]/ spec.md, design.md, PLAN.md, CONTEXT.md, LOOP_NOTES.md, history/
+  reforge/[name]/ SOURCE.md, ANALYSIS.md, CHANGES.md, DELTA.md, DECISION.md
 ```
 
 ## STATE.md
 
-Phases: `idle` → `planning` → `executing` → `verifying` → `looping` → completed
+Phases: `idle` | `existing` → `planning` → `executing` → `verifying` → `looping` → completed
+- `idle`: no work started; fresh implementation
+- `existing`: code detected during /init; run /spec before /dev
+- `reforging`: session-level state tracked as a separate entry in STATE.md (not a feature phase). Used by /reforge to track the transformation pipeline. Individual features transition directly to `idle` when specs are generated.
+  Format: `### [reforge-name] [reforging]` with `Started:`, `Source:`, `Phase: N/5`
 - Each feature's phase is independent
 - Keep under 100 lines — archive completed entries
 
 ## Commands
 
-`/init` `/brainstorm` `/spec` `/office-hours` `/dev` `/dev --team` `/review` `/loop` `/debug` `/status` `/rule`
-
-## Per-Task Review
-
-During `/dev`, each task (except `[worker]`) gets a `task-spec-reviewer` (haiku) review.
-Max 2 rounds. Rounds do NOT count toward auto-fix budget. After 2 fails → escalate.
+`/init` `/create` `/brainstorm` `/spec` `/dev` `/dev --team` `/reforge` `/review` `/loop` `/debug` `/status` `/rule`
 
 ## Checkpoints
 
@@ -39,7 +40,7 @@ Max retries: **3** per `/dev` session (persists via PLAN.md `Used: N`). `/loop`:
 ## Fresh Context Execution
 
 Lead-engineer dispatches each task to a fresh-context subagent:
-`[lead]`→task-executor(sonnet), `[db]`→db-engineer(sonnet), `[ui]`→ui-engineer(sonnet), `[worker]`→worker-engineer(haiku)
+`[lead]`→task-executor(sonnet), `[db]`→db-engineer(sonnet), `[ui]`→ui-engineer(sonnet)
 
 Orchestrator maintains in-memory task ledger. Never writes code directly. Passes `UPSTREAM:` context to dependent tasks.
 
@@ -82,4 +83,4 @@ When spec.md is modified (not initial creation):
 
 ## Extended References
 
-Read ONLY when applicable: `_document-format.md`, `_model-routing.md`, `_delegation.md`, `_verification.md`, `_loop-protocol.md`, `_agent-roles.md`, `_nextjs-ordering.md`, `_skill-budget.md`, `_artifact-limits.md`
+Read ONLY when applicable: `_subagent-rules.md` (subagents only), `_document-format.md`, `_model-routing.md`, `_delegation.md`, `_verification.md`, `_loop-protocol.md`, `_agent-roles.md`, `_nextjs-ordering.md`, `_skill-budget.md`, `_artifact-limits.md`

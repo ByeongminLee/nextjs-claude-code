@@ -24,7 +24,6 @@ const REQUIRED_AGENTS = [
   'loop',
   'loop-completion',
   'status',
-  'product-reviewer',
   'learning-extractor',
 ];
 
@@ -54,6 +53,8 @@ const REQUIRED_RULES = [
   '_nextjs-ordering.md',
   '_skill-budget.md',
   '_artifact-limits.md',
+  '_subagent-rules.md',
+  'conventions.md',
 ];
 
 export async function runDoctor(cwd: string = process.cwd()): Promise<void> {
@@ -214,7 +215,37 @@ export async function runDoctor(cwd: string = process.cwd()): Promise<void> {
     });
   }
 
-  // ── 9. Node.js version ─────────────────────────────────────────────────────
+  // ── 9. Playwright MCP (.mcp.json) ─────────────────────────────────────────
+  const mcpPath = path.join(cwd, '.mcp.json');
+  if (fs.existsSync(mcpPath)) {
+    try {
+      const mcp = JSON.parse(fs.readFileSync(mcpPath, 'utf-8')) as {
+        mcpServers?: Record<string, unknown>;
+      };
+      const hasPlaywright = !!mcp?.mcpServers?.playwright;
+      results.push({
+        label: 'Playwright MCP',
+        status: hasPlaywright ? 'ok' : 'warn',
+        message: hasPlaywright
+          ? 'Configured in .mcp.json'
+          : 'Not configured — /qa and Level 3b browser testing unavailable',
+      });
+    } catch {
+      results.push({
+        label: '.mcp.json',
+        status: 'warn',
+        message: 'JSON parse error',
+      });
+    }
+  } else {
+    results.push({
+      label: 'Playwright MCP',
+      status: 'warn',
+      message: 'No .mcp.json — run: npx nextjs-claude-code to add Playwright MCP',
+    });
+  }
+
+  // ── 10. Node.js version ─────────────────────────────────────────────────────
   const nodeVersion = parseInt(process.version.slice(1).split('.')[0]);
   results.push({
     label: 'Node.js version',

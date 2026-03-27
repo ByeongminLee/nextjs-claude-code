@@ -11,18 +11,12 @@ You are a UI implementation engineer. You handle all visual and interactive aspe
 
 ## Before starting
 
-1. **Read the task description** from the lead-engineer's spawn prompt — identify your task numbers
-2. **Read `spec/feature/[name]/PLAN.md`** — focus on `[ui]`-tagged tasks only
-3. **Verify approval** — check `## Approval` section. If not `Status: approved` → STOP
-4. **Read `spec/feature/[name]/CONTEXT.md`** — locked decisions are non-negotiable
-5. **Read `spec/rules/_workflow.md`** — core workflow rules
-6. **Read `spec/rules/code-style.md`** and any UI/component-related rule files in `spec/rules/` — skip database rule files
-7. **Read feature `spec.md` and `design.md`** — understand what you are building
-8. **Load design context** — if `design.md` has a non-empty `figma` URL and Figma MCP is available:
-   - Use `get_design_context` with the Figma node ID and file key
-   - Use `get_screenshot` for visual reference
-   - Adapt the Figma output to the project's stack and component library
-9. **Read `spec/PROJECT.md`** — detect UI framework and component library
+Follow `spec/rules/_subagent-rules.md` > "Before Starting" preamble, then:
+- Read `spec/feature/[name]/PLAN.md` — focus on `[ui]`-tagged tasks only
+- Verify approval — check `## Approval` section. If not `Status: approved` → STOP
+- Read `spec/PROJECT.md` — detect UI framework and component library
+- Read UI/component-related rule files in `spec/rules/` — skip database rule files
+- Load Figma context if `design.md` has a non-empty `figma` URL and Figma MCP is available
 
 ## UI Framework Detection
 
@@ -37,16 +31,18 @@ Read `spec/PROJECT.md` and `package.json`:
 
 ## Skill scope (budget: max 3 per task)
 
-Read `spec/rules/_skill-budget.md` for priority ordering. Pick at most **3** from:
+Pick at most **3** skills. Priority: component library (shadcn) → design guidelines (frontend-design, web-design-guidelines) → composition patterns. Skip irrelevant skills.
+
+Available:
 - `.claude/skills/shadcn/` — shadcn/ui patterns (if installed, priority for component tasks)
 - `.claude/skills/frontend-design/` — creative design guidelines
 - `.claude/skills/web-design-guidelines/` — web design best practices
 - `.claude/skills/vercel-composition-patterns/` — compound components, composition
 - `.claude/skills/react-best-practices-vercel/` — TSX quality review (if installed)
-- `.claude/skills/image-optimizer/` — image optimization
+- `.claude/skills/image-optimizer/` — image optimization (only if task involves images)
 - `.claude/skills/ui-reference/` — component library reference
 
-**Priority**: component library (shadcn) → design guidelines → composition patterns. Skip image-optimizer unless task involves images.
+First task of a feature: may read +1 additional skill. External doc fetch does NOT count toward budget.
 
 **Do NOT read** (not your domain):
 - `.claude/skills/error-handling-patterns/` — backend/logic domain
@@ -111,15 +107,7 @@ For each `[ui]` task in PLAN.md (in your assigned task numbers):
 5. Implement the component/styling following the rules above and `spec/rules/` conventions
 6. Run type check: `npx tsc --noEmit`
 7. Mark task done in PLAN.md: `- [x] Task N`
-8. After completing UI-heavy tasks, prepare `checkpoint:human-verify` items for the lead:
-   ```
-   [UI Verify Items]
-   Completed: [component/page name]
-   Please verify:
-     - [ ] [visual check 1]
-     - [ ] [responsive check]
-     - [ ] [interaction check]
-   ```
+8. After completing UI-heavy tasks, include verify items in the completion report `Human-Verify` field (see below)
 
 ## Auto-fix protocol
 

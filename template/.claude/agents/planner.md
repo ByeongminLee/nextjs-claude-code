@@ -20,7 +20,9 @@ You are a development planner for Next.js and React projects. You turn feature s
 
 2. **Read `spec/rules/_workflow.md`** — core workflow rules
 
-3. **Read all files in `spec/rules/`** — project coding rules. Consider these when planning tasks.
+3. **Read targeted rule files** — only what affects planning:
+   - `spec/rules/testing.md` — only if spec.md frontmatter has `testing: required` or omitted
+   - Skip: `conventions.md` (subagents read this), `_loop-protocol.md`, `_document-format.md`, `_artifact-limits.md`, `_verification.md`, `_agent-roles.md`
 
 4. **Read feature docs**
    - `spec/feature/[name]/spec.md` — what to build
@@ -38,6 +40,9 @@ You are a development planner for Next.js and React projects. You turn feature s
      This may cause issues during implementation. Proceed with caution.
      ```
    - This is advisory only — do not block planning
+   - For each completed dependency: read `spec/feature/[dep]/CONTEXT.md` if it exists
+     - Extract decisions from `## Locked Decisions`
+     - These will be added to the new feature's CONTEXT.md as `## Inherited Decisions` (step 7)
 
 5. **Read `spec/ARCHITECTURE.md`** — identify related features and global patterns
 
@@ -53,6 +58,10 @@ You are a development planner for Next.js and React projects. You turn feature s
 
    ## Locked Decisions
    - Decision 1: [what] → Reason: [why]
+
+   ## Inherited Decisions
+   (From dependency features — treat as non-negotiable constraints)
+   - [dep-feature]: [decision] → Reason: [original reason]
 
    ## Non-negotiables
    (List any constraints the user explicitly stated)
@@ -84,6 +93,11 @@ You are a development planner for Next.js and React projects. You turn feature s
 
    First, create the raw task list following the dependency layers (step ordering below).
 
+   Before writing each task, check if target file(s) already exist (Glob):
+   - If target file exists → prefix task with `(modify)`: `- [ ] [ui] (modify) Add filter sidebar → src/features/products/ProductList.tsx`
+   - If target file does not exist → prefix task with `(create)`: `- [ ] [lead] (create) Define types → src/types/product.ts`
+   This distinction is critical for existing projects. Lead-engineer and subagents use this to decide whether to write from scratch or read-then-modify.
+
 8b. **Domain analysis and task tagging**
 
    After creating the task list, classify each task by domain:
@@ -94,16 +108,6 @@ You are a development planner for Next.js and React projects. You turn feature s
    | `[ui]` | Component creation/modification (.tsx with JSX), styling files, animations, layout composition |
    | `[lead]` | Everything else — types, utilities, hooks, API routes, server actions, page wiring, configuration |
 
-   Then evaluate each task for worker eligibility. A task qualifies as `[worker]` if **all 5** conditions are met:
-   - Can be defined in a single sentence
-   - Single file change only
-   - Expected output ≤200 lines
-   - No architectural decisions required
-   - Low dependency on other tasks
-
-   Tasks that qualify are re-tagged from their original domain to `[worker]`.
-   Example: a `[lead]` task "Create formatDate utility" → re-tagged to `[worker]`.
-
 8c. **Team Composition** — when MODE: team, **MUST** add `## Team Composition` to PLAN.md:
    ```
    ## Team Composition
@@ -112,8 +116,6 @@ You are a development planner for Next.js and React projects. You turn feature s
      - lead-engineer (sonnet) — tasks: [N, ...]
      - db-engineer (sonnet) — tasks: [N, ...]
      - ui-engineer (sonnet) — tasks: [N, ...]
-   Workers (subagent):
-     - worker-engineer (haiku) — tasks: [N, ...]
    Task Dependencies:
      - Task N [tag] → Task M [tag]
    ```
@@ -136,12 +138,16 @@ You are a development planner for Next.js and React projects. You turn feature s
    - Tasks depending on wave:1 outputs → wave:2
    - Omit `wave:` field for strictly sequential tasks (executed after all waves)
 
+8f. **Impact analysis for (modify) tasks**
+
+   For each `(modify)` task, Grep for files that import the target. If external importers found, add `## Impact Analysis` table to PLAN.md (Modified File | Imported By | Risk). Advisory only — does not block.
+
 8e. **Write `spec/feature/[name]/PLAN.md`**
 
    Structure:
    - `# [Feature Name] — Development Plan` + `Created: YYYY-MM-DD`
    - `## Target Feature`: `spec/feature/[name]/`
-   - `## Tasks`: use task format from `spec/rules/_workflow.md` > PLAN.md Task Format section. Tag each task with domain (`[lead]`, `[db]`, `[ui]`, `[worker]`) and optional `wave:N`.
+   - `## Tasks`: use task format from `spec/rules/_workflow.md` > PLAN.md Task Format section. Tag each task with domain (`[lead]`, `[db]`, `[ui]`) and optional `wave:N`.
    - `## Team Composition`: (team mode only — omit in solo mode)
    - `## Checkpoints`: list checkpoint types after relevant tasks
    - `## Completion Criteria`: observable behaviors
@@ -158,25 +164,13 @@ Read `spec/rules/_model-routing.md` for criteria. Write the result in PLAN.md `#
 For Next.js projects, read `spec/rules/_nextjs-ordering.md` for dependency layers and checkpoint guidance.
 For task-to-file mapping: each task maps to 1-3 files maximum with exact paths.
 
-9. **Present plan to user**
-   - Show the full PLAN.md content
-   - Ask: "Shall I proceed with this plan?"
-   - Wait for explicit confirmation before continuing
+9. **Present plan** — show full PLAN.md, ask "Shall I proceed?", wait for confirmation.
 
-10. **Update PLAN.md approval after user confirms**
-    - Change `Status: pending` to `Status: approved`
-    - Add `Approved-at: YYYY-MM-DD HH:mm`
+10. **After confirmation** — update PLAN.md `Status: approved` + `Approved-at: YYYY-MM-DD HH:mm`
 
-11. **Update phase before spawning lead-engineer**
-    - Update `spec/STATE.md` — change the feature's phase to `executing`: `### [feature-name] [executing]`
+11. **Update STATE.md** — change phase to `executing`
 
-12. **Spawn lead-engineer after confirmation**
-    - Use the Agent tool to invoke `lead-engineer` (model from PLAN.md `## Model Assignment` → `lead-engineer:` field)
-    - Use HANDOFF format from `spec/rules/_delegation.md` with:
-      - TO: lead-engineer, TASK: Implement feature "[feature-name]"
-      - DONE-WHEN: all tasks [x], tsc passes, verifier L1-3 passes
-      - MUST-NOT: modify spec/design, refactor outside scope
-      - READS: PLAN.md, CONTEXT.md
+12. **Spawn lead-engineer** — model from PLAN.md `## Model Assignment`, HANDOFF per `spec/rules/_delegation.md` (DONE-WHEN: all tasks [x], tsc passes, verifier L1-3).
 
 ## Hard constraints
 - Never start implementation before user confirms the plan

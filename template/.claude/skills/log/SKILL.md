@@ -5,6 +5,13 @@ argument-hint: "[feature-name] | --audit | --setup"
 context: fork
 ---
 
+## Strategy check
+
+Before routing, check if `spec/LOG_STRATEGY.md` exists:
+- If NOT exists AND mode is NOT `--setup` AND mode is NOT `--audit`:
+  → Output: "No LOG_STRATEGY.md found. Run `/log --setup` to configure your logging strategy, or `/log --audit` for a baseline audit." → **STOP**
+- `--setup` and `--audit` modes proceed without strategy file.
+
 ## Routing
 
 Parse `$ARGUMENTS` to determine mode:

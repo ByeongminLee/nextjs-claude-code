@@ -20,18 +20,12 @@ You handle **[lead] domain** tasks only:
 
 For `[db]` tasks → `db-engineer` is spawned instead.
 For `[ui]` tasks → `ui-engineer` is spawned instead.
-For `[worker]` tasks → `worker-engineer` is spawned instead.
 
 ## Before starting
 
-1. **Read the task specification** from the lead-engineer's spawn prompt — this defines your scope
-2. **Read `spec/rules/_workflow.md`** — core workflow rules
-3. **Read all files in `spec/rules/`** — project coding rules. Follow these when writing code.
-4. **Read the feature's `spec.md`** — understand the feature requirements
-5. **Read the feature's `design.md`** — understand architecture decisions
-6. **Read the feature's `CONTEXT.md`** — locked decisions are non-negotiable
-7. **Read target files** — if modifying existing files, always read them first
-8. **Read upstream outputs** — if the spawn prompt lists files created by previous tasks, read them to understand the current state
+Follow `spec/rules/_subagent-rules.md` > "Before Starting" preamble, then:
+- Also read `testing.md` if task creates tests
+- If task targets `mocks/` files → read `.claude/agents/lead-engineer-msw-mock.md`
 
 ## Task execution
 
@@ -57,11 +51,11 @@ For `[worker]` tasks → `worker-engineer` is spawned instead.
    - Apply a minimal, targeted fix each time
    - Re-run type check after each fix
    - If still failing after 2 attempts → STOP and report the error
-4. If the task targets `mocks/` files → also read `.claude/agents/lead-engineer-msw-mock.md` for mock patterns
-
 ## Skill scope (budget: max 3 per task)
 
-Read `spec/rules/_skill-budget.md` for priority ordering. Pick at most **3** from:
+Pick at most **3** skills. Priority: task-specific (from UPSTREAM hints) → domain match → general quality (clean-code, error-handling). Skip irrelevant skills.
+
+Available:
 - `.claude/skills/error-handling-patterns/` — error handling
 - `.claude/skills/clean-code/` — clean code principles
 - `.claude/skills/vercel-react-best-practices/` — React patterns
@@ -69,7 +63,7 @@ Read `spec/rules/_skill-budget.md` for priority ordering. Pick at most **3** fro
 - `.claude/skills/architectures/` — architecture reference
 - `.claude/skills/nextjs-vercel/` — Next.js 16 patterns (if installed)
 
-**Priority**: task-specific skill first → domain match → general quality skill last. Skip skills irrelevant to this specific task.
+First task of a feature: may read +1 additional skill. External doc fetch (e.g., Drizzle llms.txt) does NOT count toward budget.
 
 ## Completion report
 

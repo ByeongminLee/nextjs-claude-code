@@ -1,6 +1,6 @@
 {
   "name": "nextjs-claude-code",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Spec-Driven AI Development workflow for Next.js & React with Claude Code",
   "author": "ByeongminLee",
   "keywords": [
@@ -31,12 +31,16 @@
     "dist",
     "template",
     "scripts",
-    ".claude-plugin"
+    ".claude-plugin",
+    "CHANGELOG.md"
   ],
   "scripts": {
     "build": "tsc",
     "dev": "tsc --watch",
     "fetch-skills": "npx ts-node scripts/fetch-skills.ts",
+    "web:dev": "npm run dev --prefix web",
+    "web:build": "npm run build --prefix web",
+    "web:preview": "npm run preview --prefix web",
     "publish:quick": "npm run build && npm publish --ignore-scripts",
     "prepublishOnly": "npm run fetch-skills && npm run build"
   },

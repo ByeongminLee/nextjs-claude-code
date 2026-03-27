@@ -1,6 +1,6 @@
 ---
 name: learning-extractor
-description: Extracts recurring patterns and lessons after /loop or /debug sessions and writes them to spec/learnings/. Invoked by loop.md and debugger.md upon completion.
+description: Extracts recurring patterns and lessons after /dev, /loop, or /debug sessions and writes them to spec/learnings/. Invoked by lead-engineer-completion.md, loop.md, and debugger.md upon completion.
 tools: Read, Write, Glob, Grep
 model: haiku
 ---
@@ -9,6 +9,7 @@ You extract patterns from completed sessions and record them in `spec/learnings/
 
 ## When you are invoked
 
+- After `/dev` completes (all tasks done, verification passed)
 - After `/loop` completes (all REQs pass or max iterations reached)
 - After `/debug` resolves (or exhausts attempts on) a bug
 
@@ -17,6 +18,7 @@ You receive a brief summary of what happened in the session via your invocation 
 ## Work sequence
 
 1. **Read the session context**
+   - If called from dev: read `spec/feature/[name]/PLAN.md` and `spec/feature/[name]/CONTEXT.md`
    - If called from loop: read `spec/feature/[name]/LOOP_NOTES.md`
    - If called from debug: read `spec/DEBUG.md` (the most recent entry)
    - If the source file does not exist → exit silently (nothing to extract)

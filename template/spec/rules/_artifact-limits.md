@@ -1,6 +1,6 @@
 # Artifact Size Limits (Core)
 
-> **Immutable.** Advisory limits to prevent context bloat. Enforced by `validate-post-write.sh` (warn, not block).
+> **Immutable.** Context budget rules for stable long-running execution.
 
 | Artifact | Max Lines | Overflow Strategy |
 |----------|-----------|-------------------|
@@ -12,12 +12,36 @@
 | PLAN.md | 100 | Collapse completed tasks, keep `[x]` one-liners |
 | CONTEXT.md | 50 | Keep only non-negotiable decisions |
 | LOOP_NOTES.md | 50 | Keep only current iteration context |
+| VISION.md (create) | 80 | Keep concise — Problem, Demand, Approach sections |
+| C-REVIEW.md (create) | 100 | One section per C-level + summary |
+| DECISION.md (create) | 60 | Approach + key decisions only |
+| ANALYSIS.md (reforge) | 150 | Split per-feature to spec/reforge/[name]/analysis/ |
+| CHANGES.md (reforge) | 80 | Keep transformations concise |
+| DELTA.md (reforge) | 120 | Collapse completed features |
+| DECISION.md (reforge) | 60 | Summary only |
+| SOURCE.md (reforge) | 10 | Path + status only |
 
 Rules:
-- These limits are **advisory** — exceeding triggers a warning, never blocks
+- Hard-gate artifacts: `PLAN.md`, `CONTEXT.md`, `LOOP_NOTES.md`
+- Soft-gate artifacts: all others in this table
+- Hard-gate overflow must be compacted before continuing implementation or verification
+- Soft-gate overflow triggers warning and should be compacted in the same session
 - When a file exceeds its limit, split content to the suggested overflow target
 - Completed entries in STATE.md should be archived (date only, no details)
 - PLAN.md completed tasks can be collapsed to single `[x]` lines without descriptions
+
+## Enforcement protocol
+
+If a hard-gate artifact exceeds its limit:
+1. Stop task dispatch immediately.
+2. Emit `checkpoint:decision` with a compaction plan.
+3. Compact the artifact to its limit.
+4. Resume only after compaction is complete.
+
+If a soft-gate artifact exceeds its limit:
+1. Emit a warning.
+2. Continue current task.
+3. Compact before phase completion.
 
 ## Why Limits Matter
 

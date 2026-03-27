@@ -99,9 +99,20 @@ if (/\.json$/.test(absPath)) {
 
 // ═══ Part 3: Spec artifact advisory checks ══════════════════════════════════
 
-// Artifact size limits
+// Artifact size limits — read from _artifact-limits.md table, fallback to defaults
 if (filePath.includes("spec/") && filePath.endsWith(".md")) {
-  const limits = { "PROJECT.md":80,"ARCHITECTURE.md":120,"STATE.md":100,"spec.md":150,"design.md":200,"PLAN.md":100,"CONTEXT.md":50,"LOOP_NOTES.md":50 };
+  let limits = { "PROJECT.md":80,"ARCHITECTURE.md":120,"STATE.md":100,"spec.md":150,"design.md":200,"PLAN.md":100,"CONTEXT.md":50,"LOOP_NOTES.md":50 };
+  try {
+    const limitsFile = path.join(process.cwd(), "spec/rules/_artifact-limits.md");
+    if (fs.existsSync(limitsFile)) {
+      const content = fs.readFileSync(limitsFile, "utf-8");
+      const parsed = {};
+      for (const m of content.matchAll(/\|\s*(\S+\.md)\s*\|\s*(\d+)\s*\|/g)) {
+        parsed[m[1]] = parseInt(m[2], 10);
+      }
+      if (Object.keys(parsed).length > 0) limits = Object.assign(limits, parsed);
+    }
+  } catch {}
   const bn = filePath.split("/").pop() || "";
   const lim = limits[bn];
   if (lim) {

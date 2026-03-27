@@ -34,19 +34,13 @@ For each wave (1, then 2, then 3…):
 
 2. **Dispatch single tasks as fresh-context subagents**:
    - `[lead]` tasks → spawn `task-executor` subagent (per task)
-   - `[worker]` tasks → spawn `worker-engineer` subagent (per task)
    - Single `[db]` or `[ui]` tasks in this group → spawn as fresh-context subagent (single-task mode)
 
 3. **Run all dispatches for this group in parallel** — teammates and subagents execute simultaneously
 
 4. **Wait for all tasks in this group to complete** before starting the next group
 
-5. **Per-task review**: After each task completes (from teammate report or subagent report), spawn `task-spec-reviewer` (haiku). Skip for `[worker]` tasks.
-   - If FAIL: instruct the responsible agent to fix (re-spawn subagent or message teammate), max 2 rounds
-   - After 2 failed rounds: escalate to user
-   - Review rounds do NOT count toward the auto-fix budget
-
-6. **Mark tasks done** in PLAN.md: `- [x] Task N`
+5. **Mark tasks done** in PLAN.md: `- [x] Task N`
 
 ### Step 4 — Coordinate
 

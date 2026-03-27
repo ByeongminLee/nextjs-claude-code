@@ -34,17 +34,19 @@ Before modifying code:
 | \`/init\` | First-time setup |
 | \`/spec [name] "desc"\` | Define a feature spec |
 | \`/dev [name]\` | Implement a feature (solo mode) |
-| \`/dev [name] --team\` | Implement with parallel engineer team (db/ui/worker) |
+| \`/dev [name] --team\` | Implement with parallel engineer team (db/ui/lead) |
 | \`/review [name]\` | Check spec compliance |
 | \`/loop [name]\` | Force-complete until all REQs pass |
 | \`/debug "desc"\` | Systematic bug fixing |
 | \`/status\` | Project status |
-| \`/office-hours [name]\` | Product review before development |
+| \`/create "desc"\` | Ideation → C-level review → validation |
 | \`/commit\` | Auto-generate commit message |
 | \`/pr\` | Create PR with spec-based body |
+| \`/ncc-upgrade\` | Upgrade NCC to latest version |
+| \`/ncc-help\` | NCC usage help and version info |
 
 ### Navigation
-- Agents: \`.claude/agents/\` — lead-engineer, db-engineer, ui-engineer, worker-engineer, planner, verifier
+- Agents: \`.claude/agents/\` — lead-engineer, task-executor, db-engineer, ui-engineer, planner, verifier
 - Skills: \`.claude/skills/\` — on-demand reference, loaded by skill name
 - Rules: \`spec/rules/\` — project coding rules (read before writing code)
 ${FS_MARKER_END}
@@ -63,6 +65,8 @@ export async function install(options: InstallOptions): Promise<void> {
     path.join(TEMPLATE_DIR, 'spec'),
     path.join(rootDir, 'spec'),
     vars, force, dryRun,
+    [],
+    ['feature', 'learnings', 'create', 'reforge'],
   );
 
   // ── Claude Code agent files ─────────────────────────────────────────────
@@ -114,6 +118,11 @@ async function installClaude(
     path.join(targetDir, '.claude', 'settings.json'),
     dryRun,
   );
+  await mergeMcpJson(
+    path.join(TEMPLATE_DIR, '.mcp.json'),
+    path.join(targetDir, '.mcp.json'),
+    dryRun,
+  );
   await injectBlock(
     path.join(targetDir, 'CLAUDE.md'),
     FS_CLAUDE_MD_BLOCK,
@@ -131,6 +140,7 @@ async function copyDir(
   force: boolean,
   dryRun: boolean,
   skip: string[] = [],
+  forceSkip: string[] = [],
 ): Promise<number> {
   if (!fs.existsSync(srcDir)) return 0;
   const entries = fs.readdirSync(srcDir, { withFileTypes: true });
@@ -138,10 +148,15 @@ async function copyDir(
 
   for (const entry of entries) {
     if (skip.includes(entry.name)) continue;
+    // Protect user data directories — never overwrite even with --force
+    if (force && forceSkip.includes(entry.name)) {
+      const destSubDir = path.join(destDir, entry.name);
+      if (fs.existsSync(destSubDir)) continue;
+    }
     const srcPath = path.join(srcDir, entry.name);
 
     if (entry.isDirectory()) {
-      count += await copyDir(srcPath, path.join(destDir, entry.name), vars, force, dryRun);
+      count += await copyDir(srcPath, path.join(destDir, entry.name), vars, force, dryRun, [], forceSkip);
       continue;
     }
 
@@ -232,6 +247,39 @@ async function mergeSettingsJson(
     // Remove empty arrays
     if (existing.hooks[hookType].length === 0) {
       delete existing.hooks[hookType];
+    }
+  }
+
+  if (!dryRun) {
+    fs.writeFileSync(destPath, JSON.stringify(existing, null, 2) + '\n', 'utf-8');
+  }
+}
+
+async function mergeMcpJson(
+  templatePath: string,
+  destPath: string,
+  dryRun: boolean,
+): Promise<void> {
+  if (!fs.existsSync(templatePath)) return;
+  const templateContent = JSON.parse(fs.readFileSync(templatePath, 'utf-8'));
+
+  if (!fs.existsSync(destPath)) {
+    if (!dryRun) {
+      fs.mkdirSync(path.dirname(destPath), { recursive: true });
+      fs.writeFileSync(destPath, JSON.stringify(templateContent, null, 2) + '\n', 'utf-8');
+    }
+    return;
+  }
+
+  const existing = JSON.parse(fs.readFileSync(destPath, 'utf-8'));
+
+  // Merge mcpServers — only add servers that don't already exist
+  if (templateContent.mcpServers) {
+    if (!existing.mcpServers) existing.mcpServers = {};
+    for (const [name, config] of Object.entries(templateContent.mcpServers)) {
+      if (!(name in existing.mcpServers)) {
+        existing.mcpServers[name] = config;
+      }
     }
   }
 

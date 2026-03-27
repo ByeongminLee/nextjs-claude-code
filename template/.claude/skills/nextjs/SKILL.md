@@ -55,19 +55,11 @@ validate:
     upgradeToSkill: nextjs
     upgradeWhy: 'Guides migration from Pages Router getServerSideProps to App Router server components with async data fetching.'
   -
-    pattern: getServerSideProps
-    message: 'getServerSideProps is a Pages Router pattern — migrate to App Router server components'
-    severity: warn
-  -
     pattern: export.*getStaticProps
     message: 'getStaticProps is removed in App Router — use generateStaticParams + server components instead'
     severity: error
     upgradeToSkill: nextjs
     upgradeWhy: 'Guides migration from Pages Router getStaticProps to App Router generateStaticParams with server components.'
-  -
-    pattern: getStaticProps
-    message: 'getStaticProps is a Pages Router pattern — migrate to App Router generateStaticParams + server components'
-    severity: warn
   -
     pattern: from\s+['"]next/router['"]
     message: 'next/router is Pages Router only — use next/navigation for App Router'
@@ -225,31 +217,6 @@ chainTo:
     targetSkill: nextjs
     message: 'getInitialProps is a legacy Pages Router pattern — loading Next.js guidance for App Router migration with server components and async data fetching.'
     skipIfFileContains: 'app/.*page\.|generateStaticParams|use cache'
-  -
-    pattern: 'export.*getServerSideProps|getServerSideProps\s*\('
-    targetSkill: nextjs
-    message: 'getServerSideProps is a Pages Router pattern — loading Next.js guidance for App Router migration with server components and async data fetching.'
-    skipIfFileContains: 'generateStaticParams|use cache|app/.*page\.'
-  -
-    pattern: 'export.*getStaticProps|getStaticProps\s*\('
-    targetSkill: nextjs
-    message: 'getStaticProps is a Pages Router pattern — loading Next.js guidance for App Router migration with generateStaticParams and server components.'
-    skipIfFileContains: 'generateStaticParams|use cache|app/.*page\.'
-  -
-    pattern: '_app\.(tsx?|jsx?)'
-    targetSkill: nextjs
-    message: '_app.tsx is a Pages Router pattern — loading Next.js guidance for App Router layout.tsx migration.'
-    skipIfFileContains: 'app/layout\.|app/.*layout\.'
-  -
-    pattern: '_document\.(tsx?|jsx?)'
-    targetSkill: nextjs
-    message: '_document.tsx is a Pages Router pattern — loading Next.js guidance for App Router layout.tsx with metadata API migration.'
-    skipIfFileContains: 'app/layout\.|app/.*layout\.'
-  -
-    pattern: "from\\s+['\"]next/document['\"]"
-    targetSkill: nextjs
-    message: 'next/document is Pages Router only — loading Next.js guidance for App Router layout.tsx with html/body structure.'
-    skipIfFileContains: 'app/layout\.|app/.*layout\.'
   -
     pattern: 'pages/api/'
     targetSkill: vercel-functions

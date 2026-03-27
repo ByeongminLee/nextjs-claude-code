@@ -35,7 +35,7 @@ export const ko = {
     title: '설치',
     human: '직접 설치',
     humanLink: 'https://github.com/ByeongminLee/nextjs-claude-code/blob/main/docs/installation.ko.md',
-    claude: 'For Claude Code — 가이드를 가져와서 따라 실행:',
+    claude: 'Claude Code용 — 가이드를 가져와서 따라 실행:',
     command: 'curl -s https://raw.githubusercontent.com/ByeongminLee/nextjs-claude-code/main/docs/installation.ko.md',
   },
 
@@ -63,12 +63,20 @@ export const ko = {
     description: '핵심 SDD 루프 — 무엇을 만들지 정의하고, 만듭니다.',
     commands: `/spec [이름] "기능 설명"   →  spec-writer가 질문 → spec.md + design.md 작성
 /dev  [이름]               →  planner → lead-engineer → verifier → 완료
-/dev  [이름] --team        →  planner → lead-engineer (+ db/ui/worker 팀) → verifier → 완료`,
+/dev  [이름] --team        →  planner → lead-engineer (+ db/ui 팀) → verifier → 완료`,
   },
 
   ops: {
     title: '명령어',
     sections: [
+      {
+        subtitle: '아이디에이션 & 디자인',
+        commands: [
+          { cmd: '/create "..."', desc: '아이디에이션→검증 파이프라인 (C-suite 리뷰)' },
+          { cmd: '/brainstorm "..."', desc: '빠른 디자인 탐색 + 트레이드오프' },
+          { cmd: '/reforge "[경로]" "..."', desc: '레거시 프로젝트를 spec-driven 개발로 전환' },
+        ],
+      },
       {
         subtitle: '리뷰 & 품질',
         commands: [
@@ -94,12 +102,25 @@ export const ko = {
         ],
       },
       {
+        subtitle: '이슈 리포팅',
+        commands: [
+          { cmd: '/issue-reporter "..."', desc: 'NCC 버그/기능 요청을 GitHub에 제출 (프로젝트 데이터 자동 제거, 사용자 확인 필요)' },
+        ],
+      },
+      {
         subtitle: '개발 유틸리티',
         commands: [
           { cmd: '/init', desc: '기존 코드베이스 분석 + spec 문서 초안 생성' },
           { cmd: '/debug "..."', desc: '가설 기반 버그 분석' },
           { cmd: '/status', desc: '프로젝트 상태 요약' },
           { cmd: '/rule "..."', desc: '코딩 규칙 추가 또는 수정' },
+        ],
+      },
+      {
+        subtitle: '업그레이드',
+        commands: [
+          { cmd: '/ncc-upgrade', desc: 'Claude Code 내에서 NCC 업그레이드 (플러그인/npx 자동 감지)' },
+          { cmd: 'npx nextjs-claude-code upgrade', desc: '터미널에서 NCC 업그레이드 (npx 전용)' },
         ],
       },
     ],
@@ -114,14 +135,14 @@ export const ko = {
         { name: 'spec-writer', role: 'spec.md + design.md 작성' },
         { name: 'planner', role: 'CONTEXT.md + PLAN.md 생성, 도메인 분석 + 태스크 태깅' },
         { name: 'lead-engineer', role: 'fresh-context subagent로 구현 오케스트레이션. Wave 기반 병렬 디스패치.' },
-        { name: 'verifier', role: '4단계 검증' },
+        { name: 'verifier', role: '5단계 검증 (브라우저 체크 포함)' },
       ],
     },
     subagents: {
       subtitle: 'Fresh-Context Subagents (/dev)',
       items: [
         { name: 'task-executor', role: '[lead] 태스크 구현 (타입, 유틸, 훅, API 라우트)' },
-        { name: 'task-spec-reviewer', role: '태스크별 스펙 준수 + 코드 품질 리뷰' },
+        { name: 'browser-tester', role: 'Playwright MCP 기반 AI 브라우저 테스트' },
       ],
     },
     team: {
@@ -129,7 +150,14 @@ export const ko = {
       items: [
         { name: 'db-engineer', role: '스키마, 마이그레이션, ORM, 쿼리' },
         { name: 'ui-engineer', role: '컴포넌트, 스타일링, 애니메이션' },
-        { name: 'worker-engineer', role: '단순 유틸, 타입 정의, 설정' },
+      ],
+    },
+    reforge: {
+      subtitle: 'Reforge Agents (/reforge)',
+      items: [
+        { name: 'reforge-orchestrator', role: '5단계 레거시→스펙 파이프라인' },
+        { name: 'codebase-analyzer', role: '레거시 코드베이스 심층 분석' },
+        { name: 'reforge-spec-generator', role: '분석 기반 스펙 생성' },
       ],
     },
   },
@@ -139,11 +167,16 @@ export const ko = {
     items: [
       { bold: 'Checkpoints', text: 'lead-engineer가 의사결정, UI 완료, 인증/결제 시 사용자 확인을 받고 진행' },
       { bold: 'Auto-fix Budget', text: '모드별 최대 3회 재시도 — 에러 분석 → 다른 접근법 → 최소 변경 → 에스컬레이션' },
-      { bold: 'Verification Levels', text: '파일 존재부터 브라우저 검증까지 4단계' },
+      { bold: 'Verification Levels', text: '파일 존재부터 브라우저 검증까지 5단계' },
       { bold: 'Resume Protocol', text: '중단된 /dev 세션을 중단 지점부터 재개' },
       { bold: 'Hook Profiles', text: 'minimal (보안만), standard (기본), strict (+ deprecation guard, comment checker, todo enforcer)' },
       { bold: '스펙 검증', text: 'PostToolUse 훅이 잘못된 스펙 작성을 차단하고 스펙 업데이트를 리마인드' },
     ],
+  },
+
+  references: {
+    title: 'References',
+    text: "NCC는 Claude Code 생태계에서 검증된 최선의 패턴을 연구하고, 이를 하나의 일관된 워크플로우로 통합하여 만들어졌습니다. Wave 실행, 컨텍스트 엔지니어링, 에이전트 오케스트레이션, 토큰 최적화, 검증 루프, 스펙 기반 계획 등 핵심 기능은 <a href=\"https://github.com/gsd-build/get-shit-done\">GSD</a>, <a href=\"https://github.com/garrytan/gstack\">gstack</a>, <a href=\"https://github.com/affaan-m/everything-claude-code\">Everything Claude Code</a>, <a href=\"https://github.com/code-yeongyu/oh-my-openagent\">Oh My OpenAgent</a>, <a href=\"https://github.com/obra/superpowers\">Superpowers</a>, <a href=\"https://github.com/vercel/vercel-plugin\">Vercel Plugin</a>, <a href=\"https://github.com/github/spec-kit\">Spec Kit</a>, <a href=\"https://github.com/Fission-AI/OpenSpec\">OpenSpec</a>의 인사이트를 반영하여 개선되었습니다.",
   },
 
   contributing: {

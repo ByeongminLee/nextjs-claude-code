@@ -4,9 +4,14 @@ import '../styles/global.css';
 interface Props {
   title: string;
   description?: string;
+  ogImage?: string;
 }
 
-const { title, description = 'Spec-Driven AI Development workflow for Next.js & React with Claude Code' } = Astro.props;
+const siteUrl = 'https://ByeongminLee.github.io/nextjs-claude-code';
+const defaultOgImage = '/og-image.svg';
+const { title, description = 'Spec-Driven AI Development workflow for Next.js & React with Claude Code', ogImage = defaultOgImage } = Astro.props;
+const canonicalUrl = new URL(Astro.url.pathname, siteUrl).href;
+const ogImageUrl = new URL(ogImage, siteUrl).href;
 ---
 
 <!doctype html>
@@ -15,7 +20,26 @@ const { title, description = 'Spec-Driven AI Development workflow for Next.js & 
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content={description} />
+    <meta name="author" content="ByeongminLee" />
+    <meta name="keywords" content="nextjs, react, claude code, spec-driven, AI development, workflow, agents, skills" />
+    <link rel="canonical" href={canonicalUrl} />
+
+    {/* Open Graph */}
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:site_name" content="nextjs-claude-code" />
+    <meta property="og:image" content={ogImageUrl} />
+
+    {/* Twitter */}
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImageUrl} />
+
     <title>{title}</title>
+    <link rel="icon" type="image/svg+xml" href="/nextjs-claude-code/favicon.svg" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />

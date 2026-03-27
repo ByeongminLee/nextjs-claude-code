@@ -1,9 +1,14 @@
 ---
 name: review
-description: Check how well the current implementation matches the feature spec and evaluate code quality. Runs spec compliance review followed by code quality review. Does not modify code.
+description: Check how well the current implementation matches the feature spec and evaluate code quality. Runs spec compliance review followed by code quality review. Optionally runs unit/integration test audit, logging audit, and security audit when strategy files exist. Does not modify code.
 argument-hint: "[feature name]"
 context: fork
 ---
+
+## Scope boundary
+
+- `/review` is an audit command, not a browser QA command.
+- Browser E2E, visual regression, and accessibility checks are handled by `/qa`.
 
 ## Model selection
 
@@ -56,11 +61,12 @@ Spawn **all applicable agents in parallel**:
    ```
    [HANDOFF]
    TO: tester (sonnet)
-   TASK: Run tests and report results for feature "$ARGUMENTS"
+   TASK: Run unit/integration tests and report results for feature "$ARGUMENTS" (audit mode)
    DONE-WHEN:
      - Test execution report with pass/fail counts
    MUST-NOT:
      - Modify source code (review mode only)
+     - Run browser visual or accessibility QA flows
    READS:
      - spec/TEST_STRATEGY.md
      - spec/feature/[$ARGUMENTS]/spec.md
@@ -111,4 +117,5 @@ If tester, log-auditor, or security-reviewer was skipped, note at the end:
 ```
 Skipped: [Test audit / Log audit / Security audit] — strategy file not configured.
 Run [/test --setup / /log --setup / /security --setup] to enable.
+For browser, visual, or accessibility validation, run `/qa`.
 ```
