@@ -1,146 +1,252 @@
 ---
 name: copywriting
-description: Write persuasive marketing copy for web pages. Covers homepage, landing page, pricing page, and feature page copy with frameworks for headlines, CTAs, and conversion-focused structure.
+description: When the user wants to write, rewrite, or improve marketing copy for any page — including homepage, landing pages, pricing pages, feature pages, about pages, or product pages. Also use when the user says "write copy for," "improve this copy," "rewrite this page," "marketing copy," "headline help," "CTA copy," "value proposition," "tagline," "subheadline," "hero section copy," "above the fold," "this copy is weak," "make this more compelling," or "help me describe my product." Use this whenever someone is working on website text that needs to persuade or convert. For email copy, see email-sequence. For popup copy, see popup-cro. For editing existing copy, see copy-editing.
+metadata:
+  version: 1.1.0
 ---
 
-# Copywriting Skill
+# Copywriting
 
-Write compelling, conversion-focused marketing copy for web pages. Sourced from coreyhaines31/marketingskills.
+You are an expert conversion copywriter. Your goal is to write marketing copy that is clear, compelling, and drives action.
 
-## Before Writing: Gather Context
+## Before Writing
 
-Before writing any copy, establish:
+**Check for product marketing context first:**
+If `.agents/product-marketing-context.md` exists (or `.claude/product-marketing-context.md` in older setups), read it before asking questions. Use that context and only ask for information not already covered or specific to this task.
 
-- **Page type** — homepage, landing page, pricing page, feature page
-- **Primary visitor action** — the single most important thing visitors should do
-- **Target audience** — who they are, what they care about, their pain points
-- **Product differentiation** — what makes this different from alternatives
-- **Desired outcomes** — what the customer achieves by using the product
-- **Traffic source** — where visitors come from and what they already know
-- **Voice and tone** — brand personality and communication style
+Gather this context (ask if not provided):
 
-## Core Writing Principles
+### 1. Page Purpose
+- What type of page? (homepage, landing page, pricing, feature, about)
+- What is the ONE primary action you want visitors to take?
+
+### 2. Audience
+- Who is the ideal customer?
+- What problem are they trying to solve?
+- What objections or hesitations do they have?
+- What language do they use to describe their problem?
+
+### 3. Product/Offer
+- What are you selling or offering?
+- What makes it different from alternatives?
+- What's the key transformation or outcome?
+- Any proof points (numbers, testimonials, case studies)?
+
+### 4. Context
+- Where is traffic coming from? (ads, organic, email)
+- What do visitors already know before arriving?
+
+---
+
+## Copywriting Principles
 
 ### Clarity Over Cleverness
-Write so anyone can understand on first read. Avoid jargon, buzzwords, and marketing fluff. If a sentence requires re-reading, rewrite it.
+If you have to choose between clear and creative, choose clear.
 
 ### Benefits Over Features
-Features describe what a product does. Benefits describe what the customer achieves. Lead with benefits.
+Features: What it does. Benefits: What that means for the customer.
 
-- Bad: "AI-powered analytics dashboard"
-- Good: "Cut reporting from 4 hours to 15 minutes"
+### Specificity Over Vagueness
+- Vague: "Save time on your workflow"
+- Specific: "Cut your weekly reporting from 4 hours to 15 minutes"
 
-### Specific Over Vague
-Replace vague claims with concrete outcomes and numbers.
+### Customer Language Over Company Language
+Use words your customers use. Mirror voice-of-customer from reviews, interviews, support tickets.
 
-- Bad: "Streamline your workflow"
-- Good: "Eliminate 12 manual steps from your onboarding process"
+### One Idea Per Section
+Each section should advance one argument. Build a logical flow down the page.
 
-### Active Voice
-Write in active voice. The subject performs the action.
+---
 
-- Bad: "Reports are generated automatically"
-- Good: "Generate reports automatically"
+## Writing Style Rules
 
-### Mirror Customer Language
-Use the exact words your customers use to describe their problems and goals. Pull from support tickets, reviews, interviews, and social posts.
+### Core Principles
 
-## Page Structure
+1. **Simple over complex** — "Use" not "utilize," "help" not "facilitate"
+2. **Specific over vague** — Avoid "streamline," "optimize," "innovative"
+3. **Active over passive** — "We generate reports" not "Reports are generated"
+4. **Confident over qualified** — Remove "almost," "very," "really"
+5. **Show over tell** — Describe the outcome instead of using adverbs
+6. **Honest over sensational** — Fabricated statistics or testimonials erode trust and create legal liability
+
+### Quick Quality Check
+
+- Jargon that could confuse outsiders?
+- Sentences trying to do too much?
+- Passive voice constructions?
+- Exclamation points? (remove them)
+- Marketing buzzwords without substance?
+
+For thorough line-by-line review, use the **copy-editing** skill after your draft.
+
+---
+
+## Best Practices
+
+### Be Direct
+Get to the point. Don't bury the value in qualifications.
+
+❌ Slack lets you share files instantly, from documents to images, directly in your conversations
+
+✅ Need to share a screenshot? Send as many documents, images, and audio files as your heart desires.
+
+### Use Rhetorical Questions
+Questions engage readers and make them think about their own situation.
+- "Hate returning stuff to Amazon?"
+- "Tired of chasing approvals?"
+
+### Use Analogies When Helpful
+Analogies make abstract concepts concrete and memorable.
+
+### Pepper in Humor (When Appropriate)
+Puns and wit make copy memorable—but only if it fits the brand and doesn't undermine clarity.
+
+---
+
+## Page Structure Framework
 
 ### Above the Fold
-Every page needs three elements visible without scrolling:
 
-1. **Headline** — the single most compelling promise or outcome
-2. **Subheadline** — supporting detail that adds specificity or credibility
-3. **CTA** — a clear, action-oriented button
+**Headline**
+- Your single most important message
+- Communicate core value proposition
+- Specific > generic
 
-### Core Page Sections
-Structure the body using these sections (adapt order to page type):
+**Example formulas:**
+- "{Achieve outcome} without {pain point}"
+- "The {category} for {audience}"
+- "Never {unpleasant event} again"
+- "{Question highlighting main pain point}"
 
-1. **Social proof** — logos, testimonials, metrics ("Trusted by 10,000+ teams")
-2. **Problem statement** — articulate the pain the reader feels
-3. **Solution / benefits** — how the product solves that pain
-4. **How it works** — simple 3-step explanation
-5. **Feature highlights** — 3-5 key capabilities tied to outcomes
-6. **Objection handling** — address top concerns (pricing, security, migration)
-7. **Final CTA** — repeat the primary action with urgency or incentive
+**For comprehensive headline formulas**: See [references/copy-frameworks.md](references/copy-frameworks.md)
 
-## Headlines
+**For natural transition phrases**: See [references/natural-transitions.md](references/natural-transitions.md)
 
-### Formulas That Work
-- **Outcome-focused:** "Get [desired result] without [common pain]"
-- **Specificity:** "[Number] [audience] use [product] to [outcome]"
-- **Question:** "Still spending [time] on [manual task]?"
-- **Before/After:** "From [current state] to [desired state]"
+**Subheadline**
+- Expands on headline
+- Adds specificity
+- 1-2 sentences max
 
-### Headlines to Avoid
-- Puns that sacrifice clarity
-- "Welcome to [product name]"
-- Anything requiring knowledge of the product to understand
+**Primary CTA**
+- Action-oriented button text
+- Communicate what they get: "Start Free Trial" > "Sign Up"
 
-## CTAs
+### Core Sections
 
-### Strong CTAs Specify Outcomes
-- "Start Free Trial" (not "Submit")
-- "Get the Complete Checklist" (not "Download")
-- "See It in Action" (not "Learn More")
-- "Create Your First Report" (not "Sign Up")
+| Section | Purpose |
+|---------|---------|
+| Social Proof | Build credibility (logos, stats, testimonials) |
+| Problem/Pain | Show you understand their situation |
+| Solution/Benefits | Connect to outcomes (3-5 key benefits) |
+| How It Works | Reduce perceived complexity (3-4 steps) |
+| Objection Handling | FAQ, comparisons, guarantees |
+| Final CTA | Recap value, repeat CTA, risk reversal |
 
-### CTA Placement
-- Above the fold (primary)
-- After each major section (contextual)
-- Page bottom (final, with urgency or incentive)
+**For detailed section types and page templates**: See [references/copy-frameworks.md](references/copy-frameworks.md)
 
-## Page-Specific Strategies
+---
+
+## CTA Copy Guidelines
+
+**Weak CTAs (avoid):**
+- Submit, Sign Up, Learn More, Click Here, Get Started
+
+**Strong CTAs (use):**
+- Start Free Trial
+- Get [Specific Thing]
+- See [Product] in Action
+- Create Your First [Thing]
+- Download the Guide
+
+**Formula:** [Action Verb] + [What They Get] + [Qualifier if needed]
+
+Examples:
+- "Start My Free Trial"
+- "Get the Complete Checklist"
+- "See Pricing for My Team"
+
+---
+
+## Page-Specific Guidance
 
 ### Homepage
-- Serve multiple audience segments; use broad but specific language
-- Lead with the primary value proposition
-- Include navigation paths to deeper content
-- Social proof from recognizable brands or impressive metrics
+- Serve multiple audiences without being generic
+- Lead with broadest value proposition
+- Provide clear paths for different visitor intents
 
 ### Landing Page
-- Single focus, single CTA — remove navigation distractions
-- Match headline to the ad or link that brought visitors
-- Longer pages convert better for high-consideration purchases
-- Use testimonials from the specific audience segment being targeted
+- Single message, single CTA
+- Match headline to ad/traffic source
+- Complete argument on one page
 
 ### Pricing Page
-- Lead with value before showing numbers
-- Anchor to the most popular or recommended plan
-- Use feature comparison tables for clarity
-- Address "Why should I pay?" before "How much?"
+- Help visitors choose the right plan
+- Address "which is right for me?" anxiety
+- Make recommended plan obvious
 
 ### Feature Page
-- Lead with the problem this feature solves
-- Show the feature in context (screenshots, workflows)
-- Connect to outcomes: "This means you can..."
-- Include a use case or mini case study
+- Connect feature → benefit → outcome
+- Show use cases and examples
+- Clear path to try or buy
 
-## Quality Checklist
+### About Page
+- Tell the story of why you exist
+- Connect mission to customer benefit
+- Still include a CTA
 
-Before publishing, verify:
+---
 
-- [ ] No jargon or buzzwords without explanation
-- [ ] No passive voice in key sections (headlines, CTAs, benefit statements)
-- [ ] No exclamation points (they weaken copy)
-- [ ] No unsubstantiated claims ("best," "leading," "#1" without proof)
-- [ ] Every feature tied to a customer outcome
-- [ ] CTA text describes what happens next
-- [ ] Above-the-fold content works independently
-- [ ] Copy reads naturally when spoken aloud
-
-## Voice and Tone Guidelines
+## Voice and Tone
 
 Before writing, establish:
 
-- **Formality level** — casual, professional, technical
-- **Personality** — friendly, authoritative, playful, minimal
-- **Audience relationship** — peer, expert, guide, partner
-- **Emotional register** — empathetic, confident, urgent, calm
+**Formality level:**
+- Casual/conversational
+- Professional but friendly
+- Formal/enterprise
 
-Maintain consistency across all page sections. When in doubt, choose clear and direct over clever and creative.
+**Brand personality:**
+- Playful or serious?
+- Bold or understated?
+- Technical or accessible?
+
+Maintain consistency, but adjust intensity:
+- Headlines can be bolder
+- Body copy should be clearer
+- CTAs should be action-oriented
 
 ---
 
-*Sourced from [coreyhaines31/marketingskills](https://github.com/coreyhaines31/marketingskills) (MIT License)*
+## Output Format
+
+When writing copy, provide:
+
+### Page Copy
+Organized by section:
+- Headline, Subheadline, CTA
+- Section headers and body copy
+- Secondary CTAs
+
+### Annotations
+For key elements, explain:
+- Why you made this choice
+- What principle it applies
+
+### Alternatives
+For headlines and CTAs, provide 2-3 options:
+- Option A: [copy] — [rationale]
+- Option B: [copy] — [rationale]
+
+### Meta Content (if relevant)
+- Page title (for SEO)
+- Meta description
+
+---
+
+## Related Skills
+
+- **copy-editing**: For polishing existing copy (use after your draft)
+- **page-cro**: If page structure/strategy needs work, not just copy
+- **email-sequence**: For email copywriting
+- **popup-cro**: For popup and modal copy
+- **ab-test-setup**: To test copy variations
