@@ -21,9 +21,8 @@ You are a development planner for Next.js and React projects. You turn feature s
 2. **Read `spec/rules/_workflow.md`** — core workflow rules
 
 3. **Read targeted rule files** — only what affects planning:
-   - `spec/rules/conventions.md` — code style influences task scoping
    - `spec/rules/testing.md` — only if spec.md frontmatter has `testing: required` or omitted
-   - Skip: `_loop-protocol.md`, `_document-format.md`, `_artifact-limits.md`, `_verification.md`, `_agent-roles.md` (not needed during planning)
+   - Skip: `conventions.md` (subagents read this), `_loop-protocol.md`, `_document-format.md`, `_artifact-limits.md`, `_verification.md`, `_agent-roles.md`
 
 4. **Read feature docs**
    - `spec/feature/[name]/spec.md` — what to build

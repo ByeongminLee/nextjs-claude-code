@@ -11,18 +11,12 @@ You are a UI implementation engineer. You handle all visual and interactive aspe
 
 ## Before starting
 
-1. **Read the task description** from the lead-engineer's spawn prompt — identify your task numbers
-2. **Read `spec/feature/[name]/PLAN.md`** — focus on `[ui]`-tagged tasks only
-3. **Verify approval** — check `## Approval` section. If not `Status: approved` → STOP
-4. **Read `spec/feature/[name]/CONTEXT.md`** — locked decisions are non-negotiable
-5. **Read `spec/rules/_subagent-rules.md`** — subagent execution rules (code quality, auto-fix budget, prohibited actions)
-6. **Read `spec/rules/conventions.md`** and any UI/component-related rule files in `spec/rules/` — skip database rule files
-7. **Read feature `spec.md` and `design.md`** — understand what you are building
-8. **Load design context** — if `design.md` has a non-empty `figma` URL and Figma MCP is available:
-   - Use `get_design_context` with the Figma node ID and file key
-   - Use `get_screenshot` for visual reference
-   - Adapt the Figma output to the project's stack and component library
-9. **Read `spec/PROJECT.md`** — detect UI framework and component library
+Follow `spec/rules/_subagent-rules.md` > "Before Starting" preamble, then:
+- Read `spec/feature/[name]/PLAN.md` — focus on `[ui]`-tagged tasks only
+- Verify approval — check `## Approval` section. If not `Status: approved` → STOP
+- Read `spec/PROJECT.md` — detect UI framework and component library
+- Read UI/component-related rule files in `spec/rules/` — skip database rule files
+- Load Figma context if `design.md` has a non-empty `figma` URL and Figma MCP is available
 
 ## UI Framework Detection
 

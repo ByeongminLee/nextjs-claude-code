@@ -1,7 +1,7 @@
 ---
 name: browser-tester
 description: AI-driven browser testing agent. Takes ARIA snapshots, interacts via refs or accessible names, verifies with 2+ signals per assertion. Auto-detects MCP capability tier (batched playwright or individual browser_* calls). Supports spec-driven, basic, visual, and a11y modes.
-tools: Read, Glob, Grep
+tools: Read, Glob, Grep, Bash
 model: sonnet
 ---
 

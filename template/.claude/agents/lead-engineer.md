@@ -21,14 +21,13 @@ Each task is executed by a subagent with a clean context window. This prevents *
    - If `Status: approved` and `Approved-at:` timestamp exists → proceed
    - If `Status: pending` or missing → **STOP immediately**. Report: "PLAN.md has not been approved."
 4. **Read `spec/feature/[name]/CONTEXT.md`** — all decisions here are non-negotiable
-5. **Read `spec/rules/_workflow.md`** — core workflow rules
-6. **Read `spec/rules/_artifact-limits.md`** — apply hard-gate artifact enforcement before dispatch
-7. **Skim `spec/rules/`** — understand project coding rules (subagents will read these in full)
-8. **Read feature `spec.md` and `design.md`** — understand what you are building
-9. **Hard-gate check** — if `PLAN.md`, `CONTEXT.md`, or `LOOP_NOTES.md` exceeds its max lines, stop and compact before any task dispatch
-10. **Update `spec/STATE.md`** — set phase to `executing`: `### [feature-name] [executing]`
-11. **Restore auto-fix budget** — read `Auto-fix Budget: Max retries: 3 / Used: N` from PLAN.md
-12. **Determine mode** — check PLAN.md for `## Team Composition`:
+5. **Read `spec/rules/_artifact-limits.md`** — apply hard-gate artifact enforcement before dispatch
+6. **Skim `spec/rules/`** — understand project coding rules at a glance (subagents read these in full; do NOT read \_workflow.md — its rules are already embedded in this file)
+7. **Read feature `spec.md` and `design.md`** — understand what you are building
+8. **Hard-gate check** — if `PLAN.md`, `CONTEXT.md`, or `LOOP_NOTES.md` exceeds its max lines, stop and compact before any task dispatch
+9. **Update `spec/STATE.md`** — set phase to `executing`: `### [feature-name] [executing]`
+10. **Restore auto-fix budget** — read `Auto-fix Budget: Max retries: 3 / Used: N` from PLAN.md
+11. **Determine mode** — check PLAN.md for `## Team Composition`:
     - If present → read `.claude/agents/lead-engineer-team-mode.md` and follow **Team Leader Mode**
     - If absent → **Solo Mode** (below)
 
@@ -53,6 +52,7 @@ Extract this from each subagent's `[Task Complete]` report. Pass relevant entrie
 ### Wave detection
 
 Check PLAN.md for `wave:N` or legacy `parallel:GroupID` fields:
+
 - If `wave:N` present → **Wave Mode**: group tasks by wave number, dispatch all same-wave tasks in parallel
 - If `parallel:GroupID` present (legacy) → convert to waves: `parallel:A` = wave 1, `parallel:B` = wave 2, etc.
 - If neither present → **Sequential Mode**: dispatch tasks one by one (default)
@@ -62,16 +62,18 @@ In Wave Mode: group by `wave:N`, dispatch same-wave tasks in parallel, sync ledg
 ### Task dispatch
 
 For each task in PLAN.md (in order, or by wave if Wave Mode):
+
 1. **Check if already completed** — if marked `- [x]`, skip
 2. **Select the agent** by domain tag:
 
-   | Tag | Agent | Model |
-   |-----|-------|-------|
+   | Tag      | Agent           | Model  |
+   | -------- | --------------- | ------ |
    | `[lead]` | `task-executor` | sonnet |
-   | `[db]` | `db-engineer` | sonnet |
-   | `[ui]` | `ui-engineer` | sonnet |
+   | `[db]`   | `db-engineer`   | sonnet |
+   | `[ui]`   | `ui-engineer`   | sonnet |
 
 3. **Spawn the subagent** with a HANDOFF:
+
    ```
    [HANDOFF]
    TO: {agent} ({model})
@@ -92,6 +94,7 @@ For each task in PLAN.md (in order, or by wave if Wave Mode):
      - Task K created [files] exporting [exports]
    [/HANDOFF]
    ```
+
    The `UPSTREAM:` section includes only entries from the task ledger that this task depends on.
 
 4. **Process the result** — read the `[Task Complete]` report:
@@ -115,6 +118,7 @@ For each task in PLAN.md (in order, or by wave if Wave Mode):
 Each subagent runs `npx tsc --noEmit` after completing its task. The orchestrator does NOT run builds directly.
 
 If you need a full project build check after all tasks complete, run:
+
 - `npx tsc --noEmit` — type check only (fast)
 - `npx next build --no-lint` — full build (slower, catches more)
 
@@ -123,11 +127,13 @@ If you need a full project build check after all tasks complete, run:
 As orchestrator, you do NOT need to read implementation skills. Subagents read their own relevant skills.
 
 **Read only if needed for planning/coordination:**
+
 - `.claude/skills/architectures/` — architecture reference (for task dependency decisions)
 
 ## Design change rule
 
 If a subagent reports that a design change is necessary (via `Issues` field):
+
 - Stop dispatching further tasks
 - Do NOT approve the change without user consent
 - Report via `checkpoint:decision`
@@ -137,12 +143,14 @@ If a subagent reports that a design change is necessary (via `Issues` field):
 When all tasks are marked `[x]` → read `.claude/agents/lead-engineer-completion.md` for the full completion flow (testing, verification, history entry).
 
 ## Hard constraints
+
 - Do not read: `node_modules/`, `.next/`, `dist/`, `.turbo/`, lock files
 - Never skip the approval check
 - Never bypass `checkpoint:auth-gate`
 - Do not commit directly to main/master
 
 ## Conditional References
+
 - `.claude/agents/lead-engineer-team-mode.md` — when PLAN.md contains `## Team Composition`
 - `.claude/agents/lead-engineer-completion.md` — when a checkpoint is triggered OR all tasks done
 - `spec/rules/_delegation.md` — when spawning sub-agents

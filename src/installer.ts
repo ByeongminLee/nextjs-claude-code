@@ -65,6 +65,8 @@ export async function install(options: InstallOptions): Promise<void> {
     path.join(TEMPLATE_DIR, 'spec'),
     path.join(rootDir, 'spec'),
     vars, force, dryRun,
+    [],
+    ['feature', 'learnings', 'create', 'reforge'],
   );
 
   // ── Claude Code agent files ─────────────────────────────────────────────
@@ -138,6 +140,7 @@ async function copyDir(
   force: boolean,
   dryRun: boolean,
   skip: string[] = [],
+  forceSkip: string[] = [],
 ): Promise<number> {
   if (!fs.existsSync(srcDir)) return 0;
   const entries = fs.readdirSync(srcDir, { withFileTypes: true });
@@ -145,10 +148,15 @@ async function copyDir(
 
   for (const entry of entries) {
     if (skip.includes(entry.name)) continue;
+    // Protect user data directories — never overwrite even with --force
+    if (force && forceSkip.includes(entry.name)) {
+      const destSubDir = path.join(destDir, entry.name);
+      if (fs.existsSync(destSubDir)) continue;
+    }
     const srcPath = path.join(srcDir, entry.name);
 
     if (entry.isDirectory()) {
-      count += await copyDir(srcPath, path.join(destDir, entry.name), vars, force, dryRun);
+      count += await copyDir(srcPath, path.join(destDir, entry.name), vars, force, dryRun, [], forceSkip);
       continue;
     }
 

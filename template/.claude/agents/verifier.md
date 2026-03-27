@@ -119,17 +119,14 @@ Verify integration across the system:
 **When to run:** Level 1-3 all pass AND `package.json` has a `dev` script.
 **When to skip:** `design.md` has `figma: "N/A"` AND spec.md has no UI-related REQs (pure backend/API feature).
 
-1. Start the dev server in background:
+1. Check if a dev server is already running:
    ```bash
-   npm run dev &
-   DEV_PID=$!
-   for i in $(seq 1 30); do
-     curl -s http://localhost:3000 > /dev/null && break
-     curl -s http://localhost:3001 > /dev/null && break
-     curl -s http://localhost:5173 > /dev/null && break
-     sleep 1
-   done
+   curl -s -o /dev/null -w "%{http_code}" http://localhost:3000 2>/dev/null | grep -q 200 && echo "http://localhost:3000" && exit 0
+   curl -s -o /dev/null -w "%{http_code}" http://localhost:3001 2>/dev/null | grep -q 200 && echo "http://localhost:3001" && exit 0
+   curl -s -o /dev/null -w "%{http_code}" http://localhost:5173 2>/dev/null | grep -q 200 && echo "http://localhost:5173" && exit 0
+   echo "NOT_RUNNING"
    ```
+   If not running → ask the user: "Dev server is not running. Please start it (`npm run dev`) and confirm." **Wait for user response before proceeding.**
    Record the BASE_URL that responded.
 
 2. Determine verification depth:
@@ -165,11 +162,6 @@ Verify integration across the system:
    - `AGENT_ERROR` only → Level 3b INCONCLUSIVE (retry recommended)
    - `APP_BUG` / `SELECTOR_DRIFT` / `ENV_ISSUE` → Level 3b failed
    - Warnings only (non-critical console warnings) → Level 3b passed (advisory)
-
-5. Stop the dev server:
-   ```bash
-   kill $DEV_PID 2>/dev/null
-   ```
 
 ```
 ✓ Level 3b passed — browser verification clean (N REQs tested, 0 errors)

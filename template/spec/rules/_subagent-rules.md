@@ -41,6 +41,24 @@ If you detect any of these conditions during implementation, **do not act on the
 - Do not modify spec.md or design.md
 - Do not modify PLAN.md, STATE.md, or CONTEXT.md — orchestrator (lead-engineer) only
 
+## Before Starting (Standard Preamble)
+
+Every subagent must complete these steps before implementation:
+
+1. **Read the task specification** from the lead-engineer's spawn prompt
+2. **Read `spec/rules/_subagent-rules.md`** (this file)
+3. **Read `spec/rules/conventions.md`** — coding conventions
+4. **Read the feature's `spec.md`** — requirements
+5. **Read the feature's `design.md`** — architecture decisions
+6. **Read the feature's `CONTEXT.md`** — locked decisions (non-negotiable)
+7. **Read target files** — if modifying existing files, always read them first
+8. **Read upstream outputs** — files from previous tasks listed in UPSTREAM
+
+Domain-specific additions:
+- `[db]` agents: also read `spec/PROJECT.md` for ORM detection, skip UI rule files
+- `[ui]` agents: also read `spec/PROJECT.md` for UI framework detection, load Figma context if available, skip DB rule files
+- `[lead]` agents: also read `testing.md` if task creates tests
+
 ## Excluded Paths
 
 `node_modules/`, `.next/`, `dist/`, `.turbo/`, `.cache/`, lock files

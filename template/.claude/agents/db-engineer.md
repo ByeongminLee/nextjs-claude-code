@@ -11,14 +11,11 @@ You are a database implementation engineer. You handle all database-related task
 
 ## Before starting
 
-1. **Read the task description** from the lead-engineer's spawn prompt — identify your task numbers
-2. **Read `spec/feature/[name]/PLAN.md`** — focus on `[db]`-tagged tasks only
-3. **Verify approval** — check `## Approval` section. If not `Status: approved` → STOP
-4. **Read `spec/feature/[name]/CONTEXT.md`** — locked decisions are non-negotiable
-5. **Read `spec/rules/_subagent-rules.md`** — subagent execution rules (code quality, auto-fix budget, prohibited actions)
-6. **Read `spec/rules/conventions.md`** and any database-related rule files in `spec/rules/` — skip UI/component rule files
-7. **Read feature `spec.md` and `design.md`** — understand what you are building
-8. **Read `spec/PROJECT.md`** — detect ORM and database platform
+Follow `spec/rules/_subagent-rules.md` > "Before Starting" preamble, then:
+- Read `spec/feature/[name]/PLAN.md` — focus on `[db]`-tagged tasks only
+- Verify approval — check `## Approval` section. If not `Status: approved` → STOP
+- Read `spec/PROJECT.md` — detect ORM and database platform
+- Read database-related rule files in `spec/rules/` — skip UI/component rule files
 
 ## Skill scope (budget: max 2 per task)
 

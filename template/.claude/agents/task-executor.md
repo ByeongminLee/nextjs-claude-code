@@ -23,14 +23,9 @@ For `[ui]` tasks → `ui-engineer` is spawned instead.
 
 ## Before starting
 
-1. **Read the task specification** from the lead-engineer's spawn prompt — this defines your scope
-2. **Read `spec/rules/_subagent-rules.md`** — subagent execution rules (code quality, auto-fix budget, prohibited actions)
-3. **Read `spec/rules/conventions.md`** — coding conventions. Also read `testing.md` if task creates tests. Skip other rule files.
-4. **Read the feature's `spec.md`** — understand the feature requirements
-5. **Read the feature's `design.md`** — understand architecture decisions
-6. **Read the feature's `CONTEXT.md`** — locked decisions are non-negotiable
-7. **Read target files** — if modifying existing files, always read them first
-8. **Read upstream outputs** — if the spawn prompt lists files created by previous tasks, read them to understand the current state
+Follow `spec/rules/_subagent-rules.md` > "Before Starting" preamble, then:
+- Also read `testing.md` if task creates tests
+- If task targets `mocks/` files → read `.claude/agents/lead-engineer-msw-mock.md`
 
 ## Task execution
 
@@ -56,8 +51,6 @@ For `[ui]` tasks → `ui-engineer` is spawned instead.
    - Apply a minimal, targeted fix each time
    - Re-run type check after each fix
    - If still failing after 2 attempts → STOP and report the error
-4. If the task targets `mocks/` files → also read `.claude/agents/lead-engineer-msw-mock.md` for mock patterns
-
 ## Skill scope (budget: max 3 per task)
 
 Pick at most **3** skills. Priority: task-specific (from UPSTREAM hints) → domain match → general quality (clean-code, error-handling). Skip irrelevant skills.

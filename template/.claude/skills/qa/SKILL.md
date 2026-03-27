@@ -59,21 +59,22 @@ Run /spec [name] first to create a feature spec, or use /qa --e2e to run existin
 
 ### 3. Verify dev server
 
+Check if a dev server is already running on common ports:
+
 ```bash
-# Check common ports
-curl -s -o /dev/null -w "%{http_code}" http://localhost:3000 || \
-curl -s -o /dev/null -w "%{http_code}" http://localhost:3001 || \
-curl -s -o /dev/null -w "%{http_code}" http://localhost:5173 || \
-echo "DEV_SERVER_NOT_RUNNING"
+curl -s -o /dev/null -w "%{http_code}" http://localhost:3000 2>/dev/null | grep -q 200 && echo "http://localhost:3000" && exit 0
+curl -s -o /dev/null -w "%{http_code}" http://localhost:3001 2>/dev/null | grep -q 200 && echo "http://localhost:3001" && exit 0
+curl -s -o /dev/null -w "%{http_code}" http://localhost:5173 2>/dev/null | grep -q 200 && echo "http://localhost:5173" && exit 0
+echo "NOT_RUNNING"
 ```
 
-If not running:
-```bash
-npm run dev &
-DEV_PID=$!
-# Wait for server ready
-for i in $(seq 1 30); do curl -s http://localhost:3000 > /dev/null && break; sleep 1; done
+If not running → ask the user:
 ```
+Dev server is not running. Please start it in a separate terminal:
+  npm run dev
+Then re-run /qa.
+```
+→ **STOP** — do not start the dev server automatically. Background processes are unreliable and leave orphan servers.
 
 Record the BASE_URL that responded (e.g., `http://localhost:3000`).
 
@@ -227,4 +228,4 @@ READS:
 - Never modify source code — only test and report
 - If Playwright is not installed, do not attempt to install without user confirmation
 - Always report actual test output, not assumptions
-- Kill the dev server if you started it (cleanup): `kill $DEV_PID 2>/dev/null`
+- Do not start dev servers automatically — ask the user to start one if not running
